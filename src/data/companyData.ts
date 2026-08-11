@@ -8,7 +8,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     iconName: 'Bot',
     shortDesc: 'Intelligent systems that automate work, analyze data, and power smart digital experiences.',
     businessValue: 'Eliminate repetitive manual tasks, provide 24/7 intelligent customer responses, and make data-driven decisions faster.',
-    technicalDescription: 'Custom AI agent architectures, RAG systems, model fine-tuning, natural language processing, and multimodal vision integrations.',
+    technicalDescription: 'Intelligent assistant architectures, retrieval-based knowledge systems, natural language workflows, automation layers, and multimodal integrations selected to fit the project.',
     whoNeedsIt: 'Businesses looking to automate client inquiries, streamline document processing, or build smart AI features directly into their products.',
     features: [
       'AI Assistants & Intelligent Chatbot Systems',
@@ -20,13 +20,13 @@ export const SERVICES_DATA: ServiceItem[] = [
       'Natural Language Analytics & Summarization'
     ],
     deliverables: [
-      'Fine-tuned AI Model Pipeline',
+      'Production-ready intelligent workflow or model integration',
       'Secure Middleware & API Layer',
       'Admin Dashboard for Performance Monitoring',
-      'Full Security & Privacy Compliance Setup'
+      'Security and privacy implementation aligned with project requirements'
     ],
     useCases: [
-      'Customer support auto-resolution up to 80%',
+      'Customer support triage and assisted response workflows',
       'Automated invoice & document reading',
       'Personalized learning/fitness feedback engines'
     ],
@@ -37,7 +37,7 @@ export const SERVICES_DATA: ServiceItem[] = [
       },
       {
         q: 'How do you ensure user privacy with AI models?',
-        a: 'We implement zero-data-retention enterprise API configurations and keep all proprietary data isolated inside private encrypted databases.'
+        a: 'We design privacy and data-handling controls around the selected infrastructure, project requirements and available platform capabilities.'
       }
     ]
   },
@@ -142,7 +142,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     faqs: [
       {
         q: 'Will my website load quickly on mobile devices?',
-        a: 'Absolutely. We build with lightweight modern frameworks and optimize every asset to score top grades on Google Core Web Vitals.'
+        a: 'Yes. We build mobile-first and optimize assets, loading behavior and page structure with Core Web Vitals and real-device performance in mind.'
       }
     ]
   },
@@ -177,7 +177,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     faqs: [
       {
         q: 'How long does custom software development take?',
-        a: 'Initial working MVPs are typically ready within 6 to 10 weeks, depending on the complexity of features and integrations.'
+        a: 'Timeline depends on scope, integrations, design depth and testing requirements. After discovery, we provide a project-specific delivery plan rather than a generic promise.'
       }
     ]
   },

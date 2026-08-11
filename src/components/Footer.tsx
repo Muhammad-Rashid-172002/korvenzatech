@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({
               <span>•</span>
               <span className="flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Enterprise Grade Security</span>
+                <span>Security-conscious engineering</span>
               </span>
             </div>
           </div>
@@ -65,24 +65,16 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigateSection('about')} className="hover:text-white transition-colors">
-                  About Us
-                </button>
+                <a href="/about" className="hover:text-white transition-colors">About Us</a>
               </li>
               <li>
-                <button onClick={() => onNavigateSection('work')} className="hover:text-white transition-colors">
-                  Featured Work
-                </button>
+                <a href="/work" className="hover:text-white transition-colors">Featured Work</a>
               </li>
               <li>
-                <button onClick={onOpenCareers} className="hover:text-white transition-colors">
-                  Careers & Roles
-                </button>
+                <a href="/careers" className="hover:text-white transition-colors">Careers & Roles</a>
               </li>
               <li>
-                <button onClick={onOpenContact} className="hover:text-white transition-colors">
-                  Contact Us
-                </button>
+                <a href="/contact" className="hover:text-white transition-colors">Contact Us</a>
               </li>
             </ul>
           </div>
@@ -95,9 +87,7 @@ export const Footer: React.FC<FooterProps> = ({
             <ul className="space-y-2">
               {SERVICES_DATA.slice(0, 5).map((srv) => (
                 <li key={srv.id}>
-                  <button onClick={() => onSelectService(srv)} className="hover:text-white transition-colors">
-                    {srv.title}
-                  </button>
+                  <a href={`/services/${srv.id}`} className="hover:text-white transition-colors">{srv.title}</a>
                 </li>
               ))}
             </ul>
@@ -110,9 +100,7 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2">
               <li>
-                <button onClick={() => onNavigateSection('insights')} className="hover:text-white transition-colors">
-                  Insights & Articles
-                </button>
+                <a href="/insights" className="hover:text-white transition-colors">Insights & Articles</a>
               </li>
               <li>
                 <button onClick={() => onNavigateSection('faq')} className="hover:text-white transition-colors">
@@ -145,12 +133,7 @@ export const Footer: React.FC<FooterProps> = ({
             © {new Date().getFullYear()} KorvenzaTech. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-indigo-400 transition-colors">LinkedIn</a>
-            <a href="#" className="hover:text-indigo-400 transition-colors">GitHub</a>
-            <a href="#" className="hover:text-indigo-400 transition-colors">X (Twitter)</a>
-            <a href="#" className="hover:text-indigo-400 transition-colors">YouTube</a>
-          </div>
+          <div className="flex items-center gap-6"><a href="https://korvenzatech.com" className="hover:text-indigo-400 transition-colors">korvenzatech.com</a></div>
         </div>
 
       </div>

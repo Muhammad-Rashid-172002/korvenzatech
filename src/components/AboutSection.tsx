@@ -62,6 +62,22 @@ export const AboutSection: React.FC = () => {
           </div>
         </div>
 
+        <div className="mt-16 grid gap-6 lg:grid-cols-[.78fr_1.22fr] items-stretch">
+          <div className="premium-card p-8 flex flex-col justify-between">
+            <div>
+              <div className="text-[11px] uppercase tracking-[.18em] font-bold text-violet-300">Leadership</div>
+              <h3 className="mt-4 text-3xl font-extrabold tracking-tight text-white">Muhammad Rashid</h3>
+              <p className="mt-2 text-sm font-semibold text-violet-300">Founder & Chief Executive Officer</p>
+            </div>
+            <div className="mt-8 h-px bg-gradient-to-r from-violet-400/30 to-transparent" />
+          </div>
+          <div className="premium-card p-8 sm:p-10">
+            <h3 className="text-2xl font-bold text-white">Engineering leadership with a product-first mindset.</h3>
+            <p className="mt-5 text-sm sm:text-base leading-8 text-slate-400">Muhammad Rashid leads KorvenzaTech's technology vision, product direction, client solutions and long-term growth. His public professional company profile focuses on software engineering, mobile application development, intelligent applications, backend systems, API integrations and modern digital product development.</p>
+            <p className="mt-4 text-sm leading-7 text-slate-500">KorvenzaTech keeps private personal information and education details outside the public company profile unless formally published.</p>
+          </div>
+        </div>
+
       </div>
     </section>
   );

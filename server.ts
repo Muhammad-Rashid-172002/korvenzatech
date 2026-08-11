@@ -118,8 +118,12 @@ async function start() {
         }
       },
     }));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get('*', (req, res) => {
+      const cleanPath = req.path.replace(/^\/+|\/+$/g, '');
+      const routeIndex = cleanPath ? path.join(distPath, cleanPath, 'index.html') : path.join(distPath, 'index.html');
+      res.sendFile(routeIndex, (error) => {
+        if (error) res.sendFile(path.join(distPath, 'index.html'));
+      });
     });
   }
 

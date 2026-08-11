@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Sparkles, Layers, Shield, ChevronRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
 import { HeroVisual } from './HeroVisual';
 
 interface HeroProps {
@@ -8,95 +8,75 @@ interface HeroProps {
   onOpenSolutionWizard: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({
-  onStartProject,
-  onExploreWork,
-  onOpenSolutionWizard,
-}) => {
-  return (
-    <section id="hero" className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-radial-gradient">
-      {/* Background Subtle Grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" />
+const capabilities = ['Custom Software', 'SaaS', 'Mobile Apps', 'AI Solutions', 'Web Platforms', 'APIs & Cloud'];
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 text-left space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            
-            {/* Top Positioning Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Technology Built Around Your Business</span>
+export const Hero: React.FC<HeroProps> = ({ onStartProject, onExploreWork, onOpenSolutionWizard }) => {
+  return (
+    <section id="hero" className="kz-hero relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
+      <div className="kz-hero-orb kz-hero-orb-a" />
+      <div className="kz-hero-orb kz-hero-orb-b" />
+      <div className="absolute inset-0 kz-fine-grid pointer-events-none" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-7">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.06] px-3.5 py-1.5 text-[11px] font-bold tracking-[.08em] text-emerald-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              SOFTWARE DEVELOPMENT COMPANY • GLOBAL DELIVERY
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-              We Build{' '}
-              <span className="gradient-text-cyan">
-                Technology
-              </span>{' '}
-              That Moves Businesses Forward.
+            <h1 className="mt-7 max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-5xl lg:text-[68px]">
+              We build smart, scalable software that helps businesses <span className="kz-gradient-word">move faster.</span>
             </h1>
 
-            {/* Supporting Description */}
-            <p className="text-lg sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl">
-              From <strong className="text-white font-semibold">AI systems</strong> and <strong className="text-white font-semibold">custom software</strong> to <strong className="text-white font-semibold">mobile apps</strong>, websites, APIs, cloud infrastructure and digital growth — KorvenzaTech turns ambitious ideas into reliable, scalable technology.
+            <p className="mt-7 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+              KorvenzaTech designs and develops modern software, SaaS platforms, mobile applications, AI-enabled systems, websites and secure APIs for startups and growing companies. We turn complex technology into clear business outcomes.
             </p>
 
-            {/* Call to Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              {/* Primary CTA */}
-              <button
-                onClick={onStartProject}
-                className="group px-7 py-4 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-sm shadow-xl shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2.5"
-              >
-                <span>Start Your Project</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button onClick={onStartProject} className="kz-primary-cta group">
+                Start a Project
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
-
-              {/* Secondary CTA */}
-              <button
-                onClick={onExploreWork}
-                className="px-6 py-4 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
-              >
-                <span>Explore Our Work</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
+              <button onClick={onExploreWork} className="kz-secondary-cta group">
+                View Our Work
+                <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-0.5" />
               </button>
-
-              {/* Solution Wizard CTA */}
-              <button
-                onClick={onOpenSolutionWizard}
-                className="px-5 py-4 text-xs font-medium text-indigo-400 hover:text-indigo-300 underline decoration-indigo-400/40 underline-offset-4 transition-colors flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Not sure what you need? Use Interactive Solution Builder &rarr;</span>
+              <button onClick={onOpenSolutionWizard} className="kz-text-link">
+                Not sure what you need? Get guidance →
               </button>
             </div>
 
-            {/* Credibility Line */}
-            <div className="pt-6 border-t border-slate-800 flex flex-wrap items-center gap-3 text-xs text-slate-400 font-medium">
-              <span className="text-slate-300 font-semibold uppercase tracking-wider text-[11px]">Core Capabilities:</span>
-              <div className="flex flex-wrap items-center gap-2 text-slate-300">
-                <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60">AI Solutions</span>
-                <span className="text-slate-600">•</span>
-                <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60">Custom Software</span>
-                <span className="text-slate-600">•</span>
-                <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60">Mobile Apps</span>
-                <span className="text-slate-600">•</span>
-                <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60">APIs & Cloud</span>
-                <span className="text-slate-600">•</span>
-                <span className="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700/60">Digital Growth</span>
-              </div>
+            <div className="mt-9 grid max-w-2xl gap-3 sm:grid-cols-3">
+              {[
+                ['Business-first', 'Clear scope before code'],
+                ['Built to scale', 'Architecture that can grow'],
+                ['Transparent', 'Visible milestones & updates'],
+              ].map(([title, copy]) => (
+                <div key={title} className="kz-proof-item">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                  <div>
+                    <div className="text-xs font-bold text-slate-100">{title}</div>
+                    <div className="mt-1 text-[10px] leading-4 text-slate-500">{copy}</div>
+                  </div>
+                </div>
+              ))}
             </div>
 
+            <div className="mt-8 flex max-w-3xl flex-wrap gap-2 border-t border-white/[0.07] pt-6">
+              {capabilities.map((item) => (
+                <span key={item} className="kz-capability-pill">{item}</span>
+              ))}
+            </div>
           </div>
 
-          {/* Right Hero Visual Column */}
-          <div className="lg:col-span-5 flex items-center justify-center">
-            <HeroVisual />
+          <div className="lg:col-span-5">
+            <div className="kz-hero-visual-wrap">
+              <div className="kz-visual-label top-5 left-5">PRODUCT ENGINEERING</div>
+              <div className="kz-visual-label right-5 bottom-5">DESIGN • BUILD • SCALE</div>
+              <HeroVisual />
+            </div>
           </div>
-
         </div>
       </div>
     </section>

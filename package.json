@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-seo-pages.mjs",
     "start": "tsx server.ts",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "check": "npm run lint && npm run build"
+    "check": "npm run lint && npm run build",
+    "seo:generate": "node scripts/generate-seo-pages.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.1.14",

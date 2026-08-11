@@ -30,7 +30,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 text-xs font-semibold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>End-to-End Capabilities</span>
           </div>
@@ -52,7 +52,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 activeCategory === cat
-                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
                   : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700/60'
               }`}
             >
@@ -70,15 +70,15 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
               <div
                 key={service.id}
                 onClick={() => onSelectService(service)}
-                className="group cursor-pointer rounded-2xl glass-panel p-7 glass-panel-hover flex flex-col justify-between relative overflow-hidden border border-white/10 hover:border-blue-500/40"
+                className="group cursor-pointer rounded-2xl glass-panel p-7 glass-panel-hover flex flex-col justify-between relative overflow-hidden border border-white/10 hover:border-emerald-400/30"
               >
                 {/* Subtle Glow Accent Line on Top Hover */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-violet-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 <div className="space-y-5">
                   {/* Icon & Category Badge */}
                   <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-violet-400 group-hover:bg-blue-600/20 group-hover:text-violet-300 group-hover:scale-110 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-400/15 flex items-center justify-center text-emerald-300 group-hover:bg-emerald-500/15 group-hover:text-emerald-200 group-hover:scale-110 transition-all duration-300">
                       <IconComponent className="w-6 h-6" />
                     </div>
                     <span className="text-[10px] font-mono font-semibold px-2.5 py-1 rounded-full bg-white/5 text-slate-400 border border-white/5">
@@ -87,13 +87,13 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
+                  <h3 className="text-xl font-bold text-white group-hover:text-emerald-200 transition-colors">
                     {service.title}
                   </h3>
 
                   {/* Plain-English Business Value */}
                   <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/5 space-y-1">
-                    <span className="text-[10px] font-semibold tracking-wider text-violet-400 uppercase block">
+                    <span className="text-[10px] font-semibold tracking-wider text-emerald-300 uppercase block">
                       Business Value:
                     </span>
                     <p className="text-xs text-slate-300 font-medium leading-relaxed">
@@ -105,7 +105,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
                   <ul className="space-y-2 pt-1">
                     {service.features.slice(0, 3).map((feat, fIdx) => (
                       <li key={fIdx} className="text-xs text-slate-400 flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -113,7 +113,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
                 </div>
 
                 {/* Bottom Card Footer Action */}
-                <div className="pt-6 mt-6 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-blue-400 group-hover:text-violet-300">
+                <div className="pt-6 mt-6 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-emerald-300 group-hover:text-emerald-200">
                   <span>Explore Capabilities & Specs</span>
                   <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                     <ArrowRight className="w-4 h-4" />
@@ -125,7 +125,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
         </div>
 
         {/* Bottom CTA Box */}
-        <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-blue-950/40 via-[#0a101d] to-[#080b12] border border-blue-500/20 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-emerald-950/20 via-[#0b1112] to-[#080b0d] border border-emerald-400/15 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-left">
             <h4 className="text-xl font-bold text-white">
               Need a custom package or technical advice on your architecture?
@@ -136,7 +136,7 @@ export const ServicesOverview: React.FC<ServicesOverviewProps> = ({ onSelectServ
           </div>
           <button
             onClick={onStartProject}
-            className="shrink-0 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
+            className="shrink-0 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2"
           >
             <span>Request Technical Proposal</span>
             <ChevronRight className="w-4 h-4" />

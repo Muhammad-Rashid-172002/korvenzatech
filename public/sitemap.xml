@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://korvenzatech.com/</loc></url>
-  <url><loc>https://korvenzatech.com/services</loc></url>
-  <url><loc>https://korvenzatech.com/work</loc></url>
-  <url><loc>https://korvenzatech.com/industries</loc></url>
-  <url><loc>https://korvenzatech.com/about</loc></url>
-  <url><loc>https://korvenzatech.com/insights</loc></url>
-  <url><loc>https://korvenzatech.com/careers</loc></url>
-  <url><loc>https://korvenzatech.com/contact</loc></url>
-  <url><loc>https://korvenzatech.com/start-project</loc></url>
+  <url><loc>https://korvenzatech.com/</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://korvenzatech.com/services</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/work</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/industries</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/about</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/insights</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/careers</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/contact</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/start-project</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://korvenzatech.com/services/ai-solutions</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/api-development</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/mobile-app-development</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/web-development</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/custom-software</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/saas-development</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/cloud-solutions</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/ui-ux-design</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://korvenzatech.com/services/digital-marketing</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
 </urlset>

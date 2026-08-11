@@ -654,8 +654,9 @@ export function KorvenzaAIChat() {
 
                 <p className="mt-3 max-w-sm text-sm leading-6 text-slate-400">
                   Explain your idea naturally. I can help with AI, apps, APIs,
-                  websites, software, digital strategy and general business
-                  questions — in the language you use.
+                  websites, SaaS, APIs, software and KorvenzaTech services —
+                  in the language you use. For unrelated topics, I’ll keep the
+                  conversation focused on how KorvenzaTech can help.
                 </p>
 
                 <div className="mt-6 grid gap-2">
