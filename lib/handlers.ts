@@ -1,10 +1,9 @@
-import { buildAssistantInstruction } from './assistantKnowledge';
+import { buildAssistantInstruction } from './assistantKnowledge.js';
 import {
   generateIntelligence,
   isIntelligenceConfigured,
   parseJsonResponse,
-} from './intelligence';
-
+} from './intelligence.js';
 
 export type ApiResult = {
   status: number;
@@ -17,8 +16,9 @@ const fallbackSuggestions = [
   'Show me another option',
 ];
 
-function sanitizeSuggestionList(value: unknown) {
+function sanitizeSuggestionList(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
+
   return value
     .filter((item) => typeof item === 'string' && item.trim())
     .slice(0, 3)
@@ -26,17 +26,32 @@ function sanitizeSuggestionList(value: unknown) {
 }
 
 export async function handleChat(body: any): Promise<ApiResult> {
-  const message = typeof body?.message === 'string' ? body.message.trim() : '';
-  const history = Array.isArray(body?.history) ? body.history : [];
-  const memory = typeof body?.memory === 'string' ? body.memory.slice(0, 5000) : '';
+  const message =
+    typeof body?.message === 'string' ? body.message.trim() : '';
+
+  const history =
+    Array.isArray(body?.history) ? body.history : [];
+
+  const memory =
+    typeof body?.memory === 'string'
+      ? body.memory.slice(0, 5000)
+      : '';
 
   if (!message) {
-    return { status: 400, body: { error: 'Please enter a message.' } };
+    return {
+      status: 400,
+      body: {
+        error: 'Please enter a message.',
+      },
+    };
   }
+
   if (message.length > 4000) {
     return {
       status: 400,
-      body: { error: 'Please keep each message under 4,000 characters.' },
+      body: {
+        error: 'Please keep each message under 4,000 characters.',
+      },
     };
   }
 
@@ -59,13 +74,27 @@ export async function handleChat(body: any): Promise<ApiResult> {
     )
     .slice(-28)
     .map((item: any) => ({
-      role: item.role === 'assistant' ? 'model' as const : 'user' as const,
-      parts: [{ text: item.text.slice(0, 4000) }],
+      role:
+        item.role === 'assistant'
+          ? ('model' as const)
+          : ('user' as const),
+      parts: [
+        {
+          text: item.text.slice(0, 4000),
+        },
+      ],
     }));
 
   const contents = [
     ...cleanHistory,
-    { role: 'user' as const, parts: [{ text: message }] },
+    {
+      role: 'user' as const,
+      parts: [
+        {
+          text: message,
+        },
+      ],
+    },
   ];
 
   const raw = await generateIntelligence({
@@ -80,30 +109,45 @@ export async function handleChat(body: any): Promise<ApiResult> {
 
   if (!parsed || typeof parsed !== 'object') {
     parsed = {
-      reply: raw || 'I’m here. What would you like help with?',
+      reply:
+        raw || 'I’m here. What would you like help with?',
       suggestions: fallbackSuggestions,
       memory,
     };
   }
 
-  // Defensive normalization in case a model embeds the requested object in `reply`.
+  // If model accidentally returns another JSON object inside reply,
+  // normalize it safely.
   if (typeof parsed.reply === 'string') {
-    const nested = parseJsonResponse<any>(parsed.reply.trim(), null);
-    if (nested && typeof nested === 'object' && typeof nested.reply === 'string') {
+    const nested = parseJsonResponse<any>(
+      parsed.reply.trim(),
+      null,
+    );
+
+    if (
+      nested &&
+      typeof nested === 'object' &&
+      typeof nested.reply === 'string'
+    ) {
       parsed = {
         reply: nested.reply,
-        suggestions: nested.suggestions ?? parsed.suggestions,
-        memory: nested.memory ?? parsed.memory,
+        suggestions:
+          nested.suggestions ?? parsed.suggestions,
+        memory:
+          nested.memory ?? parsed.memory,
       };
     }
   }
 
   const reply =
-    typeof parsed.reply === 'string' && parsed.reply.trim()
+    typeof parsed.reply === 'string' &&
+    parsed.reply.trim()
       ? parsed.reply.trim().slice(0, 14000)
       : 'I’m here. What would you like help with?';
 
-  const suggestions = sanitizeSuggestionList(parsed.suggestions);
+  const suggestions =
+    sanitizeSuggestionList(parsed.suggestions);
+
   const updatedMemory =
     typeof parsed.memory === 'string'
       ? parsed.memory.trim().slice(0, 5000)
@@ -115,20 +159,28 @@ export async function handleChat(body: any): Promise<ApiResult> {
       configured: true,
       reply,
       suggestions:
-        suggestions.length === 3 ? suggestions : fallbackSuggestions,
+        suggestions.length === 3
+          ? suggestions
+          : fallbackSuggestions,
       memory: updatedMemory,
     },
   };
 }
 
-export async function handleScope(body: any): Promise<ApiResult> {
-  const idea = typeof body?.idea === 'string' ? body.idea.trim() : '';
+export async function handleScope(
+  body: any,
+): Promise<ApiResult> {
+  const idea =
+    typeof body?.idea === 'string'
+      ? body.idea.trim()
+      : '';
 
   if (idea.length < 5) {
     return {
       status: 400,
       body: {
-        error: 'Please provide a brief description of your business idea or goal.',
+        error:
+          'Please provide a brief description of your business idea or goal.',
       },
     };
   }
@@ -137,16 +189,19 @@ export async function handleScope(body: any): Promise<ApiResult> {
     return {
       status: 503,
       body: {
-        error: 'The intelligent scope engine is not configured on this deployment yet.',
+        error:
+          'The intelligent scope engine is not configured on this deployment yet.',
       },
     };
   }
 
   const prompt = `You are KorvenzaTech's lead solutions architect.
+
 Analyze this client idea:
 "${idea.slice(0, 6000)}"
 
-Return raw JSON only with:
+Return raw JSON only with this structure:
+
 {
   "recommendedService": "Primary service title",
   "suggestedStack": ["4 or 5 provider-neutral technologies"],
@@ -162,18 +217,31 @@ Rules:
 - Prefer provider-neutral terms such as language model, multimodal intelligence, cloud platform, or managed database when a vendor name is not necessary.`;
 
   const raw = await generateIntelligence({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            text: prompt,
+          },
+        ],
+      },
+    ],
     responseMimeType: 'application/json',
     temperature: 0.4,
     maxOutputTokens: 1200,
   });
 
-  const parsed = parseJsonResponse<any>(raw, null);
+  const parsed =
+    parseJsonResponse<any>(raw, null);
 
   if (!parsed || typeof parsed !== 'object') {
     return {
       status: 502,
-      body: { error: 'The scope engine could not format the analysis. Please try again.' },
+      body: {
+        error:
+          'The scope engine could not format the analysis. Please try again.',
+      },
     };
   }
 
@@ -184,20 +252,41 @@ Rules:
         typeof parsed.recommendedService === 'string'
           ? parsed.recommendedService.slice(0, 140)
           : 'Custom Digital Product',
-      suggestedStack: Array.isArray(parsed.suggestedStack)
-        ? parsed.suggestedStack.filter((x: any) => typeof x === 'string').slice(0, 5)
-        : [],
+
+      suggestedStack:
+        Array.isArray(parsed.suggestedStack)
+          ? parsed.suggestedStack
+              .filter(
+                (x: any) =>
+                  typeof x === 'string',
+              )
+              .slice(0, 5)
+          : [],
+
       estimatedTimeline:
         typeof parsed.estimatedTimeline === 'string'
           ? parsed.estimatedTimeline.slice(0, 120)
           : 'Scope dependent',
-      recommendedFeatures: Array.isArray(parsed.recommendedFeatures)
-        ? parsed.recommendedFeatures.filter((x: any) => typeof x === 'string').slice(0, 4)
-        : [],
+
+      recommendedFeatures:
+        Array.isArray(parsed.recommendedFeatures)
+          ? parsed.recommendedFeatures
+              .filter(
+                (x: any) =>
+                  typeof x === 'string',
+              )
+              .slice(0, 4)
+          : [],
+
       businessValueSummary:
-        typeof parsed.businessValueSummary === 'string'
-          ? parsed.businessValueSummary.slice(0, 800)
+        typeof parsed.businessValueSummary ===
+        'string'
+          ? parsed.businessValueSummary.slice(
+              0,
+              800,
+            )
           : '',
+
       nextStep:
         typeof parsed.nextStep === 'string'
           ? parsed.nextStep.slice(0, 240)
@@ -206,85 +295,158 @@ Rules:
   };
 }
 
-export async function handleContact(body: any): Promise<ApiResult> {
-  const fullName = typeof body?.fullName === 'string' ? body.fullName.trim() : '';
-  const email = typeof body?.email === 'string' ? body.email.trim() : '';
+export async function handleContact(
+  body: any,
+): Promise<ApiResult> {
+  const fullName =
+    typeof body?.fullName === 'string'
+      ? body.fullName.trim()
+      : '';
+
+  const email =
+    typeof body?.email === 'string'
+      ? body.email.trim()
+      : '';
 
   if (!fullName || !email) {
     return {
       status: 400,
-      body: { error: 'Name and email are required fields.' },
+      body: {
+        error:
+          'Name and email are required fields.',
+      },
     };
   }
 
   if (
     fullName.length > 120 ||
     email.length > 180 ||
-    (body?.ideaDescription && String(body.ideaDescription).length > 8000)
+    (body?.ideaDescription &&
+      String(body.ideaDescription).length >
+        8000)
   ) {
-    return { status: 400, body: { error: 'Please shorten the submitted details.' } };
+    return {
+      status: 400,
+      body: {
+        error:
+          'Please shorten the submitted details.',
+      },
+    };
   }
 
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailOk =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   if (!emailOk) {
-    return { status: 400, body: { error: 'Please enter a valid email address.' } };
+    return {
+      status: 400,
+      body: {
+        error:
+          'Please enter a valid email address.',
+      },
+    };
   }
 
-  // Honeypot: bots may fill this hidden field.
+  // Honeypot protection
   if (body?.website) {
     return {
       status: 200,
       body: {
         success: true,
-        message: 'Thank you. Your inquiry has been received.',
+        message:
+          'Thank you. Your inquiry has been received.',
       },
     };
   }
 
-  const referenceId = `KZ-${Date.now().toString(36).toUpperCase()}-${Math.random()
+  const referenceId = `KZ-${Date.now()
+    .toString(36)
+    .toUpperCase()}-${Math.random()
     .toString(36)
     .slice(2, 6)
     .toUpperCase()}`;
 
-  const webhook = process.env.CONTACT_WEBHOOK_URL?.trim();
+  const webhook =
+    process.env.CONTACT_WEBHOOK_URL?.trim();
+
   if (webhook) {
     try {
-      const webhookResponse = await fetch(webhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          referenceId,
-          submittedAt: new Date().toISOString(),
-          fullName,
-          email,
-          companyName: String(body?.companyName || '').slice(0, 180),
-          country: String(body?.country || '').slice(0, 120),
-          serviceNeeded: String(body?.serviceNeeded || 'General Inquiry').slice(0, 160),
-          budgetRange: String(body?.budgetRange || 'Not specified').slice(0, 100),
-          ideaDescription: String(body?.ideaDescription || '').slice(0, 8000),
-          preferredContact: String(body?.preferredContact || 'Email').slice(0, 80),
-        }),
-      });
+      const webhookResponse = await fetch(
+        webhook,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            referenceId,
+            submittedAt:
+              new Date().toISOString(),
+
+            fullName,
+            email,
+
+            companyName: String(
+              body?.companyName || '',
+            ).slice(0, 180),
+
+            country: String(
+              body?.country || '',
+            ).slice(0, 120),
+
+            serviceNeeded: String(
+              body?.serviceNeeded ||
+                'General Inquiry',
+            ).slice(0, 160),
+
+            budgetRange: String(
+              body?.budgetRange ||
+                'Not specified',
+            ).slice(0, 100),
+
+            ideaDescription: String(
+              body?.ideaDescription || '',
+            ).slice(0, 8000),
+
+            preferredContact: String(
+              body?.preferredContact ||
+                'Email',
+            ).slice(0, 80),
+          }),
+        },
+      );
 
       if (!webhookResponse.ok) {
-        throw new Error(`Webhook returned ${webhookResponse.status}`);
+        throw new Error(
+          `Webhook returned ${webhookResponse.status}`,
+        );
       }
     } catch (error) {
-      console.error('Project inquiry forwarding failed:', error);
+      console.error(
+        'Project inquiry forwarding failed:',
+        error,
+      );
+
       return {
         status: 502,
         body: {
-          error: 'We could not deliver your inquiry right now. Please try again shortly.',
+          error:
+            'We could not deliver your inquiry right now. Please try again shortly.',
         },
       };
     }
   } else {
-    console.info('Project inquiry received', {
-      referenceId,
-      fullName,
-      email,
-      serviceNeeded: body?.serviceNeeded || 'General Inquiry',
-    });
+    console.info(
+      'Project inquiry received',
+      {
+        referenceId,
+        fullName,
+        email,
+        serviceNeeded:
+          body?.serviceNeeded ||
+          'General Inquiry',
+      },
+    );
   }
 
   return {
