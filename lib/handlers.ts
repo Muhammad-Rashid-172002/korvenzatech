@@ -5,6 +5,7 @@ import {
   parseJsonResponse,
 } from './intelligence';
 
+
 export type ApiResult = {
   status: number;
   body: Record<string, unknown>;
