@@ -8,4 +8,4 @@ coverage/
 !.env.example
 .env
 /Users/app/Desktop/Company_web/korvenza/.env
-.env.example
+.env.example.vite/
