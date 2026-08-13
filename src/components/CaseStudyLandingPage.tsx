@@ -1,3 +1,4 @@
+git status
 import React from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2, Layers3, ShieldCheck, Sparkles } from 'lucide-react';
 import { CaseStudy } from '../types';
