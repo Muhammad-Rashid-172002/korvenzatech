@@ -352,7 +352,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { label: 'Modules', value: '4 IELTS' },
       { label: 'Platform', value: 'Android' }
     ],
-    imageSrc: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop'
+    imageSrc: '/IELTS-AI-Study-Assistant .png'
   },
   {
     id: 'skilllink',
@@ -383,7 +383,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       { label: 'Roles', value: '2-sided' },
       { label: 'Stack', value: 'Flutter' }
     ],
-    imageSrc: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=1200&auto=format&fit=crop'
+    imageSrc: '/SkillLink.png'
   }
 ];
 
