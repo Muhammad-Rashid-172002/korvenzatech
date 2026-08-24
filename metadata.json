@@ -1,0 +1,12 @@
+{
+  "name": "KorvenzaTech",
+  "description": "Production-ready multi-page technology company website with Korvenza AI.",
+  "version": "1.0.0",
+  "majorCapabilities": [
+    "PRODUCTION_MULTI_PAGE_WEBSITE",
+    "SERVER_SIDE_INTELLIGENT_ASSISTANT",
+    "MULTILINGUAL_CONVERSATION_MEMORY",
+    "PROJECT_SCOPE_ENGINE",
+    "RESPONSIVE_LIGHT_DARK_THEME"
+  ]
+}
