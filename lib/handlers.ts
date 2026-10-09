@@ -25,6 +25,20 @@ function sanitizeSuggestionList(value: unknown): string[] {
     .map((item) => String(item).trim().slice(0, 120));
 }
 
+// Verified team profile image (same asset used on the website's Leadership section).
+const SULIMAN_PROFILE = {
+  name: 'Suliman',
+  role: 'Software Engineer • COO (Chief Operating Officer)',
+  image: '/team/coo.png',
+};
+
+function profileForAnswer(message: string, reply: string) {
+  const asksAboutSuliman =
+    /sul[ae]?[iy]?m[ae]n|سلیمان|سليمان|\bcoo\b|chief operating|software engineer/i.test(message);
+  const replyNamesSuliman = /sul[ae]?[iy]?m[ae]n|سلیمان|سليمان/i.test(reply);
+  return asksAboutSuliman && replyNamesSuliman ? SULIMAN_PROFILE : undefined;
+}
+
 export async function handleChat(body: any): Promise<ApiResult> {
   const message =
     typeof body?.message === 'string' ? body.message.trim() : '';
@@ -163,6 +177,7 @@ export async function handleChat(body: any): Promise<ApiResult> {
           ? suggestions
           : fallbackSuggestions,
       memory: updatedMemory,
+      profile: profileForAnswer(message, reply),
     },
   };
 }

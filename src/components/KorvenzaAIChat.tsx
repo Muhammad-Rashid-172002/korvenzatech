@@ -20,13 +20,17 @@ type ChatMessage = {
   role: Role;
   text: string;
   createdAt: number;
+  profile?: TeamProfile;
 };
+
+type TeamProfile = { name: string; role: string; image: string };
 
 type ChatResponse = {
   reply: string;
   suggestions?: string[];
   memory?: string;
   configured?: boolean;
+  profile?: TeamProfile;
 };
 
 const CHAT_KEY = 'korvenza_ai_chat_v3';
@@ -504,6 +508,11 @@ export function KorvenzaAIChat() {
             data.reply ||
             'I’m here. Tell me what you would like to build or improve.',
           createdAt: Date.now(),
+          ...(data.profile &&
+          typeof data.profile.image === 'string' &&
+          data.profile.image.startsWith('/team/')
+            ? { profile: data.profile }
+            : {}),
         },
       ]);
 
@@ -734,6 +743,21 @@ export function KorvenzaAIChat() {
                           </div>
 
                           <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md border border-white/[0.055] bg-white/[0.025] px-4 py-3.5 text-[13px] text-slate-300 shadow-sm">
+                            {message.profile && (
+                              <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/[0.055] bg-white/[0.02] p-2.5">
+                                <img
+                                  src={message.profile.image}
+                                  alt={`${message.profile.name} — ${message.profile.role} at KorvenzaTech`}
+                                  loading="lazy"
+                                  className="h-12 w-12 shrink-0 rounded-full border border-violet-300/10 object-cover object-top"
+                                />
+                                <div className="min-w-0">
+                                  <div className="text-[13px] font-semibold text-slate-100">{message.profile.name}</div>
+                                  <div className="text-[11px] text-slate-400">{message.profile.role}</div>
+                                </div>
+                              </div>
+                            )}
+
                             <ProfessionalMessage text={message.text} />
 
                             <button
