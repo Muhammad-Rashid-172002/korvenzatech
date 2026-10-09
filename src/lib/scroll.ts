@@ -44,6 +44,7 @@ export function setupRoute() {
   routeInteractions = bindInteractions(document);
   routeMM = gsap.matchMedia();
   setupProcess(routeMM);
+  setupParallax(routeMM);
   routeCtx = gsap.context(() => {
     const hero = document.getElementById('hero');
     if (hero) {
@@ -99,6 +100,21 @@ function setupProcess(mm: gsap.MatchMedia) {
       sectionProgress.process = 0;
       section.style.removeProperty('--kz-fill-live');
     };
+  });
+}
+
+/**
+ * Gentle scroll parallax: [data-kz-parallax="<yPercent>"] drifts from +n% to
+ * -n% of its height while it crosses the viewport (≥768px only).
+ */
+function setupParallax(mm: gsap.MatchMedia) {
+  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-kz-parallax]'));
+  if (!els.length) return;
+  mm.add('(min-width: 768px)', () => {
+    els.forEach((el) => {
+      const n = Number(el.dataset.kzParallax) || 0;
+      gsap.fromTo(el, { yPercent: n }, { yPercent: -n, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
   });
 }
 

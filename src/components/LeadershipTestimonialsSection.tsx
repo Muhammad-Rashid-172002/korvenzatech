@@ -1,5 +1,5 @@
-import React from 'react';
-import { Quote, Star } from 'lucide-react';
+import React, { useRef } from 'react';
+import { ArrowLeft, ArrowRight, Quote, Star } from 'lucide-react';
 import { Eyebrow, SectionHeader } from './ui';
 import { useTilt } from '../lib/motion';
 
@@ -94,10 +94,63 @@ function Portrait({ leader, featured = false, index }: { leader: Leader; feature
   );
 }
 
+/** Scroll the testimonial row by about one card. */
+function useRowScroll() {
+  const row = useRef<HTMLDivElement>(null);
+  const by = (dir: 1 | -1) => {
+    const el = row.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('figure');
+    const step = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
+  };
+  return { row, by };
+}
+
+function TestimonialsRow() {
+  const { row, by } = useRowScroll();
+  return (
+    <>
+      <div className="mt-8 flex justify-end gap-2">
+        <button type="button" onClick={() => by(-1)} className="kz-row-btn" aria-label="Previous testimonials" aria-controls="testimonials-row"><ArrowLeft className="h-4 w-4" aria-hidden="true" /></button>
+        <button type="button" onClick={() => by(1)} className="kz-row-btn" aria-label="Next testimonials" aria-controls="testimonials-row"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+      </div>
+      {/* Draggable row (mouse drag with inertia via lib/interactions.ts); native swipe / scroll / keyboard everywhere. */}
+      <div ref={row} id="testimonials-row" className="kz-drag-row mt-5" data-kz-drag-scroll="" tabIndex={0} role="region" aria-label="Client testimonials">
+        {testimonials.map((item, index) => (
+          <figure key={`${item.author}-${index}`} data-kz-tilt="6" className="kz-testimonial-card kz-tilt kz-reveal relative overflow-hidden p-7 sm:p-9" style={{ '--d': index % 2 } as React.CSSProperties}>
+            <Quote className="absolute -right-2 -top-3 h-24 w-24 text-emerald-500/[.06]" aria-hidden="true" />
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <div className="text-sm font-bold text-[var(--kz-text)]">{item.label}</div>
+                <div className="kz-meta mt-1.5 !text-[10px]">{item.meta}</div>
+              </div>
+              <div className="flex gap-0.5" role="img" aria-label="Rated 5 out of 5">
+                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />)}
+              </div>
+            </div>
+            <blockquote className="mt-6 text-[15px] leading-7 text-[var(--kz-text-2)]">“{item.quote}”</blockquote>
+            <figcaption className="mt-7 flex items-center gap-3 border-t border-[var(--kz-border)] pt-5">
+              <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-sm font-extrabold text-[var(--kz-accent-text)]" aria-hidden="true">{item.author.charAt(0)}</span>
+              <span>
+                <span className="block text-sm font-bold text-[var(--kz-text)]">{item.author}</span>
+                <span className="block text-xs text-[var(--kz-muted)]">{item.role}</span>
+              </span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export const LeadershipTestimonialsSection: React.FC = () => (
   <>
     <section id="leadership" className="kz-leaders kz-cinematic relative overflow-hidden py-[var(--kz-section)]" aria-labelledby="leadership-title">
       <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(50%_40%_at_20%_10%,rgba(25,199,132,.12),transparent_70%),radial-gradient(40%_40%_at_90%_60%,rgba(8,127,91,.16),transparent_70%)]" aria-hidden="true" />
+      {/* Slow drifting fog (CSS only; animates while on screen, static for reduced motion). */}
+      <div className="kz-fog" data-kz-live="" aria-hidden="true"><i /><i /></div>
       <div className="kz-container relative">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="kz-reveal lg:col-span-7">
@@ -110,10 +163,10 @@ export const LeadershipTestimonialsSection: React.FC = () => (
         </div>
 
         <div className="mt-16 grid gap-12 sm:mt-20 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5" data-kz-parallax="3">
             <Portrait leader={leaders[0]} featured index={0} />
           </div>
-          <div className="grid gap-12 sm:grid-cols-2 sm:gap-8 lg:col-span-7 lg:pt-24">
+          <div className="grid gap-12 sm:grid-cols-2 sm:gap-8 lg:col-span-7 lg:pt-24" data-kz-parallax="-4">
             <Portrait leader={leaders[1]} index={1} />
             <Portrait leader={leaders[2]} index={2} />
           </div>
@@ -121,7 +174,7 @@ export const LeadershipTestimonialsSection: React.FC = () => (
       </div>
     </section>
 
-    <section className="kz-section kz-section-alt" aria-labelledby="testimonials-title">
+    <section className="kz-section kz-section-alt overflow-x-clip" aria-labelledby="testimonials-title">
       <div className="kz-container">
         <SectionHeader
           align="center"
@@ -129,30 +182,7 @@ export const LeadershipTestimonialsSection: React.FC = () => (
           title={<span id="testimonials-title">Confidence is earned in the delivery.</span>}
           lead="Feedback from software, startup, platform and education work."
         />
-        <div className="mt-14 grid gap-5 lg:grid-cols-2">
-          {testimonials.map((item, index) => (
-            <figure key={`${item.author}-${index}`} className="kz-testimonial-card kz-reveal relative overflow-hidden p-7 sm:p-9" style={{ '--d': index % 2 } as React.CSSProperties}>
-              <Quote className="absolute -right-2 -top-3 h-24 w-24 text-emerald-500/[.06]" aria-hidden="true" />
-              <div className="flex items-start justify-between gap-5">
-                <div>
-                  <div className="text-sm font-bold text-[var(--kz-text)]">{item.label}</div>
-                  <div className="kz-meta mt-1.5 !text-[10px]">{item.meta}</div>
-                </div>
-                <div className="flex gap-0.5" role="img" aria-label="Rated 5 out of 5">
-                  {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />)}
-                </div>
-              </div>
-              <blockquote className="mt-6 text-[15px] leading-7 text-[var(--kz-text-2)]">“{item.quote}”</blockquote>
-              <figcaption className="mt-7 flex items-center gap-3 border-t border-[var(--kz-border)] pt-5">
-                <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-sm font-extrabold text-[var(--kz-accent-text)]" aria-hidden="true">{item.author.charAt(0)}</span>
-                <span>
-                  <span className="block text-sm font-bold text-[var(--kz-text)]">{item.author}</span>
-                  <span className="block text-xs text-[var(--kz-muted)]">{item.role}</span>
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <TestimonialsRow />
       </div>
     </section>
   </>

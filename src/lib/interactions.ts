@@ -5,10 +5,13 @@
  *  [data-kz-tilt="<deg>"]  card tilts toward the pointer (max <deg>), border
  *                          glow follows the cursor, `.kz-magnetic-arrow`
  *                          inside drifts toward the pointer.
- *  .kz-bento-scene         SVG micro-scenes animate only while on screen.
+ *  .kz-bento-scene,        SVG micro-scenes / ambient layers animate only
+ *  [data-kz-live]          while on screen (.is-live).
  *  [data-kz-magnetic]      element drifts toward the pointer while it is
  *                          inside the nearest [data-kz-magnetic-zone] (or itself).
  *  [data-kz-ripple]        click ripple from the press point.
+ *  [data-kz-drag-scroll]   horizontal row: mouse drag with inertia (touch,
+ *                          wheel and keyboard keep native scrolling).
  */
 type Cleanup = () => void;
 
@@ -98,16 +101,77 @@ function bindRipple(el: HTMLElement): Cleanup {
   return () => el.removeEventListener('pointerdown', down);
 }
 
+function bindDragScroll(el: HTMLElement): Cleanup {
+  let down = false;
+  let moved = 0;
+  let startX = 0;
+  let startLeft = 0;
+  let lastX = 0;
+  let lastT = 0;
+  let v = 0; // px per ms
+  let raf = 0;
+  const stopInertia = () => { cancelAnimationFrame(raf); raf = 0; };
+  const pdown = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    stopInertia();
+    down = true; moved = 0; v = 0;
+    startX = lastX = e.clientX; startLeft = el.scrollLeft; lastT = performance.now();
+  };
+  const pmove = (e: PointerEvent) => {
+    if (!down) return;
+    const dx = e.clientX - startX;
+    if (!moved && Math.abs(dx) < 4) return;
+    if (!moved) { el.setPointerCapture(e.pointerId); el.dataset.dragging = 'true'; }
+    moved = Math.max(moved, Math.abs(dx));
+    el.scrollLeft = startLeft - dx;
+    const now = performance.now();
+    const dt = Math.max(1, now - lastT);
+    v = v * 0.6 + ((lastX - e.clientX) / dt) * 0.4;
+    lastX = e.clientX; lastT = now;
+  };
+  const pup = (e: PointerEvent) => {
+    if (!down) return;
+    down = false;
+    if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
+    if (!moved) return;
+    let t0 = performance.now();
+    const step = (t: number) => {
+      const dt = Math.min(32, t - t0); t0 = t;
+      el.scrollLeft += v * dt;
+      v *= Math.pow(0.94, dt / 16.7);
+      if (Math.abs(v) > 0.02) raf = requestAnimationFrame(step);
+      else { raf = 0; delete el.dataset.dragging; }
+    };
+    raf = requestAnimationFrame(step);
+  };
+  // A drag must not click whatever is under the pointer.
+  const click = (e: MouseEvent) => { if (moved > 4) { e.preventDefault(); e.stopPropagation(); moved = 0; } };
+  const wheel = () => stopInertia();
+  el.addEventListener('pointerdown', pdown);
+  el.addEventListener('pointermove', pmove);
+  el.addEventListener('pointerup', pup);
+  el.addEventListener('pointercancel', pup);
+  el.addEventListener('click', click, true);
+  el.addEventListener('wheel', wheel, { passive: true });
+  return () => {
+    stopInertia(); delete el.dataset.dragging;
+    el.removeEventListener('pointerdown', pdown); el.removeEventListener('pointermove', pmove);
+    el.removeEventListener('pointerup', pup); el.removeEventListener('pointercancel', pup);
+    el.removeEventListener('click', click, true); el.removeEventListener('wheel', wheel);
+  };
+}
+
 /** Bind all pointer/visibility micro-interactions under `root`. Returns one cleanup. */
 export function bindInteractions(root: ParentNode = document): Cleanup {
   const cleanups: Cleanup[] = [];
   if (finePointer()) {
     root.querySelectorAll<HTMLElement>('[data-kz-tilt]').forEach((el) => cleanups.push(bindTilt(el)));
     root.querySelectorAll<HTMLElement>('[data-kz-magnetic]').forEach((el) => cleanups.push(bindMagnetic(el)));
+    root.querySelectorAll<HTMLElement>('[data-kz-drag-scroll]').forEach((el) => cleanups.push(bindDragScroll(el)));
   }
   root.querySelectorAll<HTMLElement>('[data-kz-ripple]').forEach((el) => cleanups.push(bindRipple(el)));
 
-  const scenes = root.querySelectorAll<Element>('.kz-bento-scene');
+  const scenes = root.querySelectorAll<Element>('.kz-bento-scene, [data-kz-live]');
   if (scenes.length) {
     const io = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('is-live', e.isIntersecting)));
     scenes.forEach((s) => io.observe(s));

@@ -640,3 +640,30 @@ html.lenis { scroll-behavior: auto !important; }
 .kz-ripple { position: absolute; z-index: -1; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0) 60%); transform: scale(0); animation: kzRipple 650ms var(--kz-ease-out) forwards; }
 @keyframes kzRipple { to { transform: scale(1); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .kz-ripple { display: none; } }
+
+/* Testimonials draggable row (LeadershipTestimonialsSection.tsx + lib/interactions.ts) */
+.kz-drag-row {
+  display: flex; gap: 20px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+  --kz-row-edge: calc(max(0px, (100vw - var(--kz-container)) / 2) + var(--kz-gutter));
+  margin-inline: calc(50% - 50vw); padding: 14px var(--kz-row-edge) 30px; scroll-padding-inline: var(--kz-row-edge);
+  scrollbar-width: none; perspective: 1200px;
+}
+.kz-drag-row::-webkit-scrollbar { display: none; }
+.kz-drag-row > figure { flex: 0 0 min(560px, 86vw); scroll-snap-align: start; }
+.kz-drag-row:focus-visible { outline: 2px solid var(--kz-accent); outline-offset: -2px; border-radius: var(--kz-radius-lg); }
+@media (hover: hover) and (pointer: fine) { .kz-drag-row { cursor: grab; } }
+.kz-drag-row[data-dragging="true"] { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.kz-drag-row[data-dragging="true"] .kz-tilt { transform: none !important; }
+.kz-row-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--kz-border-strong); background: var(--kz-surface); color: var(--kz-text); transition: border-color var(--kz-dur), color var(--kz-dur), transform var(--kz-dur) var(--kz-ease-out); }
+.kz-row-btn:hover { border-color: rgba(25, 199, 132, .5); color: var(--kz-accent-text); }
+.kz-row-btn:active { transform: scale(.94); }
+
+/* Leadership fog + parallax (LeadershipTestimonialsSection.tsx, lib/scroll.ts) */
+.kz-fog { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.kz-fog i { position: absolute; inset: -25% -15%; opacity: .9; will-change: transform; }
+.kz-fog i:first-child { background: radial-gradient(38% 30% at 30% 40%, rgba(166, 235, 205, .07), transparent 70%), radial-gradient(30% 26% at 75% 70%, rgba(25, 199, 132, .06), transparent 70%); animation: kzFogA 38s ease-in-out infinite alternate; }
+.kz-fog i:last-child { background: radial-gradient(34% 28% at 60% 25%, rgba(166, 235, 205, .05), transparent 70%), radial-gradient(40% 30% at 20% 80%, rgba(8, 127, 91, .08), transparent 70%); animation: kzFogB 46s ease-in-out infinite alternate; }
+.kz-fog:not(.is-live) i { animation-play-state: paused; }
+@keyframes kzFogA { from { transform: translate3d(-4%, 0, 0) scale(1); } to { transform: translate3d(5%, -3%, 0) scale(1.08); } }
+@keyframes kzFogB { from { transform: translate3d(4%, 2%, 0) scale(1.05); } to { transform: translate3d(-5%, -2%, 0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .kz-fog i { animation: none; } }

@@ -12,8 +12,8 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Services bento
 - [x] Tech orbit
 - [x] CTA particles
-- [ ] Testimonials
-- [ ] Leadership
+- [x] Testimonials
+- [x] Leadership
 - [ ] Global effects
 - [ ] Final audit
 
@@ -35,6 +35,8 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 
 7. **Orbit hover is ray-cast manually.** drei `View` only routes R3F pointer events when the event target is the track element itself (and the last View to mount takes over `events.connected`), so R3F `onPointerOver` cannot work with tracks that sit under page content. The orbit listens on its stage element and ray-casts every frame (bonus: logos moving under a still cursor still highlight).
 8. **three.js split into its own lazy vendor chunk** (`three-*.js`, 190 KB gzip) so the Experience chunk is ~89 KB and long-term cacheable; still only downloaded on tier 1/2 after load.
+
+9. **Leadership fog/parallax is CSS + GSAP, not WebGL** — the brief asked for "subtle"; drifting gradient fog layers and scrubbed column parallax give that at near-zero cost on every tier, without a fourth always-on WebGL view behind photos.
 
 ## Known issues
 
@@ -159,3 +161,21 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Laptop: scroll to "Have something ambitious in mind?" → green dust drifts in and forms the K behind the heading; headline stays readable. Move the mouse over the section → particles part around the cursor. Hover the buttons → they lean toward the pointer. Click "Start a project" → ripple + the K blows outward, then the project page opens (~0.5 s). Cmd/Ctrl-click → opens in a new tab with no delay.
 - Android: K forms on scroll (fewer particles), tap ripple; tap navigates after the short burst.
 - Reduced motion / `?kz3d=off`: no particles, button navigates immediately, no ripple.
+
+### Testimonials (5.8) + Leadership (5.9) — done (one commit; they share a component file)
+
+**Files:** `src/components/LeadershipTestimonialsSection.tsx`, `src/lib/interactions.ts` (drag-scroll with inertia, live toggling), `src/lib/scroll.ts` (parallax), `src/index.css`.
+
+**Testimonials:** the 2×2 grid is now one horizontal row (4 cards, no duplicates, text untouched) that bleeds to the screen edge and starts aligned with the page content. Mouse: drag with inertia (a drag never triggers a click), cards tilt toward the pointer (max 6°, flattened while dragging). Touch: native swipe with soft snapping. Keyboard: the row is a focusable region (arrow keys scroll) and there are Previous/Next buttons (44 px, labelled). No cylinder.
+
+**Leadership:** two slow fog layers drift behind the portraits (only while on screen; static for reduced motion) and the two portrait columns drift at different speeds on scroll (≥768 px). Existing portrait tilt unchanged.
+
+**Bundle (gzip):** main +0.3 KB (120.71) · scroll chunk +0.5 KB (56.27) · CSS +0.6 KB (20.65) · Experience 0.
+
+**Lighthouse (local, `/`):** mobile Perf 91 · A11y 100 · BP 96 (sandbox fonts) · SEO 100. axe: no violations.
+
+**Manual test checklist**
+- Laptop, testimonials: grab a card and fling left → row glides and slows down; release over a card → nothing is "clicked". Hover a card → gentle tilt. Use ← → buttons. Tab to the row and press → / ←.
+- Android: swipe the row; it settles on a card. Buttons work.
+- Leadership: scroll slowly past the founders → left and right columns move at slightly different speeds; soft green haze drifts in the background. No layout jumps.
+- Reduced motion: row still scrolls (buttons jump without smooth scroll), no tilt/fog/parallax.
