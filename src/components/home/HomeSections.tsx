@@ -4,6 +4,7 @@ import { CASE_STUDIES, SERVICES_DATA } from '../../data/companyData';
 import { Link } from '../../lib/router';
 import { Eyebrow, SectionHeader } from '../ui';
 import { projectImage } from '../../data/media';
+import { BentoScene } from './BentoScene';
 
 const ICONS: Record<string, React.FC<{ className?: string }>> = { Bot, Network, Smartphone, Globe, Code, Layers, Cloud, Layout, TrendingUp };
 
@@ -24,7 +25,7 @@ export function HomeServices() {
         </div>
 
         <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Link to={`/services/${lead.id}`} className="kz-card kz-card-hover kz-reveal group relative flex min-h-[320px] flex-col justify-between overflow-hidden p-8 md:col-span-2 lg:row-span-2">
+          <Link to={`/services/${lead.id}`} data-kz-tilt="4" className="kz-card kz-card-hover kz-tilt kz-reveal group relative flex min-h-[320px] flex-col justify-between overflow-hidden p-8 md:col-span-2 lg:row-span-2">
             <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl transition-opacity duration-700 group-hover:opacity-100" aria-hidden="true" />
             <div>
               <div className="flex items-center justify-between">
@@ -45,10 +46,11 @@ export function HomeServices() {
           {rest.slice(0, 6).map((s, i) => {
             const Icon = ICONS[s.iconName] || Code;
             return (
-              <Link key={s.id} to={`/services/${s.id}`} className="kz-card kz-card-hover kz-reveal group flex flex-col p-6" style={{ '--d': (i % 2) + 1 } as React.CSSProperties}>
-                <div className="flex items-center justify-between">
+              <Link key={s.id} to={`/services/${s.id}`} data-kz-tilt="8" className="kz-card kz-card-hover kz-tilt kz-reveal group flex flex-col p-6" style={{ '--d': (i % 2) + 1 } as React.CSSProperties}>
+                <div className="flex items-center justify-between gap-3">
                   <span className="kz-icon-orb !h-10 !w-10 !rounded-xl"><Icon className="h-[18px] w-[18px]" /></span>
-                  <ArrowUpRight className="h-4 w-4 text-[var(--kz-muted)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--kz-accent-text)]" aria-hidden="true" />
+                  <BentoScene id={s.id} />
+                  <span className="kz-magnetic-arrow" aria-hidden="true"><ArrowUpRight className="h-4 w-4 text-[var(--kz-muted)] transition-colors duration-300 group-hover:text-[var(--kz-accent-text)]" /></span>
                 </div>
                 <h3 className="kz-h3 mt-6">{s.title}</h3>
                 <p className="mt-2 text-[13.5px] leading-6 text-[var(--kz-muted)] line-clamp-3">{s.shortDesc}</p>

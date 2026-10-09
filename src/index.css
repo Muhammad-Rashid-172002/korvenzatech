@@ -574,3 +574,49 @@ html.lenis { scroll-behavior: auto !important; }
 .kz-project[data-kz3d="ready"] { background: transparent; }
 /* Platform pill: solid enough for AA contrast on any poster/3D backdrop. */
 .kz-project-pill { position: absolute; z-index: 1; color: #fff; background: rgba(6, 14, 11, 0.82); border: 1px solid rgba(255, 255, 255, 0.18); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+/* Services "Living Bento" (components/home/HomeSections.tsx + BentoScene.tsx + lib/interactions.ts) */
+.kz-tilt[data-tilting="true"] {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-3px) !important;
+  transition: transform 140ms linear, border-color var(--kz-dur), box-shadow var(--kz-dur-slow) var(--kz-ease-out);
+}
+.kz-tilt::after {
+  content: ""; position: absolute; inset: -1px; z-index: 1; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(25, 199, 132, .9), rgba(25, 199, 132, 0) 62%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity 300ms var(--kz-ease-out);
+}
+.kz-tilt[data-tilting="true"]::after { opacity: 1; }
+.kz-magnetic-arrow { display: inline-flex; flex-shrink: 0; transform: translate(var(--ax, 0px), var(--ay, 0px)); transition: transform 320ms var(--kz-ease-out); }
+
+.kz-bento-scene { flex: 1; min-width: 0; max-width: 180px; height: 40px; overflow: visible; }
+.kz-bento-scene * { transform-box: fill-box; }
+.kz-bento-scene:not(.is-live) * { animation: none !important; }
+.kz-bs-line, .kz-bs-frame, .kz-bs-chev { fill: none; stroke: var(--kz-border-strong); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.kz-bs-frame, .kz-bs-chev { stroke: color-mix(in oklab, var(--kz-accent-text) 55%, var(--kz-border-strong)); }
+.kz-bs-node, .kz-bs-fill, .kz-bs-packet { fill: var(--kz-accent-text); }
+.kz-bs-soft { fill: color-mix(in oklab, var(--kz-accent-text) 24%, transparent); }
+.kz-bs-layer { fill: color-mix(in oklab, var(--kz-accent-text) 12%, var(--kz-surface)); stroke: color-mix(in oklab, var(--kz-accent-text) 60%, transparent); stroke-width: 1.2; stroke-linejoin: round; }
+.kz-bs-fillstroke { fill: color-mix(in oklab, var(--kz-accent-text) 30%, var(--kz-surface)); }
+.kz-bs-packet { offset-rotate: 0deg; animation: kzBsTravel 2.6s var(--kz-ease-out) infinite; }
+.kz-bs-d1 { animation-delay: .35s !important; }
+.kz-bs-d2 { animation-delay: 1.3s !important; }
+.kz-bs-d3 { animation-delay: .7s !important; }
+.kz-bs-scroll { animation: kzBsScroll 4.5s cubic-bezier(.65,0,.35,1) infinite alternate; }
+.kz-bs-float { animation: kzBsFloat 3.2s ease-in-out infinite alternate; }
+.kz-bs-build, .kz-bs-type { transform-origin: left center; animation: kzBsBuild 4s var(--kz-ease-out) infinite; }
+.kz-bs-caret { animation: kzBsBlink 1s steps(2, jump-none) infinite; }
+.kz-bs-layer { animation: kzBsLayer 3.4s ease-in-out infinite alternate; }
+.kz-bs-l0 { --kz-l: -7px; } .kz-bs-l1 { --kz-l: 0px; } .kz-bs-l2 { --kz-l: 7px; }
+.kz-bs-l0 { transform: translateY(-5px); } .kz-bs-l2 { transform: translateY(5px); }
+.kz-bs-up { animation: kzBsUp 1.8s ease-in infinite; }
+.kz-bs-down { animation: kzBsDown 1.8s ease-in infinite; }
+@keyframes kzBsTravel { 0% { offset-distance: 0%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+@keyframes kzBsScroll { 0%, 15% { transform: translateY(0); } 85%, 100% { transform: translateY(-27px); } }
+@keyframes kzBsFloat { from { transform: translateY(-2px); } to { transform: translateY(3px); } }
+@keyframes kzBsBuild { 0% { transform: scaleX(0); opacity: 0; } 25% { transform: scaleX(1); opacity: 1; } 85% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+@keyframes kzBsBlink { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes kzBsLayer { from { transform: translateY(calc(var(--kz-l) * .6)); } to { transform: translateY(calc(var(--kz-l) * 1.5)); } }
+@keyframes kzBsUp { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-12px); opacity: 0; } }
+@keyframes kzBsDown { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .kz-bento-scene * { animation: none !important; } .kz-tilt::after { display: none; } }

@@ -9,7 +9,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Process journey
 - [x] Screenshot generation — **NEEDS RASHID REVIEW** (`tools/screens/contact-sheet.png`)
 - [x] Product phones
-- [ ] Services bento
+- [x] Services bento
 - [ ] Tech orbit
 - [ ] CTA particles
 - [ ] Testimonials
@@ -30,6 +30,8 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 3. **Frameloop:** canvas runs `always` only while a 3D view is on screen and the tab is visible, otherwise `never` (`VisibilityLoop`). Scroll-driven scenes animate every frame while visible, so `demand` + `invalidate` would invalidate every frame anyway; the visibility gate gives the same idle cost (0 frames when off-screen).
 4. **Chunk size:** R3F 9 imports the full `three` namespace, so the lazy Experience chunk is 261 KB gzip (was 136 KB for the old imperative scene). It loads only after `load` + idle on tier 1/2 devices; tier 0 never downloads it. `chunkSizeWarningLimit` raised to 1000 with a comment.
 5. **Lighthouse note:** headless Lighthouse reports a software GPU, so it runs tier 0 (poster only). Scores therefore measure the real first-paint path; 3D cost is checked separately with forced-3D Playwright runs (`?kz3d=force`).
+
+6. **Services micro-scenes are SVG + CSS, not WebGL.** The cards tilt in 3D (CSS perspective) and have opaque backgrounds; a WebGL view behind them would be hidden by the card or mis-align with the tilted border, and six extra scissored renders cost GPU for tiny visuals. SVG micro-scenes tilt with the card, work on every tier (incl. phones), and cost ~1 KB.
 
 ## Known issues
 
@@ -104,3 +106,20 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Light theme: media area stays dark/cinematic (as before), pill readable.
 - Android: phones visible (smaller), screens change every ~3 s on their own; tapping the card opens the case study.
 - `?kz3d=off`: original images, unchanged.
+
+### Services "Living Bento" (5.5) — done
+
+**Files:** `src/components/home/BentoScene.tsx` (new), `src/components/home/HomeSections.tsx` (HomeServices), `src/lib/interactions.ts` (new, lazy), `src/lib/scroll.ts` (binds interactions per route), `src/index.css`.
+
+**What it does:** six live micro-scenes, one per service card (API packets travelling between endpoints, a phone whose screens scroll, a browser assembling its layout, code being typed, SaaS layers breathing, cloud sync). They animate only while on screen and are static for reduced motion. Mouse: cards tilt toward the pointer (max 8°, 4° on the large AI card), a green glow follows the cursor along the card border, and the ↗ arrow drifts magnetically toward the pointer. Touch and reduced motion: no tilt (the interaction code is never loaded for reduced motion).
+
+**Bundle (gzip):** main +0.9 KB (119.93) · scroll chunk +0.6 KB (55.39) · CSS +0.9 KB (19.77) · Experience 0.
+
+**Lighthouse (local, `/`):** mobile Perf 89 · A11y 100 · BP 96 (sandbox fonts) · SEO 100.
+
+**Manual test checklist**
+- Laptop: scroll to "One technology partner…" → small diagrams in each service card start moving. Move the mouse across a card → it tilts toward the cursor, a green highlight runs along the border under the cursor, the ↗ arrow nudges toward the cursor; leave → card settles flat. The AI card tilts less.
+- Keyboard: Tab through the cards → normal focus ring, no tilt, links work.
+- Light theme: diagrams in deep green, readable.
+- Android: diagrams animate; no tilt on touch; tapping opens the service page.
+- OS "reduce motion" on: diagrams static, no tilt/glow.

@@ -10,12 +10,14 @@ import Lenis from 'lenis';
 import { pinRanges, scrollStore, sectionProgress } from './scrollStore';
 import { PROCESS, SCROLL } from '../components/three/config';
 import { EASE, DUR } from './motion';
+import { bindInteractions } from './interactions';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 let lenis: Lenis | null = null;
 let routeCtx: gsap.Context | null = null;
 let routeMM: gsap.MatchMedia | null = null;
+let routeInteractions: (() => void) | null = null;
 
 export function initSmoothScroll() {
   if (lenis) return;
@@ -38,6 +40,8 @@ export function initSmoothScroll() {
 export function setupRoute() {
   routeCtx?.revert();
   routeMM?.revert();
+  routeInteractions?.();
+  routeInteractions = bindInteractions(document);
   routeMM = gsap.matchMedia();
   setupProcess(routeMM);
   routeCtx = gsap.context(() => {
@@ -130,6 +134,8 @@ function splitHeadline(h1: HTMLElement | null) {
 export function destroySmoothScroll() {
   routeCtx?.revert();
   routeMM?.revert();
+  routeInteractions?.();
+  routeInteractions = null;
   lenis?.destroy();
   lenis = null;
   scrollStore.lenis = null;
