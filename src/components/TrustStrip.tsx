@@ -15,7 +15,7 @@ const TECH_BADGES = [
 ];
 
 export const TrustStrip: React.FC = () => (
-  <section className="relative z-10 border-b border-[var(--kz-border)] bg-[var(--kz-bg)] py-10" aria-label="Technologies we build with">
+  <section className="relative border-b border-[var(--kz-border)] bg-[var(--kz-bg)] py-10" aria-label="Technologies we build with">
     <div className="kz-container flex flex-col items-center gap-6 lg:flex-row lg:gap-10">
       <p className="kz-meta shrink-0 text-center lg:max-w-[15rem] lg:text-left">Built with a modern, proven stack</p>
       <ul className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">

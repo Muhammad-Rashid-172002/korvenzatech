@@ -22,6 +22,8 @@ export const Hero: React.FC<HeroProps> = () => {
     <section id="hero" className="kz-hero kz-cinematic relative overflow-hidden" aria-labelledby="hero-title">
       <div className="kz-fine-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
       <div className="kz-hero-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
+      {/* Rectangle the shared WebGL canvas renders the hero scene into (extends below the hero so dissolve particles can flow into the next section). */}
+      <div data-kz-view="hero" className="kz-view-track kz-view-track--hero" aria-hidden="true" />
 
       <div className="kz-container relative z-10 grid min-h-[min(100svh,980px)] items-center gap-6 pt-28 pb-14 sm:pt-32 lg:grid-cols-12 lg:gap-4 lg:pt-28 lg:pb-20">
         <div className="lg:col-span-6 xl:col-span-6">
@@ -29,7 +31,7 @@ export const Hero: React.FC<HeroProps> = () => {
             <span className="kz-hero-chip"><b>KorvenzaTech</b> Software engineering &amp; AI products</span>
           </div>
 
-          <h1 id="hero-title" className="kz-display kz-hero-enter mt-7 max-w-[15ch] text-white" style={{ '--i': 1 } as React.CSSProperties}>
+          <h1 id="hero-title" className="kz-display mt-7 max-w-[15ch] text-white">
             Engineering ideas into <span className="kz-gradient-word">exceptional</span> digital products.
           </h1>
 

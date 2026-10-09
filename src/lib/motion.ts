@@ -1,5 +1,20 @@
 import { useEffect, useRef } from 'react';
 
+/** Shared motion language (GSAP ease names + seconds). Calm, engineered: expo/power3 outs, no linear except loops. */
+export const EASE = {
+  out: 'power3.out',
+  settle: 'expo.out',
+  inOut: 'power3.inOut',
+  soft: 'sine.inOut',
+} as const;
+
+export const DUR = {
+  fast: 0.25,
+  base: 0.45,
+  slow: 0.8,
+  reveal: 0.9,
+} as const;
+
 /**
  * One shared IntersectionObserver drives every `.kz-reveal` element.
  * Elements already on screen are marked visible *before* `.kz-js` is added to

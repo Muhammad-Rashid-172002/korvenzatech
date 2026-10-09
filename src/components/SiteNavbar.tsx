@@ -154,7 +154,7 @@ export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
       </div>
 
       {mobile && (
-        <nav id="mobile-menu" aria-label="Mobile" className="kz-mobile-menu mx-4 mb-4 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)] xl:hidden">
+        <nav id="mobile-menu" data-lenis-prevent aria-label="Mobile" className="kz-mobile-menu mx-4 mb-4 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)] xl:hidden">
           <div className="grid gap-0.5">
             {nav.map(([to, label]) => {
               const active = isActive(path, to);

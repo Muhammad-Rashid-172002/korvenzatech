@@ -13,13 +13,17 @@
     "seo:generate": "vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/generate-seo-pages.mjs"
   },
   "dependencies": {
+    "@gsap/react": "2.1.2",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.1",
     "@supabase/server": "^1.9.1",
     "@tailwindcss/vite": "4.1.14",
     "@vitejs/plugin-react": "5.0.4",
     "dotenv": "17.2.3",
     "express": "4.21.2",
+    "gsap": "3.15.0",
+    "lenis": "1.3.26",
     "lucide-react": "0.546.0",
-    "motion": "12.23.24",
     "react": "19.0.1",
     "react-dom": "19.0.1",
     "react-markdown": "10.1.0",

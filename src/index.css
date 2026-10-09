@@ -358,18 +358,19 @@ html[data-theme="light"] .kz-theme-icon-light, html[data-theme="dark"] .kz-theme
 .kz-hero-vignette { background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(3,9,7,.75) 100%); }
 .kz-hero-floor { background: radial-gradient(45% 38% at 50% 62%, rgba(25,199,132,.14), transparent 100%); }
 .kz-hero-stage { position: relative; aspect-ratio: 1 / 1; width: 100%; }
-.kz-hero-stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
 .kz-hero-fallback { position: absolute; inset: 0; display: grid; place-items: center; perspective: 1200px; transition: opacity var(--kz-dur-slow) var(--kz-ease-out); }
 .kz-hero-stage[data-ready="true"] .kz-hero-fallback { opacity: 0; }
-.kz-hero-stage canvas { opacity: 0; transition: opacity 900ms var(--kz-ease-out); }
-.kz-hero-stage[data-ready="true"] canvas { opacity: 1; }
 .kz-hero-poster { width: 100%; height: 100%; object-fit: contain; animation: kzFloat 9s var(--kz-ease-in-out) infinite; }
 .kz-hero-stage[data-ready="true"] .kz-hero-poster { animation: none; }
 .kz-hero-enter { animation: kzHeroIn 900ms var(--kz-ease-out) both; animation-delay: calc(var(--i, 0) * 90ms); }
 @keyframes kzHeroIn { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
-/* Headlines are the LCP element: they move into place but are never invisible. */
-h1.kz-hero-enter { animation-name: kzHeroRise; animation-delay: 0ms; }
-@keyframes kzHeroRise { from { transform: translate3d(0, 14px, 0); } to { transform: none; } }
+/* Hero headline is the LCP element: static at first paint; lib/scroll.ts splits it after paint (movement only). */
+#hero .kz-gradient-word {
+  background-image: linear-gradient(100deg, #A6EBCD 0%, #19C784 28%, #ECFBF4 46%, #19C784 64%, #0B9165 100%);
+  background-size: 240% 100%;
+  animation: kzShimmer 7s var(--kz-ease-in-out) infinite;
+}
+@keyframes kzShimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .kz-hero-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border-radius: 999px; border: 1px solid rgba(110,221,176,.18); background: rgba(16,35,28,.6); color: #C3D1CA; font-size: 12px; font-weight: 600; backdrop-filter: blur(8px); }
 .kz-hero-chip b { padding: 3px 8px; border-radius: 999px; background: rgba(25,199,132,.16); color: #A6EBCD; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
 .kz-hero-caption { position: absolute; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 10px; border: 1px solid rgba(110,221,176,.14); background: rgba(7,17,14,.62); backdrop-filter: blur(10px); color: #C3D1CA; font: 600 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
@@ -534,3 +535,19 @@ html[data-theme="light"] .korvenza-ai-shell .bg-white\/\[0\.025\] { background: 
   .kz-js .kz-reveal:not(.is-in) .kz-portrait-reveal { clip-path: inset(0 0 0 0 round 28px); }
   .kz-portrait-tilt, .kz-portrait-frame { transform: none !important; }
 }
+
+/* ==========================================================================
+   3D layer (components/three) — one fixed canvas between section backgrounds
+   and section content. Scenes draw only inside their tracked rectangles.
+   ========================================================================== */
+main > section > .kz-container { position: relative; z-index: 2; }
+.kz-view-track { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; }
+.kz-view-track--hero { height: calc(100% + 35vh); }
+.kz-hero-stage .kz-hero-fallback { transition: opacity 900ms var(--kz-ease-out); }
+
+/* Lenis smooth scroll (lib/scroll.ts) */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth iframe { pointer-events: none; }

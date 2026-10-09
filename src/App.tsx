@@ -31,6 +31,8 @@ import { SERVICES_DATA, CASE_STUDIES } from './data/companyData';
 import { RouterProvider } from './lib/router';
 import { useRevealObserver } from './lib/motion';
 import { SectionHeader } from './components/ui';
+import { ExperienceGate } from './components/three/ExperienceGate';
+import { scrollToElement, scrollToTop } from './lib/scrollStore';
 
 const STATIC_ROUTES = ['/', '/services', '/work', '/industries', '/about', '/insights', '/careers', '/contact', '/start-project'];
 
@@ -59,10 +61,10 @@ function App({ initialPath }: { initialPath?: string }) {
   const scrollToHash = (hash: string, smooth = true) => {
     if (!hash) return false;
     const el = document.getElementById(decodeURIComponent(hash.slice(1)));
-    if (el) { el.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant' as ScrollBehavior, block: 'start' }); return true; }
+    if (el) { scrollToElement(el, smooth); return true; }
     return false;
   };
-  const scrollTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+  const scrollTop = () => scrollToTop(true);
 
   const navigate = useCallback((to: string) => {
     const [rawPath, hashPart] = to.split('#');
@@ -70,7 +72,7 @@ function App({ initialPath }: { initialPath?: string }) {
     const hash = hashPart ? `#${hashPart}` : '';
     if (nextPath === path) {
       if (hash) { window.history.pushState({}, '', nextPath + hash); scrollToHash(hash); }
-      else window.scrollTo({ top: 0, behavior: 'smooth' });
+      else scrollToTop(false);
       return;
     }
     window.history.pushState({}, '', nextPath + hash);
@@ -88,7 +90,7 @@ function App({ initialPath }: { initialPath?: string }) {
 
   useRevealObserver(path);
 
-  const scroll = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  const scroll = (id: string) => { const el = document.getElementById(id); if (el) scrollToElement(el, true); };
   const startProject = () => navigate('/start-project');
   const openWork = () => navigate('/work');
   const navigateService = (service: { id: string }) => navigate(`/services/${service.id}`);
@@ -200,6 +202,7 @@ function App({ initialPath }: { initialPath?: string }) {
         <Footer onNavigateSection={() => {}} onOpenCareers={() => navigate('/careers')} onOpenContact={() => navigate('/contact')} onOpenLegal={setLegal} onSelectService={navigateService} />
         <LegalModal type={legal} onClose={() => setLegal(null)} />
         <KorvenzaAIChat />
+        <ExperienceGate path={path} />
       </div>
     </RouterProvider>
   );

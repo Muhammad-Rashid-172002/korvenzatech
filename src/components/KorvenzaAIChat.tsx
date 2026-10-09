@@ -678,7 +678,7 @@ export function KorvenzaAIChat() {
             </div>
           </div>
 
-          <div className="korvenza-ai-body">
+          <div className="korvenza-ai-body" data-lenis-prevent>
             {!hasConversation && (
               <div className="px-5 pb-4 pt-8">
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/10 bg-gradient-to-br from-emerald-500/15 to-emerald-400/5">

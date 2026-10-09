@@ -7,8 +7,9 @@ export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
-      // The Three.js hero scene is a lazy, homepage-only chunk (~136 kB gzip); it never blocks first paint.
-      chunkSizeWarningLimit: 600,
+      // The shared WebGL Experience (three + R3F + drei, ~261 kB gzip) is a lazy chunk that boots after
+      // load/idle on capable devices only; it never blocks first paint, so its size is allowed here.
+      chunkSizeWarningLimit: 1000,
     },
     resolve: {
       alias: {

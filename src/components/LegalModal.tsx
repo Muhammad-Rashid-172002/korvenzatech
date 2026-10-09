@@ -49,7 +49,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="legal-title" ref={dialogRef} tabIndex={-1} className="outline-none bg-[var(--kz-bg)] border border-emerald-500/30 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 space-y-6 text-left relative shadow-2xl">
+      <div data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="legal-title" ref={dialogRef} tabIndex={-1} className="outline-none bg-[var(--kz-bg)] border border-emerald-500/30 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 space-y-6 text-left relative shadow-2xl">
         
         <button
           type="button"
