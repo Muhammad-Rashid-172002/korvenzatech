@@ -7,7 +7,8 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Foundation
 - [x] Hero
 - [x] Process journey
-- [ ] Product phones (+ screenshot generation — NEEDS RASHID REVIEW)
+- [x] Screenshot generation — **NEEDS RASHID REVIEW** (`tools/screens/contact-sheet.png`)
+- [ ] Product phones
 - [ ] Services bento
 - [ ] Tech orbit
 - [ ] CTA particles
@@ -76,3 +77,10 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Resize window below 1024px wide (or under 680px tall) → lock disappears, normal tabs.
 - Light theme: path becomes a deep-green line (no glow), text stays readable on the frosted card.
 - Android: no lock; tapping phases switches the card instantly with a soft fade; the list line fills to the active phase.
+
+### Screenshot generation (5.4a) — done · NEEDS RASHID REVIEW
+
+**Option B** (Flutter project paths were "not available"): HTML recreations in `tools/screens/` (outside `src/`/`public/`, never shipped). 4 screens per app — IELTS AI Master: dashboard with the 4 modules, writing feedback with band score + AI corrections, speaking recording, progress & personal plan. SkillLink: home with categories, nearby-workers map (stylised, no map-provider branding), worker profile, job status tracking.
+- Neutral demo data only: initials avatars, "Sample learner/essay" labels, PKR prices; no store ratings, download counts or user numbers. No app repos touched.
+- Output: `public/media/work/{ielts,skilllink}/screen-1..4.webp` (1170×2532 = 390×844 @3x, 54–90 KB each) + `screen-N-540.webp` texture variants (22–35 KB) for WebGL. Contact sheet: `tools/screens/contact-sheet.png`.
+- **KTX2 skipped (safer):** the Basis transcoder adds ~200 KB of WASM/JS, more than all 8 textures together (~220 KB WebP); 540px WebP textures use ~2.5 MB GPU each and load only near the viewport.
