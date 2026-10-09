@@ -16,6 +16,13 @@ const leaders = [
     description: 'Supports company growth, operations, client coordination, delivery planning, and the leadership systems that keep KorvenzaTech projects moving with clarity.',
     icon: Users,
   },
+  {
+    name: 'Suliman',
+    role: 'COO (Chief Operating Officer)',
+    image: '/team/coo.png',
+    description: 'Oversees day-to-day operations, project execution, and the processes that keep KorvenzaTech delivery running smoothly and on schedule.',
+    icon: ShieldCheck,
+  },
 ];
 
 const testimonials = [
