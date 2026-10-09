@@ -620,3 +620,15 @@ html.lenis { scroll-behavior: auto !important; }
 @keyframes kzBsUp { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-12px); opacity: 0; } }
 @keyframes kzBsDown { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .kz-bento-scene * { animation: none !important; } .kz-tilt::after { display: none; } }
+
+/* Tech "Orbit of Tools" (components/TechStackSection.tsx + three/scenes/Orbit.tsx) */
+.kz-orbit-stage { height: clamp(300px, 80vw, 460px); }
+.kz-view-track--orbit { inset: 0; height: auto; }
+.kz-orbit-poster { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 800ms var(--kz-ease-out); pointer-events: none; }
+.kz-orbit-poster i { position: absolute; width: min(72%, 330px); aspect-ratio: 1; border-radius: 50%; border: 1px solid color-mix(in oklab, var(--kz-accent-text) 30%, transparent); }
+.kz-orbit-poster i:nth-child(2) { transform: rotateX(68deg) rotateZ(20deg); }
+.kz-orbit-poster i:nth-child(3) { transform: rotateY(68deg) rotateZ(-15deg); }
+.kz-orbit-poster b { width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(25, 199, 132, .28), transparent 70%); }
+.kz-orbit-stage[data-ready="true"] .kz-orbit-poster { opacity: 0; }
+.kz-orbit-tip { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap; padding: 6px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--kz-text); background: color-mix(in oklab, var(--kz-surface) 92%, transparent); border: 1px solid var(--kz-border-strong); box-shadow: var(--kz-shadow-md); opacity: 0; transition: opacity 180ms; }
+.kz-orbit-tip[data-show="true"] { opacity: 1; }

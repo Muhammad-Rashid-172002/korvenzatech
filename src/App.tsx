@@ -3,7 +3,6 @@ import { ArrowRight, Mail, MapPin, MessageCircle, MessageSquare, Video } from 'l
 import { SiteNavbar } from './components/SiteNavbar';
 import { PageHero } from './components/PageHero';
 import { Hero } from './components/Hero';
-import { TrustStrip } from './components/TrustStrip';
 import { ServicesOverview } from './components/ServicesOverview';
 import { HowWeHelp } from './components/HowWeHelp';
 import { FeaturedWork } from './components/FeaturedWork';
@@ -180,7 +179,6 @@ function App({ initialPath }: { initialPath?: string }) {
   </>;
   else if (path === '/') content = <>
     <Hero onStartProject={startProject} onExploreWork={openWork} onOpenSolutionWizard={() => navigate('/services')} />
-    <TrustStrip />
     <HomeServices />
     <HomeProjects />
     <HowWeHelp onStartProject={startProject} />

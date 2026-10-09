@@ -10,7 +10,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Screenshot generation — **NEEDS RASHID REVIEW** (`tools/screens/contact-sheet.png`)
 - [x] Product phones
 - [x] Services bento
-- [ ] Tech orbit
+- [x] Tech orbit
 - [ ] CTA particles
 - [ ] Testimonials
 - [ ] Leadership
@@ -32,6 +32,9 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 5. **Lighthouse note:** headless Lighthouse reports a software GPU, so it runs tier 0 (poster only). Scores therefore measure the real first-paint path; 3D cost is checked separately with forced-3D Playwright runs (`?kz3d=force`).
 
 6. **Services micro-scenes are SVG + CSS, not WebGL.** The cards tilt in 3D (CSS perspective) and have opaque backgrounds; a WebGL view behind them would be hidden by the card or mis-align with the tilted border, and six extra scissored renders cost GPU for tiny visuals. SVG micro-scenes tilt with the card, work on every tier (incl. phones), and cost ~1 KB.
+
+7. **Orbit hover is ray-cast manually.** drei `View` only routes R3F pointer events when the event target is the track element itself (and the last View to mount takes over `events.connected`), so R3F `onPointerOver` cannot work with tracks that sit under page content. The orbit listens on its stage element and ray-casts every frame (bonus: logos moving under a still cursor still highlight).
+8. **three.js split into its own lazy vendor chunk** (`three-*.js`, 190 KB gzip) so the Experience chunk is ~89 KB and long-term cacheable; still only downloaded on tier 1/2 after load.
 
 ## Known issues
 
@@ -123,3 +126,21 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Light theme: diagrams in deep green, readable.
 - Android: diagrams animate; no tilt on touch; tapping opens the service page.
 - OS "reduce motion" on: diagrams static, no tilt/glow.
+
+### Tech "Orbit of Tools" (5.6) — done
+
+**Files:** `src/components/three/scenes/Orbit.tsx` (new), `src/components/TechStackSection.tsx`, `src/App.tsx` (strip removed from home), `src/components/TrustStrip.tsx` (deleted — consolidated), `Experience.tsx`, `config.ts` (`ORBIT`), `vite.config.ts` (three vendor chunk), `package.json` (+ `simple-icons@16.31.0`, exact), `src/index.css`.
+
+**What it does:** 16 stack logos (simple-icons; AWS as a plain "AWS" text sprite, no logo) on a slowly turning sphere with faint orbit rings and a glowing core. Scroll velocity spins it faster (both directions), then it settles. Mouse over a logo: it grows and takes its brand colour, the others dim, a tooltip shows "Name · role"; spin slows while hovering. Light theme: deep-green logos, no additive glow. CSS rings are the poster (no layout shift); tier 0 keeps the poster.
+- **Tech-strip consolidation:** the separate "Built with a modern, proven stack" strip under the hero was a duplicate of this section; its list (same copy, same 10 items incl. PostgreSQL) now sits beside the orbit, and the strip component is removed. The category cards (DOM text list) are unchanged. The orbit only shows tools named on the page.
+- Every logo is decorative (`aria-hidden` stage); all names are in the DOM lists.
+
+**Bundle (gzip):** main +0.3 KB (120.19, strip moved not added) · Experience chunk 89.2 KB + three vendor 190.6 KB (was one 267.8 KB chunk; +12 KB for icons/orbit) · CSS +0.2 KB.
+
+**Lighthouse (local, `/`):** mobile Perf 95 · A11y 100 · BP 96 (sandbox fonts) · SEO 100. axe: no violations.
+
+**Manual test checklist**
+- Laptop: below the hero, the page now goes straight to services (the old badge strip is gone — its list is in the tech section). Scroll to "Modern technology, chosen with purpose." → right side shows a turning sphere of logos. Scroll fast up/down → it spins faster in that direction, then calms. Hover logos → logo pops in brand colour, others fade, tooltip names it. ~60 FPS.
+- Category filter buttons still filter the cards below.
+- Light theme: logos dark green, tooltip readable.
+- Android: sphere turns (no hover); scroll flick speeds it up. `/industries` shows the same section and orbit.

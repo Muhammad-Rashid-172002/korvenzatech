@@ -203,6 +203,24 @@ export const PRODUCT = {
   shadow: { opacity: 0.55, blur: 2.2, resolution: 256 },
 } as const;
 
+/* ------------------------------------------------------------ tech orbit */
+export const ORBIT = {
+  /** Sphere radius (world units) the logos sit on. */
+  radius: 1.55,
+  /** Logo sprite size (world units). */
+  iconSize: 0.34,
+  /** Idle spin (rad/s). */
+  baseSpeed: 0.18,
+  /** Extra spin per px/frame of scroll velocity, and its cap (rad/s). */
+  scrollGain: 0.035,
+  maxBoost: 1.4,
+  /** Opacity multiplier for the other logos while one is hovered. */
+  dimOthers: 0.3,
+  /** Camera. */
+  fov: 35,
+  cameraZ: 6,
+} as const;
+
 /* --------------------------------------------------------- motion (DOM/GSAP) */
 export const SCROLL = {
   /** Lenis smoothing: lower = heavier, longer glide. 0.1 is calm and premium. */

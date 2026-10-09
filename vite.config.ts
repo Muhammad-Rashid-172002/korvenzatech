@@ -3,13 +3,20 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ isSsrBuild }) => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
-      // The shared WebGL Experience (three + R3F + drei, ~261 kB gzip) is a lazy chunk that boots after
-      // load/idle on capable devices only; it never blocks first paint, so its size is allowed here.
-      chunkSizeWarningLimit: 1000,
+      // The shared WebGL Experience is lazy: it boots after load/idle on capable (tier 1/2) devices only and
+      // never blocks first paint. three.js core is split into its own long-cacheable vendor chunk (~700 kB min).
+      chunkSizeWarningLimit: 800,
+      rollupOptions: isSsrBuild ? undefined : {
+        output: {
+          manualChunks(id: string) {
+            if (id.includes('/node_modules/three/')) return 'three';
+          },
+        },
+      },
     },
     resolve: {
       alias: {

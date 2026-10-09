@@ -6,6 +6,7 @@ import { PRODUCT, RENDER } from './config';
 import { HeroScene } from './scenes/Hero';
 import { ProcessScene } from './scenes/Process';
 import { ProductScene } from './scenes/Product';
+import { OrbitScene } from './scenes/Orbit';
 
 export type Quality = { tier: 1 | 2; lite: boolean };
 
@@ -69,6 +70,8 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
   const heroRef = useMemo(() => ({ current: hero as HTMLElement }), [hero]);
   const process = useViewTarget('process', path);
   const processRef = useMemo(() => ({ current: process as HTMLElement }), [process]);
+  const orbit = useViewTarget('orbit', path);
+  const orbitRef = useMemo(() => ({ current: orbit as HTMLElement }), [orbit]);
   const productEls = useViewTargets('product-', path);
   const products = useMemo(
     () => productEls.filter((el) => (el.dataset.kzView ?? '').replace('product-', '') in PRODUCT.apps).map((el) => ({ el, ref: { current: el } })),
@@ -78,7 +81,7 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
   const declines = useRef(0);
   const [dpr, setDpr] = useState<number>(RENDER.dpr[tier][1]);
   const quality = useMemo<Quality>(() => ({ tier, lite }), [tier, lite]);
-  const targets = useMemo(() => [hero, process, ...products.map((p) => p.el)], [hero, process, products]);
+  const targets = useMemo(() => [hero, process, orbit, ...products.map((p) => p.el)], [hero, process, orbit, products]);
   const eventSource = useMemo(() => document.getElementById('root') ?? undefined, []);
 
   return (
@@ -120,6 +123,13 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
         <View track={processRef} index={2}>
           <Suspense fallback={null}>
             <ProcessScene track={process} quality={quality} steps={Number(process.closest<HTMLElement>('[data-steps]')?.dataset.steps) || 7} />
+          </Suspense>
+        </View>
+      )}
+      {orbit && (
+        <View track={orbitRef} index={3}>
+          <Suspense fallback={null}>
+            <OrbitScene track={orbit} quality={quality} />
           </Suspense>
         </View>
       )}
