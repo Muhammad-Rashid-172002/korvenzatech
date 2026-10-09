@@ -130,7 +130,7 @@ export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
             <span className="theme-toggle-option" data-mode="dark"><Moon className="h-3.5 w-3.5" aria-hidden="true" /></span>
           </button>
           <Link to="/contact" className="kz-nav-link">Contact</Link>
-          <Link to="/start-project" className="kz-btn kz-btn-primary !min-h-[42px] !px-4 !text-[13px]">
+          <Link to="/start-project" data-kz-magnetic="" data-kz-ripple="" className="kz-btn kz-btn-primary !min-h-[42px] !px-4 !text-[13px]">
             Start a project <ArrowRight className="kz-btn-arrow h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </div>

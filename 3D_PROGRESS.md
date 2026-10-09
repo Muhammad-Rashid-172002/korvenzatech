@@ -14,7 +14,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] CTA particles
 - [x] Testimonials
 - [x] Leadership
-- [ ] Global effects
+- [x] Global effects
 - [ ] Final audit
 
 ## Prerender check (live issue)
@@ -179,3 +179,33 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Android: swipe the row; it settles on a card. Buttons work.
 - Leadership: scroll slowly past the founders → left and right columns move at slightly different speeds; soft green haze drifts in the background. No layout jumps.
 - Reduced motion: row still scrolls (buttons jump without smooth scroll), no tilt/fog/parallax.
+
+### Global effects (5.10) — done
+
+**Files:** `src/components/fx/{Cursor,ScrollProgress,RouteCurtain,CountUp}.ts` (new, lazy), `src/lib/scroll.ts` (wires them; route setup now runs in small staged tasks), `src/components/three/ExperienceGate.tsx` (curtain on route change), `src/lib/motion.ts` (reveal threshold), `Hero.tsx` + `SiteNavbar.tsx` (magnetic + ripple on "Start a project"), `HomeSections.tsx` (`data-kz-cursor="view"` on case-study images), `TechStackSection.tsx` (count-up), `src/index.css`.
+
+- **Cursor:** dot + lagging ring; ring grows over links/buttons, becomes a green "View" disc over case-study images; native cursor returns over text fields. Only tier 2 + fine pointer + motion allowed (off on touch, low/mid tiers, reduced motion).
+- **Route curtain:** on client-side navigation a dark brand curtain with the K mark lifts away (620 ms). Timer-driven so it can never stay stuck; pointer-events none; not on first load.
+- **Scroll progress:** 2 px emerald bar at the top edge, driven by Lenis.
+- **CountUp:** the tech category counts (01–04) count up when they come into view (only real values; final value is in the HTML).
+- **Magnetic CTAs:** hero + navbar "Start a project" and both closing CTAs (ripple on press too).
+- **AI widget:** launcher has a slow breathing glow; the chat panel opens with a spring. Reduced motion: plain fade.
+- **Theme blend of 3D:** process path, orbit and product scenes cross-fade colours/blending with the theme (damped, no hard swap); hero + product media stay cinematic-dark by design (as before).
+- **Navbar "black bar" fix:** the scrolled navbar's drop shadow (`0 10px 30px -20px rgba(0,0,0,.35)`) read as a thick dark band under the bar, most visibly on light sections. Now a short, faint shadow over the existing 1 px border. *If the bar you saw was elsewhere, tell me the page/width and I'll look again.*
+- **Spacing fixes:** (1) reveal animations now start as soon as an element enters the viewport (was 8 % of the element + 8 % margin, which left tall blocks invisible = "empty space" while scrolling) and travel 18 px instead of 26 px; (2) "Problem-solving approach" section top padding ×0.75; (3) two consecutive same-background sections no longer stack two full paddings (e.g. below the "I have an idea" panel → tech section: 240 px → 174 px).
+- **Perf:** route setup (interactions, pin, parallax, hero split, refresh) now runs as separate small tasks → mobile TBT ~190–250 ms (was up to 370 ms).
+
+**Bundle (gzip):** main +0.1 KB (120.8) · scroll chunk +1.0 KB (57.3) · CSS +0.7 KB (21.4).
+
+**Lighthouse (local, `/`):** mobile Perf 93–95 · A11y 100 · BP 96 (sandbox fonts) · SEO 100; desktop 100 / 100 / 96 / 100. axe: no violations.
+
+**Manual test checklist**
+- Laptop: move the mouse → green dot + ring; over buttons the ring grows; over the two product images it becomes "View". Click inside a form field → normal text cursor.
+- Click any nav link → dark curtain with the K lifts upward, new page underneath; back button works the same.
+- Thin green bar at the very top grows as you scroll.
+- Tech section: category counts tick up to 04.
+- Hover "Start a project" (nav, hero, closing section) → button leans toward the pointer; click → ripple.
+- Chat bubble bottom-right breathes softly; open it → panel springs open.
+- Scroll the light theme past a white section → no dark band under the navbar.
+- Scroll from "Selected products" to "You bring the challenge…" and past the "I have an idea" panel → no large blank gaps; content fades in as it enters.
+- Android: no custom cursor; progress bar + curtain + ripples work.

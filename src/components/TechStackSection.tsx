@@ -72,7 +72,7 @@ export const TechStackSection: React.FC = () => {
             <article key={cat.category} className="kz-card kz-reveal p-7" style={{ '--d': idx % 3 } as React.CSSProperties}>
               <div className="flex items-baseline justify-between gap-4 border-b border-[var(--kz-border)] pb-4">
                 <h3 className="kz-h3">{cat.category}</h3>
-                <span className="font-mono text-[11px] text-[var(--kz-muted)]">{String(cat.items.length).padStart(2, '0')}</span>
+                <span className="font-mono text-[11px] text-[var(--kz-muted)]" data-kz-countup="">{String(cat.items.length).padStart(2, '0')}</span>
               </div>
               <p className="mt-4 text-[13.5px] leading-6 text-[var(--kz-muted)]">{cat.description}</p>
               <ul className="mt-5 space-y-3">

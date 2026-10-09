@@ -40,7 +40,7 @@ export const Hero: React.FC<HeroProps> = () => {
           </p>
 
           <div className="kz-hero-enter mt-9 flex flex-col gap-3 sm:flex-row sm:items-center" style={{ '--i': 3 } as React.CSSProperties}>
-            <Link to="/start-project" className="kz-btn kz-btn-primary">
+            <Link to="/start-project" data-kz-magnetic="" data-kz-ripple="" className="kz-btn kz-btn-primary">
               Start a project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" />
             </Link>
             <Link to="/work" className="kz-btn kz-btn-secondary">View our work</Link>

@@ -11,6 +11,10 @@ import { pinRanges, scrollStore, sectionProgress } from './scrollStore';
 import { PROCESS, SCROLL } from '../components/three/config';
 import { EASE, DUR } from './motion';
 import { bindInteractions } from './interactions';
+import { initCursor } from '../components/fx/Cursor';
+import { initScrollProgress } from '../components/fx/ScrollProgress';
+import { bindCountUp } from '../components/fx/CountUp';
+export { playCurtain } from '../components/fx/RouteCurtain';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -18,17 +22,22 @@ let lenis: Lenis | null = null;
 let routeCtx: gsap.Context | null = null;
 let routeMM: gsap.MatchMedia | null = null;
 let routeInteractions: (() => void) | null = null;
+let destroyCursor: (() => void) | null = null;
+let progressBar: ReturnType<typeof initScrollProgress> | null = null;
 
 export function initSmoothScroll() {
   if (lenis) return;
   lenis = new Lenis({ lerp: SCROLL.lerp, wheelMultiplier: SCROLL.wheelMultiplier, smoothWheel: true, syncTouch: false });
   scrollStore.lenis = lenis;
   document.documentElement.classList.add('kz-lenis');
+  progressBar = initScrollProgress();
+  destroyCursor = initCursor();
 
   lenis.on('scroll', (l: Lenis) => {
     scrollStore.y = l.scroll;
     scrollStore.velocity = l.velocity;
     scrollStore.progress = l.progress;
+    progressBar?.update(l.progress);
     ScrollTrigger.update();
   });
   // One clock: GSAP's ticker drives Lenis, so ScrollTrigger and Lenis never drift.
@@ -37,17 +46,29 @@ export function initSmoothScroll() {
 }
 
 /** (Re)create the scroll-driven timelines for whatever route is on screen. */
-export function setupRoute() {
+let routeGen = 0;
+/** Run each setup step in its own task so no single long task blocks input (better TBT/INP). */
+const nextTask = () => new Promise<void>((r) => setTimeout(r, 0));
+
+export async function setupRoute() {
+  const gen = ++routeGen;
   routeCtx?.revert();
   routeMM?.revert();
   routeInteractions?.();
-  routeInteractions = bindInteractions(document);
-  routeMM = gsap.matchMedia();
-  setupProcess(routeMM);
-  setupParallax(routeMM);
-  routeCtx = gsap.context(() => {
-    const hero = document.getElementById('hero');
-    if (hero) {
+  routeInteractions = null;
+  routeCtx = gsap.context(() => {});
+  const mm = (routeMM = gsap.matchMedia());
+  const steps: (() => void)[] = [
+    () => {
+      const unbindInteractions = bindInteractions(document);
+      const unbindCount = bindCountUp(document);
+      routeInteractions = () => { unbindInteractions(); unbindCount(); };
+    },
+    () => setupProcess(mm),
+    () => setupParallax(mm),
+    () => routeCtx?.add(() => {
+      const hero = document.getElementById('hero');
+      if (!hero) return;
       sectionProgress.hero = 0;
       ScrollTrigger.create({
         trigger: hero,
@@ -57,9 +78,14 @@ export function setupRoute() {
         onUpdate: (self) => { sectionProgress.hero = self.progress; },
       });
       splitHeadline(hero.querySelector<HTMLElement>('#hero-title'));
-    }
-  });
-  ScrollTrigger.refresh();
+    }),
+    () => ScrollTrigger.refresh(),
+  ];
+  for (const step of steps) {
+    await nextTask();
+    if (gen !== routeGen) return; // a newer route took over
+    step();
+  }
 }
 
 /**
@@ -152,6 +178,8 @@ export function destroySmoothScroll() {
   routeMM?.revert();
   routeInteractions?.();
   routeInteractions = null;
+  destroyCursor?.(); destroyCursor = null;
+  progressBar?.destroy(); progressBar = null;
   lenis?.destroy();
   lenis = null;
   scrollStore.lenis = null;

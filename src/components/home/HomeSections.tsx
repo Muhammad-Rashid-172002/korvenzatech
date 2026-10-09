@@ -82,7 +82,7 @@ export function HomeProjects() {
             const img = projectImage(c.id, c.imageSrc);
             return (
               <article key={c.id} className="kz-project kz-reveal group" style={{ '--d': i } as React.CSSProperties}>
-                <Link to={`/work/${c.id}`} className="block" aria-label={`${c.name} case study`}>
+                <Link to={`/work/${c.id}`} className="block" data-kz-cursor="view" aria-label={`${c.name} case study`}>
                   <div className="kz-project-media kz-reveal-img" data-ready="false">
                     {/* Rectangle the shared WebGL canvas renders this product's phones into (poster image stays until the first 3D frame). */}
                     <div data-kz-view={`product-${c.id}`} className="kz-view-track kz-view-track--product" aria-hidden="true" />

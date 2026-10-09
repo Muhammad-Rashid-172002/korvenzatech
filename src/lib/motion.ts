@@ -44,7 +44,7 @@ export function useRevealObserver(key: string) {
           io.unobserve(entry.target);
         }
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    }, { rootMargin: '0px 0px -4% 0px', threshold: 0 });
     els.filter((el) => !el.classList.contains('is-in')).forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [key]);

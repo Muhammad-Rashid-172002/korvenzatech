@@ -328,7 +328,7 @@ html[data-theme="light"] input:not(.kz-cinematic *), html[data-theme="light"] te
 
 /* ---------- Navigation --------------------------------------------------- */
 .kz-nav { position: fixed; inset: 0 0 auto 0; z-index: var(--kz-z-sticky); transition: background-color var(--kz-dur) var(--kz-ease-out), border-color var(--kz-dur), box-shadow var(--kz-dur), transform var(--kz-dur-slow) var(--kz-ease-out); border-bottom: 1px solid transparent; }
-.kz-nav.is-scrolled { background: var(--kz-nav); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); border-bottom-color: var(--kz-border); box-shadow: 0 10px 30px -20px rgba(0,0,0,.35); }
+.kz-nav.is-scrolled { background: var(--kz-nav); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); border-bottom-color: var(--kz-border); box-shadow: 0 6px 18px -16px rgba(0,0,0,.25); }
 .kz-nav-link { position: relative; padding: 8px 13px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--kz-muted); transition: color var(--kz-dur); }
 .kz-nav-link:hover { color: var(--kz-text); }
 .kz-nav-link[aria-current="page"] { color: var(--kz-text); }
@@ -389,7 +389,7 @@ html[data-theme="light"] .kz-theme-icon-light, html[data-theme="dark"] .kz-theme
 /* ---------- Reveal motion ------------------------------------------------
    Content is visible by default (SSR / no-JS). The app adds .kz-js after it
    has marked everything already on screen, so nothing above the fold hides. */
-.kz-js .kz-reveal:not(.is-in) { opacity: 0; transform: translate3d(0, 26px, 0); }
+.kz-js .kz-reveal:not(.is-in) { opacity: 0; transform: translate3d(0, 18px, 0); }
 .kz-js .kz-reveal { transition: opacity var(--kz-dur-reveal) var(--kz-ease-out), transform var(--kz-dur-reveal) var(--kz-ease-out); transition-delay: calc(var(--d, 0) * 80ms); }
 .kz-js .kz-reveal-img:not(.is-in) img { transform: scale(1.06); }
 .kz-reveal-img img { transition: transform 1.4s var(--kz-ease-out); }
@@ -667,3 +667,46 @@ html.lenis { scroll-behavior: auto !important; }
 @keyframes kzFogA { from { transform: translate3d(-4%, 0, 0) scale(1); } to { transform: translate3d(5%, -3%, 0) scale(1.08); } }
 @keyframes kzFogB { from { transform: translate3d(4%, 2%, 0) scale(1.05); } to { transform: translate3d(-5%, -2%, 0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .kz-fog i { animation: none; } }
+
+/* ---------- Global effects (components/fx/*, lib/scroll.ts) ---------- */
+/* Spacing fixes: two same-background sections in a row no longer stack two full paddings,
+   and "Problem-solving approach" sits closer to the products above it. */
+main > .kz-section:not(.kz-section-alt):not(.kz-cinematic) + .kz-section:not(.kz-section-alt):not(.kz-cinematic) { padding-top: calc(var(--kz-section) * .45); }
+#how-we-help { padding-top: calc(var(--kz-section) * .75); }
+
+/* Reading progress */
+.kz-progress { position: fixed; left: 0; right: 0; top: 0; height: 2px; z-index: calc(var(--kz-z-sticky) + 1); transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, #087F5B, #19C784 60%, #A6EBCD); pointer-events: none; }
+
+/* Cursor (tier 2, fine pointer, motion allowed) */
+html.kz-cursor-on, html.kz-cursor-on a, html.kz-cursor-on button, html.kz-cursor-on [role="tab"] { cursor: none; }
+html.kz-cursor-on :is(input, textarea, select, [contenteditable="true"]) { cursor: auto; }
+.kz-cursor { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; opacity: 0; transition: opacity 200ms; }
+html.kz-cursor-on .kz-cursor { opacity: 1; }
+.kz-cursor-dot, .kz-cursor-ring { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform; }
+.kz-cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: #19C784; }
+.kz-cursor-ring { width: 34px; height: 34px; margin: -17px 0 0 -17px; display: grid; place-items: center; }
+.kz-cursor-ring::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(25, 199, 132, .6); transition: transform 260ms var(--kz-ease-out), background-color 260ms, border-color 260ms; }
+.kz-cursor-label { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: #04110C; opacity: 0; transform: scale(.6); transition: opacity 200ms, transform 260ms var(--kz-ease-out); }
+.kz-cursor[data-state="hot"] .kz-cursor-ring::before { transform: scale(1.45); background: rgba(25, 199, 132, .08); }
+.kz-cursor[data-state="view"] .kz-cursor-ring::before { transform: scale(2.2); background: #19C784; border-color: #19C784; }
+.kz-cursor[data-state="view"] .kz-cursor-label { opacity: 1; transform: scale(1); }
+.kz-cursor[data-state="view"] .kz-cursor-dot, .kz-cursor[data-state="hidden"] { opacity: 0; }
+.kz-cursor.is-down .kz-cursor-ring::before { transform: scale(.8); }
+
+/* Route curtain */
+.kz-curtain { position: fixed; inset: 0; z-index: calc(var(--kz-z-modal) + 5); pointer-events: none; display: none; place-items: center; background: radial-gradient(60% 50% at 50% 60%, #0E3B2B, #07110E 70%); clip-path: inset(0 0 0 0); }
+.kz-curtain.is-on { display: grid; }
+.kz-curtain.is-leaving { clip-path: inset(0 0 100% 0); transition: clip-path 620ms cubic-bezier(.76, 0, .24, 1); }
+.kz-curtain-mark { width: 44px; height: 44px; border-radius: 12px; background: url(/media/brand/logo-64.webp) center / 32px no-repeat, #0A1612; border: 1px solid rgba(110, 221, 176, .2); transition: opacity 300ms, transform 620ms var(--kz-ease-out); }
+.kz-curtain.is-leaving .kz-curtain-mark { opacity: 0; transform: translateY(-30px); }
+
+/* AI widget: breathing glow on the launcher, spring open for the panel */
+.korvenza-ai-launcher::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; box-shadow: 0 0 0 0 rgba(25, 199, 132, .0); animation: kzAiBreathe 3.6s ease-in-out infinite; }
+@keyframes kzAiBreathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(25, 199, 132, 0), inset 0 0 0 1px rgba(25, 199, 132, .10); } 50% { box-shadow: 0 0 26px 2px rgba(25, 199, 132, .22), inset 0 0 0 1px rgba(25, 199, 132, .35); } }
+.korvenza-ai-shell { transform-origin: 100% 100%; animation: kzAiSpring .62s cubic-bezier(.2, 1.35, .35, 1) both; }
+@keyframes kzAiSpring { 0% { opacity: 0; transform: translateY(18px) scale(.86); } 40% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .korvenza-ai-launcher::after { animation: none; }
+  .korvenza-ai-shell { animation: korvenzaAiOpen .2s linear both; }
+  .kz-curtain, .kz-cursor, .kz-progress { display: none !important; }
+}

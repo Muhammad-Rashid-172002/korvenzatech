@@ -32,7 +32,7 @@ export function ExperienceGate({ path }: { path: string }) {
           if (cancelled) return;
           scrollMod.current = m;
           m.initSmoothScroll();
-          m.setupRoute();
+          void m.setupRoute();
         }).catch(() => {});
       }
       const info = detectTier();
@@ -51,9 +51,13 @@ export function ExperienceGate({ path }: { path: string }) {
     return () => { cancelled = true; window.removeEventListener('load', schedule); };
   }, []);
 
-  // Rebuild scroll-driven timelines after every route change (after the new DOM is painted).
+  // Rebuild scroll-driven timelines after every route change (after the new DOM is painted),
+  // and lift the route curtain (not on first load).
+  const firstPath = useRef(true);
   useEffect(() => {
-    const id = requestAnimationFrame(() => requestAnimationFrame(() => scrollMod.current?.setupRoute()));
+    if (firstPath.current) firstPath.current = false;
+    else scrollMod.current?.playCurtain();
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => { void scrollMod.current?.setupRoute(); }));
     return () => cancelAnimationFrame(id);
   }, [path]);
 
