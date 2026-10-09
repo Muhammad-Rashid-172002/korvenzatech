@@ -121,7 +121,10 @@ export function OrbitScene({ track, quality }: { track: HTMLElement; quality: Qu
   }, []);
   useEffect(() => () => { mats.forEach((m) => { m.map?.dispose(); m.dispose(); }); glow.map.dispose(); glow.mat.dispose(); }, [mats, glow]);
 
+  const all = useRef<Group>(null);
   useFrame((state, delta) => {
+    // Stay hidden until the stage's scroll-in reveal has happened.
+    if (all.current) all.current.visible = !stage || stage.classList.contains('is-in') || !document.documentElement.classList.contains('kz-js');
     if (!onScreen.current || !spin.current) return;
     const dt = Math.min(delta, 0.05);
     const light = theme.tick(dt);
@@ -183,6 +186,7 @@ export function OrbitScene({ track, quality }: { track: HTMLElement; quality: Qu
   return (
     <>
       <PerspectiveCamera makeDefault fov={ORBIT.fov} position={[0, 0, ORBIT.cameraZ]} near={0.1} far={30} />
+      <group ref={all}>
       <sprite material={glow.mat} scale={ORBIT.radius * 1.5} renderOrder={-1} />
       <group ref={spin}>
         {quality.tier === 2 && [0, 1, 2].map((k) => (
@@ -200,6 +204,7 @@ export function OrbitScene({ track, quality }: { track: HTMLElement; quality: Qu
             scale={ORBIT.iconSize}
           />
         ))}
+      </group>
       </group>
     </>
   );

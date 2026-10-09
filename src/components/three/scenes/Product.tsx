@@ -90,7 +90,10 @@ export function ProductScene({ track, quality, app }: { track: HTMLElement; qual
     screenMats.forEach((m, i) => { m.uniforms.uA.value = textures[i % textures.length]; m.uniforms.uB.value = textures[i % textures.length]; });
   }, [textures, screenMats]);
 
+  const all = useRef<Group>(null);
   useFrame((state, delta) => {
+    // Never show the phones before the card itself has revealed (scroll-in fade).
+    if (all.current) all.current.visible = !card || card.classList.contains('is-in') || !document.documentElement.classList.contains('kz-js');
     if (!onScreen.current || !textures) return;
     const dt = Math.min(delta, 0.05);
     const t = state.clock.elapsedTime;
@@ -179,6 +182,7 @@ export function ProductScene({ track, quality, app }: { track: HTMLElement; qual
   return (
     <>
       <PerspectiveCamera makeDefault fov={PRODUCT.fov} position={[0, 0.05, PRODUCT.cameraZ]} near={0.1} far={20} />
+      <group ref={all}>
       {/* Backdrop: drawn in clip space; the geometry sits far outside the contact-shadow camera. */}
       <mesh geometry={quad} material={backdrop} renderOrder={-10} frustumCulled={false} position={[0, 0, -9]} />
       <ambientLight intensity={0.55} />
@@ -198,6 +202,7 @@ export function ProductScene({ track, quality, app }: { track: HTMLElement; qual
           )}
         </>
       )}
+      </group>
     </>
   );
 }

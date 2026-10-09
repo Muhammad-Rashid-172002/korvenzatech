@@ -15,7 +15,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Testimonials
 - [x] Leadership
 - [x] Global effects
-- [ ] Final audit
+- [x] Final audit
 
 ## Prerender check (live issue)
 
@@ -40,7 +40,8 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 
 ## Known issues
 
-- `THREE.Clock: This module has been deprecated` warning comes from inside R3F 9.8.1 (not our code); appears only when the 3D layer boots. Will re-check in the final audit.
+- **R3F 9.8.1 portal leak (upstream):** every drei `<View>` portal subscribes to the root store and never unsubscribes, and each portal state keeps a closure to the previous one, so every root-state write is retained. Mitigated: Views are now mounted once per slot for the whole session (scenes inside mount/unmount per route), and root writes only happen when a value actually changes. Measured JS heap over 20-route SPA laps: was +1.8 MB/lap, now ~+0.4 MB/lap and flattening. A one-line upstream fix (or `patch-package`) would remove it fully — your call; not applied, to avoid patching node_modules.
+- The `THREE.Clock` deprecation notice (created inside R3F 9.8.1) is dropped via three's official `setConsoleFunction` hook; every other three message is forwarded.
 - In the sandbox, Google Fonts fail to load (proxy) → Lighthouse "errors-in-console" (best-practices 96). Not reproducible on the real host.
 
 ---
@@ -209,3 +210,42 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Scroll the light theme past a white section → no dark band under the navbar.
 - Scroll from "Selected products" to "You bring the challenge…" and past the "I have an idea" panel → no large blank gaps; content fades in as it enters.
 - Android: no custom cursor; progress bar + curtain + ripples work.
+
+### Final audit (5.11) — done
+
+**Fixes made during the audit:** scene remount keys (hero/orbit/product posters now re-fade correctly after navigating back to `/`), persistent Views + guarded root writes (leak mitigation above), phones/orbit stay hidden until their card/stage has revealed, Clock notice filtered. Files: `src/components/three/Experience.tsx`, `scenes/Product.tsx`, `scenes/Orbit.tsx`.
+
+**Console:** 0 errors / 0 warnings in: forced-3D runs (desktop dark + light, mobile lite), 20-route × 2 SPA walk, reduced-motion, WebGL-off, lite tier, product/orbit/CTA/process interaction tests. (Only sandbox-only Google-Fonts network errors, filtered.)
+
+**Lighthouse (local prod build; headless = tier 0 poster path):**
+
+| Route | Mobile P / A11y / BP / SEO | Desktop P / A11y / BP / SEO |
+|---|---|---|
+| `/` | 91–95 / 100 / 96* / 100 | 100 / 100 / 96* / 100 |
+| `/services` | 99 / 100 / 96* / 100 | 100 / 100 / 96* / 100 |
+| `/work/skilllink` | 99 / 100 / 96* / 100 | 100 / 100 / 96* / 100 |
+| `/about` | 97 / 100 / 96* / 100 | 100 / 100 / 96* / 100 |
+| `/start-project` | 99 / 100 / 96* / 100 | 100 / 100 / 96* / 100 |
+
+\* BP 96 is only "errors in console" from Google Fonts being blocked in this sandbox. CLS 0 everywhere. Light theme: axe (11 routes × dark + light) — no violations; Lighthouse can't switch the stored theme, so light-theme contrast is covered by axe.
+
+**Checks:**
+- Reduced motion: no Lenis/GSAP/WebGL download, tier 0, all reveal content visible, no cursor/curtain/progress/ripple.
+- WebGL off (`?kz3d=off` / no GPU): posters only, no canvas, process not pinned, everything readable.
+- Low tier (`?kz3d=lite`): canvas with lite materials, no cursor, no pin < 1024 px.
+- Keyboard: first 40 tab stops all visible with focus rings; process phases, testimonials row and buttons operable by keyboard.
+- 20-route walk: exactly 1 canvas, 1 cursor, 1 curtain, 1 pin-spacer on `/` after returning; heap trend as above.
+- Copy, routes, SEO meta, sitemap, structured data: unchanged (`src/data/*`, sitemap, robots, llms.txt untouched; SEO audit: 1 h1/page, canonical + JSON-LD intact, no duplicate titles/descriptions).
+
+**Final bundle (gzip):** main 120.8 KB (+4.0 KB vs 116.85 before the 3D work) · CSS 21.4 KB (+2.9) · lazy, after paint: scroll/motion 57.3 KB · Experience 91.7 KB + three vendor 190.6 KB (tier 1/2 only) · 3D textures ~220 KB (8 × WebP, loaded near view) — total 3D assets < 2 MB.
+
+## Final summary
+
+All 11 items done on `feature/3d-experience` (one commit per section; testimonials + leadership share one). Not deployed.
+
+**Needs Rashid:**
+1. Review the app-screen recreations (`tools/screens/contact-sheet.png`) — **NEEDS RASHID REVIEW**.
+2. Run `npm install` locally (new dependency `simple-icons@16.31.0`) before `npm run build`.
+3. Fix the live-site cache for `/` (see "Prerender check").
+4. Decide on patching the upstream R3F portal leak (see Known issues).
+5. Testimonial "Rony Sultana" text — untouched, as agreed.
