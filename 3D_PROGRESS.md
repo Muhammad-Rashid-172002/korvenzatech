@@ -11,7 +11,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Product phones
 - [x] Services bento
 - [x] Tech orbit
-- [ ] CTA particles
+- [x] CTA particles
 - [ ] Testimonials
 - [ ] Leadership
 - [ ] Global effects
@@ -144,3 +144,18 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Category filter buttons still filter the cards below.
 - Light theme: logos dark green, tooltip readable.
 - Android: sphere turns (no hover); scroll flick speeds it up. `/industries` shows the same section and orbit.
+
+### CTA "Particle K" (5.7) — done
+
+**Files:** `src/components/three/scenes/Cta.tsx` (new), `src/components/home/HomeSections.tsx` (ClosingCTA), `src/lib/interactions.ts` (magnetic + ripple), `Experience.tsx`, `config.ts` (`CTA`), `src/index.css`.
+
+**What it does:** 6,000 shader particles (2,200 on lite) drift as dust and gather into the K as the closing section scrolls in — positions and colours are sampled at runtime from the real logo (`/media/brand/logo-256.webp`), pulled toward brand emerald so the graphite parts glow too. The cursor pushes particles aside. Both CTA buttons are magnetic (drift toward the pointer) and show a ripple from the press point. Clicking "Start a project" bursts the K outward (520 ms) and then navigates; with modifier keys / middle click, or without the 3D layer, it navigates immediately as before.
+
+**Bundle (gzip):** main +0.2 KB (120.41) · scroll chunk +0.4 KB (55.75) · Experience +2.1 KB (91.32) · CSS +0.1 KB.
+
+**Lighthouse (local, `/`):** mobile Perf 95 · A11y 100 · BP 96 (sandbox fonts) · SEO 100.
+
+**Manual test checklist**
+- Laptop: scroll to "Have something ambitious in mind?" → green dust drifts in and forms the K behind the heading; headline stays readable. Move the mouse over the section → particles part around the cursor. Hover the buttons → they lean toward the pointer. Click "Start a project" → ripple + the K blows outward, then the project page opens (~0.5 s). Cmd/Ctrl-click → opens in a new tab with no delay.
+- Android: K forms on scroll (fewer particles), tap ripple; tap navigates after the short burst.
+- Reduced motion / `?kz3d=off`: no particles, button navigates immediately, no ripple.

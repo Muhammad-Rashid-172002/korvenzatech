@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, ArrowUpRight, Bot, Cloud, Code, Globe, Layers, Layout, Network, Smartphone, TrendingUp } from 'lucide-react';
 import { CASE_STUDIES, SERVICES_DATA } from '../../data/companyData';
-import { Link } from '../../lib/router';
+import { Link, useRouter } from '../../lib/router';
 import { Eyebrow, SectionHeader } from '../ui';
 import { projectImage } from '../../data/media';
 import { BentoScene } from './BentoScene';
@@ -122,20 +122,34 @@ export function HomeProjects() {
   );
 }
 
+/** Burst duration (ms) — keep in sync with CTA.burstMs in components/three/config.ts. */
+const CTA_BURST_MS = 520;
+
 export function ClosingCTA() {
+  const { navigate } = useRouter();
+  // With the 3D layer ready, the primary CTA bursts the particle K first, then navigates.
+  const burstThenGo = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (document.documentElement.dataset.kzCta !== 'ready') return;
+    e.preventDefault();
+    window.dispatchEvent(new Event('kz:cta-burst'));
+    window.setTimeout(() => navigate('/start-project'), CTA_BURST_MS);
+  };
   return (
     <section className="kz-cinematic relative overflow-hidden bg-[#07110E] py-[var(--kz-section)]" aria-labelledby="cta-title">
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(45%_70%_at_50%_100%,rgba(25,199,132,.22),transparent_70%)]" aria-hidden="true" />
       <div className="bg-grid-pattern pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
+      {/* Rectangle the shared WebGL canvas renders the particle K into. */}
+      <div data-kz-view="cta" className="kz-view-track kz-view-track--cta" aria-hidden="true" />
       <div className="kz-container relative text-center">
         <Eyebrow className="kz-reveal mx-auto">Ready when you are</Eyebrow>
         <h2 id="cta-title" className="kz-h1 kz-reveal mx-auto mt-6 max-w-4xl text-white">Have something ambitious in mind?</h2>
         <p className="kz-lead kz-reveal mx-auto mt-6 max-w-2xl" style={{ '--d': 1 } as React.CSSProperties}>
           You explain the business goal. We’ll help turn it into a clear product, roadmap and technical plan.
         </p>
-        <div className="kz-reveal mt-10 flex flex-col justify-center gap-3 sm:flex-row" style={{ '--d': 2 } as React.CSSProperties}>
-          <Link to="/start-project" className="kz-btn kz-btn-primary">Start a project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></Link>
-          <Link to="/contact" className="kz-btn kz-btn-secondary">Talk to the team</Link>
+        <div className="kz-reveal mt-10 flex flex-col justify-center gap-3 sm:flex-row" data-kz-magnetic-zone="" style={{ '--d': 2 } as React.CSSProperties}>
+          <Link to="/start-project" onClick={burstThenGo} data-kz-magnetic="" data-kz-ripple="" className="kz-btn kz-btn-primary">Start a project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></Link>
+          <Link to="/contact" data-kz-magnetic="" data-kz-ripple="" className="kz-btn kz-btn-secondary">Talk to the team</Link>
         </div>
       </div>
     </section>

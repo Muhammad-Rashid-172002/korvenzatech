@@ -221,6 +221,25 @@ export const ORBIT = {
   cameraZ: 6,
 } as const;
 
+/* ------------------------------------------------------------- CTA particles */
+export const CTA = {
+  /** Logo image the K is sampled from (dark/opaque pixels become particles). */
+  logo: '/media/brand/logo-256.webp',
+  /** Particle count per tier (1 = lite, 2 = full). Linear GPU cost. */
+  count: { 1: 2200, 2: 6000 } as Record<number, number>,
+  /** Size of the formed K (world units) and base point size (px at dpr 1). */
+  size: 3.1,
+  pointSize: 3.4,
+  /** How much the logo's own colours are pulled toward brand emerald (0 = logo colours, 1 = all emerald). */
+  brandMix: 0.8,
+  /** Cursor repel radius (world units). */
+  repelRadius: 0.55,
+  /** Burst duration before navigating (ms). Also used by the button. */
+  burstMs: 520,
+  fov: 35,
+  cameraZ: 6,
+} as const;
+
 /* --------------------------------------------------------- motion (DOM/GSAP) */
 export const SCROLL = {
   /** Lenis smoothing: lower = heavier, longer glide. 0.1 is calm and premium. */

@@ -7,6 +7,7 @@ import { HeroScene } from './scenes/Hero';
 import { ProcessScene } from './scenes/Process';
 import { ProductScene } from './scenes/Product';
 import { OrbitScene } from './scenes/Orbit';
+import { CtaScene } from './scenes/Cta';
 
 export type Quality = { tier: 1 | 2; lite: boolean };
 
@@ -72,6 +73,8 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
   const processRef = useMemo(() => ({ current: process as HTMLElement }), [process]);
   const orbit = useViewTarget('orbit', path);
   const orbitRef = useMemo(() => ({ current: orbit as HTMLElement }), [orbit]);
+  const cta = useViewTarget('cta', path);
+  const ctaRef = useMemo(() => ({ current: cta as HTMLElement }), [cta]);
   const productEls = useViewTargets('product-', path);
   const products = useMemo(
     () => productEls.filter((el) => (el.dataset.kzView ?? '').replace('product-', '') in PRODUCT.apps).map((el) => ({ el, ref: { current: el } })),
@@ -81,7 +84,7 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
   const declines = useRef(0);
   const [dpr, setDpr] = useState<number>(RENDER.dpr[tier][1]);
   const quality = useMemo<Quality>(() => ({ tier, lite }), [tier, lite]);
-  const targets = useMemo(() => [hero, process, orbit, ...products.map((p) => p.el)], [hero, process, orbit, products]);
+  const targets = useMemo(() => [hero, process, orbit, cta, ...products.map((p) => p.el)], [hero, process, orbit, cta, products]);
   const eventSource = useMemo(() => document.getElementById('root') ?? undefined, []);
 
   return (
@@ -130,6 +133,13 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
         <View track={orbitRef} index={3}>
           <Suspense fallback={null}>
             <OrbitScene track={orbit} quality={quality} />
+          </Suspense>
+        </View>
+      )}
+      {cta && (
+        <View track={ctaRef} index={4}>
+          <Suspense fallback={null}>
+            <CtaScene track={cta} quality={quality} />
           </Suspense>
         </View>
       )}

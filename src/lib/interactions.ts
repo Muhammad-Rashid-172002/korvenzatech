@@ -6,6 +6,9 @@
  *                          glow follows the cursor, `.kz-magnetic-arrow`
  *                          inside drifts toward the pointer.
  *  .kz-bento-scene         SVG micro-scenes animate only while on screen.
+ *  [data-kz-magnetic]      element drifts toward the pointer while it is
+ *                          inside the nearest [data-kz-magnetic-zone] (or itself).
+ *  [data-kz-ripple]        click ripple from the press point.
  */
 type Cleanup = () => void;
 
@@ -54,10 +57,55 @@ function bindTilt(el: HTMLElement): Cleanup {
   return () => { leave(); el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); };
 }
 
+function bindMagnetic(el: HTMLElement, strength = 0.28, max = 10): Cleanup {
+  const zone = el.closest<HTMLElement>('[data-kz-magnetic-zone]') ?? el;
+  let raf = 0;
+  let tx = 0;
+  let ty = 0;
+  const apply = () => { raf = 0; el.style.translate = `${tx.toFixed(1)}px ${ty.toFixed(1)}px`; };
+  const move = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    const r = el.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    const reach = Math.max(r.width, r.height) * 0.9;
+    const k = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
+    tx = Math.max(-max, Math.min(max, dx * strength * k));
+    ty = Math.max(-max, Math.min(max, dy * strength * k));
+    if (!raf) raf = requestAnimationFrame(apply);
+  };
+  const leave = () => { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(apply); };
+  el.classList.add('kz-magnetic');
+  zone.addEventListener('pointermove', move);
+  zone.addEventListener('pointerleave', leave);
+  return () => { cancelAnimationFrame(raf); el.style.translate = ''; el.classList.remove('kz-magnetic'); zone.removeEventListener('pointermove', move); zone.removeEventListener('pointerleave', leave); };
+}
+
+function bindRipple(el: HTMLElement): Cleanup {
+  const down = (e: PointerEvent) => {
+    const r = el.getBoundingClientRect();
+    const d = Math.hypot(r.width, r.height) * 2;
+    const s = document.createElement('span');
+    s.className = 'kz-ripple';
+    s.setAttribute('aria-hidden', 'true');
+    s.style.width = s.style.height = `${d}px`;
+    s.style.left = `${e.clientX - r.left - d / 2}px`;
+    s.style.top = `${e.clientY - r.top - d / 2}px`;
+    el.appendChild(s);
+    s.addEventListener('animationend', () => s.remove(), { once: true });
+  };
+  el.addEventListener('pointerdown', down);
+  return () => el.removeEventListener('pointerdown', down);
+}
+
 /** Bind all pointer/visibility micro-interactions under `root`. Returns one cleanup. */
 export function bindInteractions(root: ParentNode = document): Cleanup {
   const cleanups: Cleanup[] = [];
-  if (finePointer()) root.querySelectorAll<HTMLElement>('[data-kz-tilt]').forEach((el) => cleanups.push(bindTilt(el)));
+  if (finePointer()) {
+    root.querySelectorAll<HTMLElement>('[data-kz-tilt]').forEach((el) => cleanups.push(bindTilt(el)));
+    root.querySelectorAll<HTMLElement>('[data-kz-magnetic]').forEach((el) => cleanups.push(bindMagnetic(el)));
+  }
+  root.querySelectorAll<HTMLElement>('[data-kz-ripple]').forEach((el) => cleanups.push(bindRipple(el)));
 
   const scenes = root.querySelectorAll<Element>('.kz-bento-scene');
   if (scenes.length) {
