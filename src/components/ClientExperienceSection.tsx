@@ -13,21 +13,21 @@ export const ClientExperienceSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-24 bg-[#080b12] relative z-10 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="kz-section  relative z-10 border-t border-[var(--kz-border)]">
+      <div className="kz-container">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-semibold uppercase tracking-wider">
+        <div className="kz-reveal text-center max-w-3xl mx-auto space-y-5 mb-14">
+          <div className="kz-eyebrow mx-auto">
             <CheckCircle className="w-3.5 h-3.5" />
             <span>The Client Journey</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="kz-h2">
             What Working With KorvenzaTech Feels Like
           </h2>
 
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
+          <p className="kz-lead">
             We eliminate stress, confusion, and technical black boxes with transparent communication and predictable milestones.
           </p>
         </div>
@@ -39,9 +39,9 @@ export const ClientExperienceSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl glass-panel border border-white/10 hover:border-blue-500/30 text-left space-y-3"
+                className="p-6 rounded-2xl glass-panel border border-white/10 hover:border-emerald-500/30 text-left space-y-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-violet-400">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <IconComp className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-white">{tp.title}</h3>

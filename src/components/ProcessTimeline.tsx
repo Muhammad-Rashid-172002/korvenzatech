@@ -1,133 +1,85 @@
 import React, { useState } from 'react';
 import { PROCESS_STEPS } from '../data/companyData';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { SectionHeader } from './ui';
 
 interface ProcessTimelineProps {
   onStartProject: () => void;
 }
 
 export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({ onStartProject }) => {
-  const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
+  const [active, setActive] = useState(0);
+  const step = PROCESS_STEPS[active];
+  const total = PROCESS_STEPS.length;
+
+  const onKey = (e: React.KeyboardEvent) => {
+    if (!['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+    e.preventDefault();
+    const next = (active + (e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : total - 1)) % total;
+    setActive(next);
+    document.getElementById(`step-tab-${next}`)?.focus();
+  };
 
   return (
-    <section id="process" className="py-24 bg-[#06080d] relative z-10 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-violet-400 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Structured Delivery Methodology</span>
+    <section id="process" className="kz-section kz-section-alt relative z-10" aria-labelledby="process-title">
+      <div className="kz-container">
+        <SectionHeader
+          eyebrow="How KorvenzaTech works"
+          title={<span id="process-title">From idea to launch — without the confusion.</span>}
+          lead={`A transparent ${total}-step engineering process, so you always know what is being built, why it matters and what comes next.`}
+        />
+
+        <div className="mt-14 grid gap-6 lg:grid-cols-12 lg:gap-10">
+          <div className="kz-reveal relative lg:col-span-5" onKeyDown={onKey}>
+            <span className="absolute bottom-6 left-[27px] top-6 w-px bg-[var(--kz-border-strong)]" aria-hidden="true" />
+            <ol role="tablist" aria-orientation="vertical" aria-label="Delivery phases" className="relative space-y-1">
+              {PROCESS_STEPS.map((s, i) => {
+                const isActive = i === active;
+                return (
+                  <li key={s.number} role="presentation">
+                    <button
+                      id={`step-tab-${i}`}
+                      role="tab"
+                      type="button"
+                      aria-selected={isActive}
+                      aria-controls="step-panel"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => setActive(i)}
+                      className={`flex w-full items-center gap-4 rounded-2xl px-2 py-2.5 text-left transition-colors ${isActive ? 'bg-[var(--kz-surface)]' : 'hover:bg-[var(--kz-surface)]/60'}`}
+                    >
+                      <span className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border font-mono text-[12px] font-bold transition-all duration-500 ${isActive ? 'border-emerald-400 bg-emerald-700 text-white kz-on-accent shadow-[0_8px_24px_-8px_rgba(25,199,132,.7)]' : i < active ? 'border-emerald-500/40 bg-[var(--kz-surface)] text-[var(--kz-accent-text)]' : 'border-[var(--kz-border-strong)] bg-[var(--kz-surface)] text-[var(--kz-muted)]'}`}>{s.number}</span>
+                      <span className={`text-[15px] font-semibold transition-colors ${isActive ? 'text-[var(--kz-text)]' : 'text-[var(--kz-muted)]'}`}>{s.title}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            From Idea to Launch — Without the Confusion
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            Our transparent 7-step engineering process ensures you always know what is being built, why it matters, and when it will be delivered.
-          </p>
-        </div>
-
-        {/* Process Horizontal Stepper Bar */}
-        <div className="mb-12 overflow-x-auto pb-4">
-          <div className="flex items-center min-w-max justify-between px-4">
-            {PROCESS_STEPS.map((step, idx) => {
-              const isActive = idx === activeStepIndex;
-              const isPast = idx < activeStepIndex;
-
-              return (
-                <button
-                  key={step.number}
-                  onClick={() => setActiveStepIndex(idx)}
-                  className="flex flex-col items-center group cursor-pointer px-3"
-                >
-                  {/* Step Circle Node */}
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-bold text-sm transition-all duration-300 border ${
-                    isActive
-                      ? 'bg-blue-600 text-white border-violet-400 shadow-lg shadow-blue-600/40 scale-110'
-                      : isPast
-                      ? 'bg-violet-950/60 text-violet-300 border-violet-500/30'
-                      : 'bg-white/5 text-slate-400 border-white/5 group-hover:border-white/20'
-                  }`}>
-                    {isPast ? <Check className="w-5 h-5 text-violet-400" /> : step.number}
-                  </div>
-
-                  <span className={`text-xs font-semibold mt-2 transition-colors ${
-                    isActive ? 'text-violet-400 font-bold' : 'text-slate-400 group-hover:text-white'
-                  }`}>
-                    {step.title.split('&')[0]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Progress Connecting Line */}
-          <div className="relative w-full h-1 bg-slate-800 rounded-full mt-4 max-w-5xl mx-auto overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-blue-600 to-violet-400 transition-all duration-500"
-              style={{ width: `${((activeStepIndex + 1) / PROCESS_STEPS.length) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Active Step Details Panel */}
-        {PROCESS_STEPS[activeStepIndex] && (
-          <div className="max-w-4xl mx-auto p-8 sm:p-10 rounded-3xl glass-panel border border-blue-500/30 bg-gradient-to-br from-[#080b12] via-[#0a0f1d] to-[#04060a] space-y-6 text-left relative overflow-hidden">
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-mono font-extrabold text-violet-400">
-                  Step {PROCESS_STEPS[activeStepIndex].number}
-                </span>
-                <span className="text-xl font-bold text-white">
-                  {PROCESS_STEPS[activeStepIndex].title}
-                </span>
+          <div id="step-panel" role="tabpanel" aria-labelledby={`step-tab-${active}`} className="kz-reveal lg:col-span-7">
+            <div key={active} className="animate-in flex h-full flex-col rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-surface)] p-8 sm:p-10">
+              <div className="flex items-center justify-between gap-4 border-b border-[var(--kz-border)] pb-6">
+                <span className="font-mono text-4xl font-extrabold tracking-tight text-[var(--kz-accent-text)]" aria-hidden="true">{step.number}</span>
+                <span className="kz-meta">Phase {active + 1} of {total}</span>
               </div>
-              <span className="text-xs font-mono text-slate-400">
-                Phase {activeStepIndex + 1} of 7
-              </span>
-            </div>
-
-            <p className="text-base text-slate-300 leading-relaxed font-normal">
-              {PROCESS_STEPS[activeStepIndex].description}
-            </p>
-
-            {/* Key Deliverable Box */}
-            <div className="p-4 rounded-2xl bg-blue-950/40 border border-blue-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-violet-400 tracking-wider">
-                  Phase Milestone Deliverable:
-                </span>
-                <p className="text-sm font-semibold text-white">
-                  {PROCESS_STEPS[activeStepIndex].deliverable}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {activeStepIndex < PROCESS_STEPS.length - 1 ? (
-                  <button
-                    onClick={() => setActiveStepIndex(activeStepIndex + 1)}
-                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all flex items-center gap-1.5"
-                  >
-                    <span>Next Phase</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={onStartProject}
-                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-1.5"
-                  >
-                    <span>Ready to Launch? Start Brief</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
+              <h3 className="mt-7 text-2xl font-extrabold tracking-tight text-[var(--kz-text)] sm:text-3xl">{step.title}</h3>
+              <p className="mt-4 text-[15px] leading-7 text-[var(--kz-text-2)]">{step.description}</p>
+              <div className="mt-auto pt-8">
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[.06] p-5">
+                  <p className="kz-meta !text-[10px] !text-[var(--kz-accent-text)]">Milestone deliverable</p>
+                  <p className="mt-2 text-[15px] font-semibold text-[var(--kz-text)]">{step.deliverable}</p>
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {active < total - 1 ? (
+                    <button type="button" onClick={() => setActive(active + 1)} className="kz-btn kz-btn-secondary">Next phase <ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+                  ) : (
+                    <button type="button" onClick={onStartProject} className="kz-btn kz-btn-primary">Ready to start? Send a brief <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></button>
+                  )}
+                </div>
               </div>
             </div>
-
           </div>
-        )}
-
+        </div>
       </div>
     </section>
   );

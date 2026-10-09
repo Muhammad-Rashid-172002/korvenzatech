@@ -89,17 +89,17 @@ export const InteractiveSolutionBuilder: React.FC<SolutionBuilderProps> = ({ onS
   const currentRec = recommendations[selectedOption] || recommendations.notsure;
 
   return (
-    <section className="py-24 bg-[#08090B] relative z-10 border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="kz-section  relative z-10 border-t border-[var(--kz-border)]">
+      <div className="kz-container">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+        <div className="kz-reveal text-center max-w-3xl mx-auto space-y-5 mb-12">
+          <div className="kz-eyebrow mx-auto">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Interactive Project Guidance</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="kz-h2">
             What Can We Build for You?
           </h2>
 
@@ -120,11 +120,11 @@ export const InteractiveSolutionBuilder: React.FC<SolutionBuilderProps> = ({ onS
                 onClick={() => setSelectedOption(opt.id)}
                 className={`p-4 rounded-2xl text-center border transition-all duration-200 flex flex-col items-center justify-center gap-3 ${
                   isSel
-                    ? 'bg-indigo-500 text-white border-indigo-400 shadow-xl shadow-indigo-500/25 scale-105'
-                    : 'bg-slate-800/80 text-slate-400 border-slate-700/60 hover:border-slate-600 hover:text-white'
+                    ? 'bg-emerald-700 text-white kz-on-accent border-emerald-400 shadow-xl shadow-emerald-500/25 scale-105'
+                    : 'bg-[var(--kz-surface-2)]/80 text-slate-400 border-[var(--kz-border)] hover:border-slate-600 hover:text-white'
                 }`}
               >
-                <IconComponent className={`w-6 h-6 ${isSel ? 'text-white' : 'text-indigo-400'}`} />
+                <IconComponent className={`w-6 h-6 ${isSel ? 'text-white' : 'text-emerald-400'}`} />
                 <span className="text-xs font-semibold leading-tight">{opt.label}</span>
               </button>
             );
@@ -132,9 +132,9 @@ export const InteractiveSolutionBuilder: React.FC<SolutionBuilderProps> = ({ onS
         </div>
 
         {/* Dynamic Recommendation Card */}
-        <div className="p-8 sm:p-10 rounded-3xl glass-panel border border-slate-800 bg-[#17181F] space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
-            <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-wider">
+        <div className="p-8 sm:p-10 rounded-3xl glass-panel border border-[var(--kz-border)] bg-[var(--kz-surface)] space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[var(--kz-border)]">
+            <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
               Recommended Solution Path:
             </span>
             <span className="text-xs text-slate-400 font-mono">Tailored for Business Impact</span>
@@ -151,13 +151,13 @@ export const InteractiveSolutionBuilder: React.FC<SolutionBuilderProps> = ({ onS
               </p>
 
               <div className="space-y-2 pt-2">
-                <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
                   Key Capabilities Included:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {currentRec.capabilities.map((cap, cIdx) => (
-                    <div key={cIdx} className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-200 flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <div key={cIdx} className="p-2.5 rounded-xl bg-[var(--kz-surface-2)]/80 border border-[var(--kz-border)] text-xs text-slate-200 flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <span>{cap}</span>
                     </div>
                   ))}
@@ -166,14 +166,14 @@ export const InteractiveSolutionBuilder: React.FC<SolutionBuilderProps> = ({ onS
             </div>
 
             {/* Right Action Box */}
-            <div className="lg:col-span-4 p-6 rounded-2xl bg-slate-900/90 border border-slate-700/60 space-y-4 text-center">
-              <span className="text-xs font-mono text-indigo-400 uppercase font-bold">Suggested Next Step</span>
+            <div className="lg:col-span-4 p-6 rounded-2xl bg-[var(--kz-surface-2)]/90 border border-[var(--kz-border)] space-y-4 text-center">
+              <span className="text-xs font-mono text-emerald-400 uppercase font-bold">Suggested Next Step</span>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {currentRec.nextStep}
               </p>
               <button
                 onClick={onStartProject}
-                className="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white kz-on-accent font-bold text-xs shadow-lg shadow-emerald-500/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
               >
                 <span>Talk to an Expert</span>
                 <ArrowRight className="w-4 h-4" />

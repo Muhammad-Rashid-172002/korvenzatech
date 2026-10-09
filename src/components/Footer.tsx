@@ -1,7 +1,8 @@
 import React from 'react';
-import { Globe, ShieldCheck, Mail, MessageCircle } from 'lucide-react';
+import { ArrowRight, Globe, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 import { ServiceItem } from '../types';
 import { SERVICES_DATA } from '../data/companyData';
+import { Link } from '../lib/router';
 
 interface FooterProps {
   onNavigateSection: (sectionId: string) => void;
@@ -11,129 +12,75 @@ interface FooterProps {
   onSelectService: (service: ServiceItem) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({
-  onNavigateSection,
-  onOpenCareers,
-  onOpenContact,
-  onOpenLegal,
-  onSelectService,
-}) => {
+const linkCls = 'inline-block py-1 text-[13.5px] text-[#8EA098] hover:text-white';
+
+export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
   return (
-    <footer className="bg-[#0B1120] border-t border-slate-800 text-slate-400 text-xs relative z-10 pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        {/* Top Footer Row */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          
-          {/* Col 1: Brand Info */}
-          <div className="col-span-2 space-y-4 text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-500 p-[1px]">
-                <div className="w-full h-full bg-[#17181F] rounded-[7px] flex items-center justify-center">
-                  <svg className="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4v16" />
-                    <path d="M18 4L8 12l10 8" />
-                  </svg>
-                </div>
-              </div>
-              <span className="text-base font-bold text-white tracking-tight">
-                Korvenza<span className="text-indigo-400">Tech</span>
+    <footer className="kz-footer kz-cinematic relative z-10 text-[#8EA098]">
+      <div className="kz-container pt-20 pb-10">
+        <div className="grid gap-12 border-b border-white/[0.07] pb-14 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <Link to="/" className="inline-flex items-center gap-3" aria-label="KorvenzaTech home">
+              <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-[#0A1612]">
+                <img src="/media/brand/logo-64.webp" width={34} height={34} alt="" className="h-[34px] w-[34px] object-contain" loading="lazy" />
               </span>
-            </div>
-
-            <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-              Technology Built Around Your Business. We design, build, automate, and scale digital products for modern companies worldwide.
+              <span className="text-lg font-extrabold tracking-tight text-white">Korvenza<span className="text-emerald-400">Tech</span></span>
+            </Link>
+            <p className="mt-5 max-w-sm text-[14px] leading-7">
+              Technology built around your business. We design, build, automate and scale digital products for modern companies worldwide.
             </p>
-
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-mono text-slate-400 pt-2">
-              <span className="flex items-center gap-1"><Globe className="w-3.5 h-3.5 text-emerald-400" /><span>Pakistan • Global delivery</span></span>
-              <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /><span>Security-conscious engineering</span></span>
-            </div>
-            <div className="grid gap-2 pt-2 text-[11px] sm:grid-cols-2">
-              <a href="mailto:info@korvenzatech.com" className="flex items-center gap-2 text-slate-400 hover:text-emerald-300"><Mail className="h-3.5 w-3.5"/>info@korvenzatech.com</a>
-              <a href="mailto:sales@korvenzatech.com" className="flex items-center gap-2 text-slate-400 hover:text-emerald-300"><Mail className="h-3.5 w-3.5"/>sales@korvenzatech.com</a>
-              <a href="https://wa.me/923701691701" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-emerald-300"><MessageCircle className="h-3.5 w-3.5"/>+92 370 1691701</a>
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[12px]">
+              <span className="inline-flex items-center gap-1.5"><Globe className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />Pakistan • Global delivery</span>
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />Security-conscious engineering</span>
             </div>
           </div>
 
-          {/* Col 2: Company */}
-          <div className="space-y-3 text-left">
-            <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-              Company
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/about" className="hover:text-white transition-colors">About Us</a>
-              </li>
-              <li>
-                <a href="/work" className="hover:text-white transition-colors">Featured Work</a>
-              </li>
-              <li>
-                <a href="/careers" className="hover:text-white transition-colors">Careers & Roles</a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-white transition-colors">Contact Us</a>
-              </li>
-            </ul>
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-5">
+            <div>
+              <h2 className="kz-meta !text-[#C3D1CA]">Company</h2>
+              <ul className="mt-4 space-y-1.5">
+                <li><Link to="/about" className={linkCls}>About us</Link></li>
+                <li><Link to="/work" className={linkCls}>Featured work</Link></li>
+                <li><Link to="/industries" className={linkCls}>Industries</Link></li>
+                <li><Link to="/careers" className={linkCls}>Careers</Link></li>
+                <li><Link to="/contact" className={linkCls}>Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="kz-meta !text-[#C3D1CA]">Services</h2>
+              <ul className="mt-4 space-y-1.5">
+                {SERVICES_DATA.slice(0, 6).map((srv) => (
+                  <li key={srv.id}><Link to={`/services/${srv.id}`} className={linkCls}>{srv.title}</Link></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 className="kz-meta !text-[#C3D1CA]">Resources</h2>
+              <ul className="mt-4 space-y-1.5">
+                <li><Link to="/insights" className={linkCls}>Insights</Link></li>
+                <li><Link to="/about#faq" className={linkCls}>FAQs</Link></li>
+                <li><button type="button" onClick={() => onOpenLegal('privacy')} className={linkCls}>Privacy policy</button></li>
+                <li><button type="button" onClick={() => onOpenLegal('terms')} className={linkCls}>Terms of service</button></li>
+                <li><button type="button" onClick={() => onOpenLegal('cookies')} className={linkCls}>Cookie preferences</button></li>
+              </ul>
+            </div>
           </div>
 
-          {/* Col 3: Services */}
-          <div className="space-y-3 text-left">
-            <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-              Services
-            </h4>
-            <ul className="space-y-2">
-              {SERVICES_DATA.slice(0, 5).map((srv) => (
-                <li key={srv.id}>
-                  <a href={`/services/${srv.id}`} className="hover:text-white transition-colors">{srv.title}</a>
-                </li>
-              ))}
+          <div className="lg:col-span-3">
+            <h2 className="kz-meta !text-[#C3D1CA]">Get in touch</h2>
+            <ul className="mt-4 space-y-1 text-[13.5px]">
+              <li><a href="mailto:info@korvenzatech.com" className="inline-flex min-h-[32px] items-center gap-2 hover:text-white"><Mail className="h-4 w-4 text-emerald-400" aria-hidden="true" />info@korvenzatech.com</a></li>
+              <li><a href="mailto:sales@korvenzatech.com" className="inline-flex min-h-[32px] items-center gap-2 hover:text-white"><Mail className="h-4 w-4 text-emerald-400" aria-hidden="true" />sales@korvenzatech.com</a></li>
+              <li><a href="https://wa.me/923701691701" target="_blank" rel="noreferrer" className="inline-flex min-h-[32px] items-center gap-2 hover:text-white"><MessageCircle className="h-4 w-4 text-emerald-400" aria-hidden="true" />+92 370 1691701</a></li>
             </ul>
+            <Link to="/start-project" className="kz-btn kz-btn-primary mt-7 !w-auto">Start a project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></Link>
           </div>
-
-          {/* Col 4: Resources & Legal */}
-          <div className="space-y-3 text-left">
-            <h4 className="font-bold text-white uppercase tracking-wider text-[11px] text-indigo-400">
-              Resources & Legal
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/insights" className="hover:text-white transition-colors">Insights & Articles</a>
-              </li>
-              <li>
-                <button onClick={() => onNavigateSection('faq')} className="hover:text-white transition-colors">
-                  FAQs
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onOpenLegal('privacy')} className="hover:text-white transition-colors">
-                  Privacy Policy
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onOpenLegal('terms')} className="hover:text-white transition-colors">
-                  Terms of Service
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onOpenLegal('cookies')} className="hover:text-white transition-colors">
-                  Cookie Preferences
-                </button>
-              </li>
-            </ul>
-          </div>
-
         </div>
 
-        {/* Bottom Bar Row */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 font-mono text-[11px]">
-          <div>
-            © {new Date().getFullYear()} KorvenzaTech. All rights reserved.
-          </div>
-
-          <div className="flex items-center gap-6"><a href="https://korvenzatech.com" className="hover:text-indigo-400 transition-colors">korvenzatech.com</a></div>
+        <div className="flex flex-col items-center justify-between gap-4 pt-8 text-[12px] sm:flex-row">
+          <p>© {new Date().getFullYear()} KorvenzaTech. All rights reserved.</p>
+          <a href="https://korvenzatech.com" className="inline-block py-1 font-mono hover:text-white">korvenzatech.com</a>
         </div>
-
       </div>
     </footer>
   );

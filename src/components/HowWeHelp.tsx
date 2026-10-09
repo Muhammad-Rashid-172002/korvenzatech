@@ -1,180 +1,130 @@
 import React, { useState } from 'react';
-import { Lightbulb, Wrench, Bot, ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
+import { Lightbulb, Wrench, Bot, ArrowRight, Check } from 'lucide-react';
+import { SectionHeader } from './ui';
 
 interface HowWeHelpProps {
   onStartProject: () => void;
 }
 
+const scenarios = [
+  {
+    title: '“I have an idea”',
+    subtitle: 'For entrepreneurs, founders and innovators with an app or software concept.',
+    icon: Lightbulb,
+    badge: 'From concept to product',
+    description: 'You do not need technical knowledge or wireframes. You explain what problem your app solves, and our team transforms your vision into a structured product roadmap, clickable user designs, and a published mobile or web app.',
+    steps: [
+      'Free 30-minute discovery call to discuss your vision',
+      'Interactive Figma prototype to preview before coding',
+      'Cross-platform mobile (iOS/Android) or web engineering',
+      'Store publishing, domain setup and a launch-ready release',
+    ],
+    quote: 'We turn raw concepts into functional, market-ready software products.',
+  },
+  {
+    title: '“My business needs better software”',
+    subtitle: 'For established companies needing internal tools, custom portals or database upgrades.',
+    icon: Wrench,
+    badge: 'Streamline operations',
+    description: 'We study your daily business workflows, spot manual bottlenecks, and engineer custom management portals, CRM tools or automated booking systems that reduce repetitive manual work for your team.',
+    steps: [
+      'Operational process audit and bottleneck identification',
+      'Custom web portal or role-based management software',
+      'Integration with your existing databases and accounting tools',
+      'Employee onboarding and ongoing technical support',
+    ],
+    quote: 'Tailor-made software built around your exact business workflow.',
+  },
+  {
+    title: '“I want to add AI”',
+    subtitle: 'For companies seeking practical AI automation, customer assistants or smart data analysis.',
+    icon: Bot,
+    badge: 'Practical AI value',
+    description: 'We identify where artificial intelligence can create real value — such as always-available customer responses, automated document reading or analytics — rather than adding AI just for hype.',
+    steps: [
+      'AI feasibility evaluation and value assessment',
+      'Secure language-model or RAG setup using your private data',
+      'Smart customer service or internal decision assistants',
+      'Ongoing accuracy monitoring and safety controls',
+    ],
+    quote: 'Practical, secure AI solutions designed around measurable business value.',
+  },
+];
+
 export const HowWeHelp: React.FC<HowWeHelpProps> = ({ onStartProject }) => {
-  const [selectedScenario, setSelectedScenario] = useState<number>(0);
+  const [selected, setSelected] = useState(0);
+  const current = scenarios[selected];
+  const Icon = current.icon;
 
-  const scenarios = [
-    {
-      id: 0,
-      title: '“I Have an Idea”',
-      subtitle: 'For entrepreneurs, founders, and innovators with a app or software concept.',
-      icon: Lightbulb,
-      badge: 'From Concept to Product',
-      description: 'You do not need technical knowledge or wireframes. You explain what problem your app solves, and our team transforms your vision into a structured product roadmap, clickable user designs, and a published mobile or web app.',
-      steps: [
-        'Free 30-minute discovery call to discuss your vision',
-        'Interactive Figma prototype to preview before coding',
-        'Cross-platform mobile (iOS/Android) or web engineering',
-        'Store publishing, domain setup, and investor-ready launch'
-      ],
-      quote: '“We turn raw concepts into functional, revenue-generating software products.”'
-    },
-    {
-      id: 1,
-      title: '“My Business Needs Better Software”',
-      subtitle: 'For established companies needing internal tools, custom portals, or database upgrades.',
-      icon: Wrench,
-      badge: 'Streamline Operations',
-      description: 'We study your daily business workflows, spot manual bottlenecks, and engineer custom management portals, CRM tools, or automated booking systems that save hundreds of staff hours every month.',
-      steps: [
-        'Operational process audit and bottleneck identification',
-        'Custom web portal or role-based management software',
-        'Integration with your existing databases and accounting tools',
-        'Employee onboarding and ongoing technical support'
-      ],
-      quote: '“Tailor-made software built around your exact business workflow.”'
-    },
-    {
-      id: 2,
-      title: '“I Want to Add AI”',
-      subtitle: 'For companies seeking genuine AI automation, customer assistants, or smart data analysis.',
-      icon: Bot,
-      badge: 'Practical AI ROI',
-      description: 'We identify where artificial intelligence will actually create measurable value — such as 24/7 intelligent customer response, automated document reading, or predictive analytics — rather than adding AI just for hype.',
-      steps: [
-        'AI feasibility evaluation & ROI estimation',
-        'Secure language-model or RAG setup using your private data',
-        'Smart customer service or internal decision assistants',
-        'Continuous accuracy monitoring and performance safety'
-      ],
-      quote: '“Practical, secure AI solutions that deliver immediate business results.”'
-    }
-  ];
-
-  const current = scenarios[selectedScenario];
-  const IconComp = current.icon;
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next = (selected + (e.key === 'ArrowRight' ? 1 : scenarios.length - 1)) % scenarios.length;
+    setSelected(next);
+    document.getElementById(`scenario-tab-${next}`)?.focus();
+  };
 
   return (
-    <section id="how-we-help" className="py-24 bg-[#080b12] relative z-10 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Problem-Solving Approach</span>
-          </div>
+    <section id="how-we-help" className="kz-section relative z-10" aria-labelledby="how-title">
+      <div className="kz-container">
+        <SectionHeader
+          align="center"
+          eyebrow="Problem-solving approach"
+          title={<span id="how-title">You bring the challenge. We build the solution.</span>}
+          lead="Wherever you are in your technology journey, KorvenzaTech meets you with clarity, technical capability and business focus."
+        />
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            You Bring the Challenge. We Build the Solution.
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            No matter where you are in your technology journey, KorvenzaTech meets you with clarity, technical capability, and business focus.
-          </p>
-        </div>
-
-        {/* Scenario Selector Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {scenarios.map((scen, idx) => {
-            const IconComponent = scen.icon;
-            const isSelected = selectedScenario === idx;
+        <div role="tablist" aria-label="Where are you starting from?" className="kz-reveal mt-14 grid gap-3 md:grid-cols-3" onKeyDown={onKey}>
+          {scenarios.map((s, i) => {
+            const SIcon = s.icon;
+            const active = i === selected;
             return (
               <button
-                key={scen.id}
-                onClick={() => setSelectedScenario(idx)}
-                className={`text-left p-6 rounded-2xl transition-all duration-300 border flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-blue-950/40 border-blue-500/50 shadow-xl shadow-blue-500/10 scale-[1.02]'
-                    : 'bg-white/[0.02] border-white/5 hover:border-white/20 hover:bg-white/[0.04]'
-                }`}
+                key={s.title}
+                id={`scenario-tab-${i}`}
+                role="tab"
+                type="button"
+                aria-selected={active}
+                aria-controls="scenario-panel"
+                tabIndex={active ? 0 : -1}
+                onClick={() => setSelected(i)}
+                className={`group relative overflow-hidden rounded-[var(--kz-radius-lg)] border p-6 text-left transition-all duration-500 ${active ? 'border-emerald-500/50 bg-[var(--kz-surface)] shadow-[var(--kz-glow)]' : 'border-[var(--kz-border)] bg-[var(--kz-surface-2)] hover:border-[var(--kz-border-strong)]'}`}
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isSelected ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400'}`}>
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-mono text-violet-400 font-bold uppercase tracking-wider">
-                      {scen.badge}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white">{scen.title}</h3>
-                  <p className="text-xs text-slate-400 line-clamp-2">{scen.subtitle}</p>
+                <span className={`absolute inset-x-0 top-0 h-0.5 origin-left bg-gradient-to-r from-emerald-400 to-emerald-700 transition-transform duration-700 ${active ? 'scale-x-100' : 'scale-x-0'}`} aria-hidden="true" />
+                <div className="flex items-center justify-between">
+                  <span className={`grid h-10 w-10 place-items-center rounded-xl transition-colors ${active ? 'bg-emerald-700 text-white kz-on-accent' : 'bg-[var(--kz-surface-3)] text-[var(--kz-muted)]'}`}><SIcon className="h-5 w-5" aria-hidden="true" /></span>
+                  <span className="kz-meta !text-[10px]">{s.badge}</span>
                 </div>
-
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-blue-400">
-                  <span>{isSelected ? 'Currently Viewing' : 'Select Scenario'}</span>
-                  <ArrowRight className={`w-4 h-4 transition-transform ${isSelected ? 'translate-x-1 text-violet-400' : ''}`} />
-                </div>
+                <h3 className="kz-h3 mt-5">{s.title}</h3>
+                <p className="mt-2 text-[13px] leading-6 text-[var(--kz-muted)]">{s.subtitle}</p>
               </button>
             );
           })}
         </div>
 
-        {/* Selected Scenario Deep Dive Card */}
-        <div className="p-8 sm:p-10 rounded-3xl glass-panel border border-blue-500/30 relative overflow-hidden bg-gradient-to-br from-[#0b101d] via-[#080b12] to-[#04060a]">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <div className="lg:col-span-7 space-y-6 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
-                <IconComp className="w-4 h-4 text-violet-400" />
-                <span>{current.badge}</span>
-              </div>
-
-              <h3 className="text-2xl sm:text-3xl font-bold text-white">
-                {current.title}
-              </h3>
-
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
-                {current.description}
-              </p>
-
-              <div className="space-y-3 pt-2">
-                <p className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
-                  How KorvenzaTech Delivers:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {current.steps.map((step, sIdx) => (
-                    <div key={sIdx} className="p-3 rounded-xl bg-slate-900/80 border border-white/5 text-xs text-slate-200 flex items-start gap-2.5">
-                      <CheckCircle className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={onStartProject}
-                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#635BFF] to-[#8B5CF6] text-white font-bold text-xs shadow-lg shadow-blue-600/30 hover:scale-[1.02] transition-all flex items-center gap-2"
-                >
-                  <span>Tell Us What You Need</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+        <div id="scenario-panel" role="tabpanel" aria-labelledby={`scenario-tab-${selected}`} className="kz-reveal mt-4 overflow-hidden rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-surface)]">
+          <div key={selected} className="animate-in grid gap-0 lg:grid-cols-12">
+            <div className="p-8 sm:p-10 lg:col-span-7">
+              <span className="kz-eyebrow"><Icon className="h-3.5 w-3.5" aria-hidden="true" />{current.badge}</span>
+              <h3 className="mt-5 text-2xl font-extrabold tracking-tight text-[var(--kz-text)] sm:text-3xl">{current.title}</h3>
+              <p className="mt-4 text-[15px] leading-7 text-[var(--kz-text-2)]">{current.description}</p>
+              <p className="kz-meta mt-8 !text-[10px]">How KorvenzaTech delivers</p>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {current.steps.map((step) => (
+                  <li key={step} className="kz-feature-row"><span className="kz-check"><Check className="h-3.5 w-3.5" aria-hidden="true" /></span><span>{step}</span></li>
+                ))}
+              </ul>
+              <button type="button" onClick={onStartProject} className="kz-btn kz-btn-primary mt-8">Tell us what you need <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></button>
             </div>
-
-            {/* Right Quote / Highlight Block */}
-            <div className="lg:col-span-5 p-8 rounded-2xl bg-gradient-to-b from-blue-900/20 to-slate-900/60 border border-blue-500/20 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-violet-300 mx-auto">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <p className="text-base font-semibold text-white italic leading-relaxed">
-                {current.quote}
-              </p>
-              <div className="pt-2 text-xs font-mono text-slate-400 uppercase tracking-wider">
-                — KorvenzaTech Client Philosophy
-              </div>
+            <div className="kz-cinematic relative flex items-center overflow-hidden bg-[#0A1612] p-8 sm:p-10 lg:col-span-5">
+              <div className="pointer-events-none absolute inset-0 [background:radial-gradient(70%_60%_at_70%_20%,rgba(25,199,132,.22),transparent_70%)]" aria-hidden="true" />
+              <figure className="relative">
+                <blockquote className="text-xl font-semibold leading-relaxed text-white sm:text-2xl">“{current.quote}”</blockquote>
+                <figcaption className="kz-meta mt-6">— KorvenzaTech client philosophy</figcaption>
+              </figure>
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
   );

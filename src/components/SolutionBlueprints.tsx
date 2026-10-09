@@ -11,7 +11,7 @@ const blueprints = [
 ];
 
 export function SolutionBlueprints({ onStartProject }: { onStartProject: () => void }) {
-  return <section className="border-t border-white/[0.06] bg-[#0B0C10] py-24">
+  return <section className="border-t border-white/[0.06] bg-[var(--kz-bg)] py-24">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl">
         <div className="kz-eyebrow w-fit">Solution blueprints</div>

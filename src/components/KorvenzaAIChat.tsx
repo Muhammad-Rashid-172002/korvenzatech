@@ -129,7 +129,7 @@ function InlineRichText({ text }: { text: string }) {
           return (
             <code
               key={index}
-              className="rounded-md border border-violet-300/10 bg-violet-400/[0.06] px-1.5 py-0.5 font-mono text-[11px] text-violet-200"
+              className="rounded-md border border-emerald-300/10 bg-emerald-400/[0.06] px-1.5 py-0.5 font-mono text-[11px] text-emerald-200"
             >
               {token.value}
             </code>
@@ -273,7 +273,7 @@ function ProfessionalMessage({ text }: { text: string }) {
               key={index}
               className={
                 compact
-                  ? 'pt-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-violet-300'
+                  ? 'pt-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-emerald-300'
                   : 'pt-2 text-[15px] font-semibold leading-6 text-slate-50'
               }
             >
@@ -288,7 +288,7 @@ function ProfessionalMessage({ text }: { text: string }) {
               key={index}
               className="flex items-start gap-3 rounded-xl border border-white/[0.045] bg-white/[0.025] px-3 py-2.5"
             >
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-violet-300 shadow-[0_0_10px_rgba(34,211,238,.45)]" />
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(34,211,238,.45)]" />
               <div className="min-w-0 flex-1 leading-6 text-slate-300">
                 <InlineRichText text={block.text} />
               </div>
@@ -300,9 +300,9 @@ function ProfessionalMessage({ text }: { text: string }) {
           return (
             <div
               key={index}
-              className="flex items-start gap-3 rounded-xl border border-blue-300/[0.07] bg-gradient-to-r from-violet-500/[0.06] to-indigo-400/[0.02] px-3 py-3"
+              className="flex items-start gap-3 rounded-xl border border-emerald-300/[0.07] bg-gradient-to-r from-emerald-500/[0.06] to-emerald-400/[0.02] px-3 py-3"
             >
-              <div className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-lg border border-violet-300/15 bg-violet-400/[0.08] px-1.5 text-[10px] font-bold text-violet-200">
+              <div className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-lg border border-emerald-300/15 bg-emerald-400/[0.08] px-1.5 text-[10px] font-bold text-emerald-200">
                 {block.number}
               </div>
               <div className="min-w-0 flex-1 leading-6 text-slate-300">
@@ -316,7 +316,7 @@ function ProfessionalMessage({ text }: { text: string }) {
           return (
             <div
               key={index}
-              className="rounded-r-xl border-l-2 border-violet-300/70 bg-violet-400/[0.035] px-4 py-3 italic leading-6 text-slate-400"
+              className="rounded-r-xl border-l-2 border-emerald-300/70 bg-emerald-400/[0.035] px-4 py-3 italic leading-6 text-slate-400"
             >
               <InlineRichText text={block.text} />
             </div>
@@ -327,7 +327,7 @@ function ProfessionalMessage({ text }: { text: string }) {
           return (
             <div
               key={index}
-              className="overflow-hidden rounded-xl border border-white/[0.07] bg-[#090A0E]"
+              className="overflow-hidden rounded-xl border border-white/[0.07] bg-[var(--kz-bg-alt)]"
             >
               {block.language && (
                 <div className="border-b border-white/[0.06] px-3 py-2 font-mono text-[9px] uppercase tracking-[0.12em] text-slate-500">
@@ -585,7 +585,7 @@ export function KorvenzaAIChat() {
         >
           <span className="korvenza-ai-launcher-glow" />
           <img
-            src="/korvenza-logo.png"
+            src="/media/brand/logo-128.webp"
             alt=""
             className="relative z-10 h-8 w-8 object-contain"
           />
@@ -604,9 +604,9 @@ export function KorvenzaAIChat() {
         >
           <div className="korvenza-ai-header">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-violet-400/20 bg-[#12131A] shadow-[0_0_28px_rgba(34,211,238,.08)]">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-[var(--kz-surface)] shadow-[0_0_28px_rgba(34,211,238,.08)]">
                 <img
-                  src="/korvenza-logo.png"
+                  src="/media/brand/logo-128.webp"
                   alt="KorvenzaTech"
                   className="h-8 w-8 object-contain"
                 />
@@ -618,7 +618,7 @@ export function KorvenzaAIChat() {
                   <h2 className="truncate text-sm font-bold text-slate-50">
                     Korvenza AI
                   </h2>
-                  {/* <span className="rounded-md border border-violet-300/10 bg-violet-400/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-violet-200">
+                  {/* <span className="rounded-md border border-emerald-300/10 bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[.14em] text-emerald-200">
                     Korvenza AI
                   </span> */}
                 </div>
@@ -648,7 +648,7 @@ export function KorvenzaAIChat() {
                 </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 top-10 z-[1002] w-52 rounded-xl border border-white/10 bg-[#111218] p-1.5 shadow-2xl">
+                  <div className="absolute right-0 top-10 z-[1002] w-52 rounded-xl border border-white/10 bg-[var(--kz-surface)] p-1.5 shadow-2xl">
                     <button
                       onClick={newChat}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs text-slate-300 hover:bg-white/5"
@@ -681,8 +681,8 @@ export function KorvenzaAIChat() {
           <div className="korvenza-ai-body">
             {!hasConversation && (
               <div className="px-5 pb-4 pt-8">
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-300/10 bg-gradient-to-br from-blue-500/15 to-violet-400/5">
-                  <Sparkles className="h-5 w-5 text-violet-300" />
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/10 bg-gradient-to-br from-emerald-500/15 to-emerald-400/5">
+                  <Sparkles className="h-5 w-5 text-emerald-300" />
                 </div>
 
                 <h3 className="text-[22px] font-extrabold leading-tight tracking-tight text-slate-50">
@@ -728,15 +728,15 @@ export function KorvenzaAIChat() {
                     }
                   >
                     {message.role === 'user' ? (
-                      <div className="max-w-[84%] whitespace-pre-wrap rounded-2xl rounded-br-md border border-blue-400/10 bg-[#24213D] px-4 py-3 text-[13px] leading-6 text-slate-100 shadow-sm">
+                      <div className="max-w-[84%] whitespace-pre-wrap rounded-2xl rounded-br-md border border-emerald-400/10 bg-[#0d3b2e] px-4 py-3 text-[13px] leading-6 text-slate-100 shadow-sm">
                         {message.text}
                       </div>
                     ) : (
                       <div className="group w-full">
                         <div className="flex items-start gap-3">
-                          <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-violet-300/10 bg-[#14151C]">
+                          <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-emerald-300/10 bg-[var(--kz-surface)]">
                             <img
-                              src="/korvenza-logo.png"
+                              src="/media/brand/logo-128.webp"
                               alt=""
                               className="h-5 w-5 object-contain"
                             />
@@ -749,7 +749,7 @@ export function KorvenzaAIChat() {
                                   src={message.profile.image}
                                   alt={`${message.profile.name} — ${message.profile.role} at KorvenzaTech`}
                                   loading="lazy"
-                                  className="h-12 w-12 shrink-0 rounded-full border border-violet-300/10 object-cover object-top"
+                                  className="h-12 w-12 shrink-0 rounded-full border border-emerald-300/10 object-cover object-top"
                                 />
                                 <div className="min-w-0">
                                   <div className="text-[13px] font-semibold text-slate-100">{message.profile.name}</div>
@@ -782,9 +782,9 @@ export function KorvenzaAIChat() {
 
                 {loading && (
                   <div className="flex items-start gap-3">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-violet-300/10 bg-[#14151C]">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-emerald-300/10 bg-[var(--kz-surface)]">
                       <img
-                        src="/korvenza-logo.png"
+                        src="/media/brand/logo-128.webp"
                         alt=""
                         className="h-5 w-5 object-contain"
                       />
@@ -793,7 +793,7 @@ export function KorvenzaAIChat() {
                     <div className="min-w-0 flex-1 py-0.5">
                       <div className="korvenza-ai-thinking-card">
                         <div className="flex items-center gap-2.5">
-                          <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-violet-300" />
+                          <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-emerald-300" />
                           <span className="text-xs font-medium text-slate-300">{thinkingLabel}</span>
                           {thinkingSeconds >= 4 && (
                             <span className="ml-auto text-[10px] tabular-nums text-slate-600">
@@ -868,7 +868,7 @@ export function KorvenzaAIChat() {
             <div className="mt-2 flex justify-between gap-4 px-1 text-[9px] text-slate-600">
               <span>AI can make mistakes. Verify important information.</span>
               {memory && (
-                <span className="whitespace-nowrap text-violet-500/70">
+                <span className="whitespace-nowrap text-emerald-500/70">
                   Memory on
                 </span>
               )}

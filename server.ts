@@ -110,6 +110,7 @@ async function start() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath, {
+      redirect: false, // serve /about from about/index.html without a trailing-slash redirect
       immutable: false,
       maxAge: '1h',
       setHeaders(res, filePath) {
@@ -122,7 +123,7 @@ async function start() {
       const cleanPath = req.path.replace(/^\/+|\/+$/g, '');
       const routeIndex = cleanPath ? path.join(distPath, cleanPath, 'index.html') : path.join(distPath, 'index.html');
       res.sendFile(routeIndex, (error) => {
-        if (error) res.sendFile(path.join(distPath, 'index.html'));
+        if (error) res.status(404).sendFile(path.join(distPath, '404.html'));
       });
     });
   }

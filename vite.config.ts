@@ -6,6 +6,10 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      // The Three.js hero scene is a lazy, homepage-only chunk (~136 kB gzip); it never blocks first paint.
+      chunkSizeWarningLimit: 600,
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

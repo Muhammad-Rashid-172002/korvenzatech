@@ -1,27 +1,40 @@
 import React from 'react';
-import { ArrowUpRight, BadgeCheck, Quote, ShieldCheck, Sparkles, Star, Users } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
+import { Eyebrow, SectionHeader } from './ui';
+import { useTilt } from '../lib/motion';
 
-const leaders = [
+type Leader = {
+  name: string;
+  role: string;
+  roleDetail?: string;
+  image: string;
+  srcSet: string;
+  description: string;
+};
+
+// Names, roles and photographs are the verified ones already used on the site.
+const leaders: Leader[] = [
   {
     name: 'Muhammad Rashid',
     role: 'Founder & CEO',
     image: '/team/muhammad-rashid.png',
+    srcSet: '/media/team/muhammad-rashid-480.webp 480w, /media/team/muhammad-rashid-960.webp 780w',
     description: 'Leads product vision, engineering direction, client solutions, and the long-term technology strategy behind KorvenzaTech.',
-    icon: Sparkles,
   },
   {
     name: 'Muhammad Taha Amir',
     role: 'Co-Founder',
     image: '/team/co-founder.jpg',
+    srcSet: '/media/team/co-founder-480.webp 480w, /media/team/co-founder-960.webp 960w',
     description: 'Supports company growth, operations, client coordination, delivery planning, and the leadership systems that keep KorvenzaTech projects moving with clarity.',
-    icon: Users,
   },
   {
     name: 'Suliman',
     role: 'COO (Chief Operating Officer)',
+    roleDetail: 'Software Engineer',
     image: '/team/coo.png',
+    srcSet: '/media/team/coo-480.webp 480w, /media/team/coo-960.webp 960w',
     description: 'Oversees day-to-day operations, project execution, and the processes that keep KorvenzaTech delivery running smoothly and on schedule.',
-    icon: ShieldCheck,
   },
 ];
 
@@ -48,64 +61,99 @@ const testimonials = [
   },
 ];
 
-export const LeadershipTestimonialsSection: React.FC = () => (
-  <section className="relative overflow-hidden border-t border-white/5 bg-[#070a0d] py-24">
-    <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_15%_10%,rgba(16,185,129,.10),transparent_30%),radial-gradient(circle_at_85%_40%,rgba(59,130,246,.08),transparent_28%)]" />
-    <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-3xl">
-          <div className="kz-eyebrow w-fit"><BadgeCheck className="h-3.5 w-3.5" /> Leadership</div>
-          <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white sm:text-5xl">Leadership that stays close to the work.</h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">A focused leadership model built around direct communication, accountable delivery and product decisions that connect engineering with business outcomes.</p>
-        </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/10 bg-white/[.035] px-4 py-3 text-xs text-slate-300">
-          <ShieldCheck className="h-4 w-4 text-emerald-300" /> Product-first • Engineering-led • Client-focused
+function Portrait({ leader, featured = false, index }: { leader: Leader; featured?: boolean; index: number }) {
+  const tiltRef = useTilt<HTMLDivElement>(featured ? 4 : 5, 7);
+  const sizes = featured ? '(min-width: 1024px) 460px, (min-width: 640px) 60vw, 92vw' : '(min-width: 1024px) 340px, (min-width: 640px) 45vw, 92vw';
+  return (
+    <article className="kz-leader kz-reveal group" style={{ '--d': index } as React.CSSProperties} aria-labelledby={`leader-${index}`}>
+      <div ref={tiltRef} className="kz-portrait">
+        <div className="kz-portrait-tilt">
+          <div className="kz-portrait-back" aria-hidden="true" />
+          <div className="kz-portrait-frame kz-portrait-reveal">
+            <img
+              src={leader.image}
+              srcSet={leader.srcSet}
+              sizes={sizes}
+              alt={`Portrait of ${leader.name}, ${leader.role}${leader.roleDetail ? ` and ${leader.roleDetail}` : ''} at KorvenzaTech`}
+              loading="lazy"
+              decoding="async"
+              width={featured ? 960 : 480}
+              height={featured ? 1200 : 600}
+            />
+          </div>
+          <div className="kz-portrait-rim" aria-hidden="true" />
+          <div className="kz-portrait-meta">
+            <span className="kz-portrait-role">{leader.role}</span>
+            <h3 id={`leader-${index}`} className={`mt-3 font-extrabold tracking-tight text-white ${featured ? 'text-3xl sm:text-4xl' : 'text-2xl'}`}>{leader.name}</h3>
+            {leader.roleDetail && <p className="mt-1 text-[13px] font-semibold text-[#A6EBCD]">{leader.roleDetail}</p>}
+          </div>
         </div>
       </div>
+      <p className={`mt-6 max-w-md leading-7 text-[#C3D1CA] ${featured ? 'text-[15px]' : 'text-[14px]'}`}>{leader.description}</p>
+    </article>
+  );
+}
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
-        {leaders.map(({ name, role, image, description, icon: Icon }) => (
-          <article key={role} className="premium-card group flex flex-col items-center gap-6 p-7 text-center sm:flex-row sm:text-left sm:p-9">
-            <div className="relative shrink-0">
-              <div className="h-36 w-36 rounded-full bg-gradient-to-br from-emerald-300 via-cyan-300 to-indigo-400 p-[2px] shadow-[0_20px_55px_rgba(16,185,129,.14)] sm:h-40 sm:w-40">
-                <div className="h-full w-full overflow-hidden rounded-full border-[5px] border-[#0b1118] bg-slate-900">
-                  <img src={image} alt={`${name} — ${role} at KorvenzaTech`} loading="lazy" className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.035]" />
+export const LeadershipTestimonialsSection: React.FC = () => (
+  <>
+    <section id="leadership" className="kz-leaders kz-cinematic relative overflow-hidden py-[var(--kz-section)]" aria-labelledby="leadership-title">
+      <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(50%_40%_at_20%_10%,rgba(25,199,132,.12),transparent_70%),radial-gradient(40%_40%_at_90%_60%,rgba(8,127,91,.16),transparent_70%)]" aria-hidden="true" />
+      <div className="kz-container relative">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div className="kz-reveal lg:col-span-7">
+            <Eyebrow>Leadership</Eyebrow>
+            <h2 id="leadership-title" className="kz-h2 mt-5 max-w-[16ch] text-white">Built by people who care about what they create.</h2>
+          </div>
+          <p className="kz-reveal kz-lead lg:col-span-5" style={{ '--d': 1 } as React.CSSProperties}>
+            KorvenzaTech is led by engineers and operators who stay close to the work — connecting product decisions, engineering quality and clear communication on every project.
+          </p>
+        </div>
+
+        <div className="mt-16 grid gap-12 sm:mt-20 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-5">
+            <Portrait leader={leaders[0]} featured index={0} />
+          </div>
+          <div className="grid gap-12 sm:grid-cols-2 sm:gap-8 lg:col-span-7 lg:pt-24">
+            <Portrait leader={leaders[1]} index={1} />
+            <Portrait leader={leaders[2]} index={2} />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section className="kz-section kz-section-alt" aria-labelledby="testimonials-title">
+      <div className="kz-container">
+        <SectionHeader
+          align="center"
+          eyebrow="Client feedback"
+          title={<span id="testimonials-title">Confidence is earned in the delivery.</span>}
+          lead="Feedback from software, startup, platform and education work."
+        />
+        <div className="mt-14 grid gap-5 lg:grid-cols-2">
+          {testimonials.map((item, index) => (
+            <figure key={`${item.author}-${index}`} className="kz-testimonial-card kz-reveal relative overflow-hidden p-7 sm:p-9" style={{ '--d': index % 2 } as React.CSSProperties}>
+              <Quote className="absolute -right-2 -top-3 h-24 w-24 text-emerald-500/[.06]" aria-hidden="true" />
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <div className="text-sm font-bold text-[var(--kz-text)]">{item.label}</div>
+                  <div className="kz-meta mt-1.5 !text-[10px]">{item.meta}</div>
+                </div>
+                <div className="flex gap-0.5" role="img" aria-label="Rated 5 out of 5">
+                  {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />)}
                 </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-[#0b1118] bg-emerald-500 text-white shadow-xl"><Icon className="h-5 w-5" /></div>
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[.06] px-3 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-emerald-300">{role}</div>
-              <h3 className="mt-4 text-2xl font-extrabold text-white">{name}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-400">{description}</p>
-              <div className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-emerald-300">KorvenzaTech leadership <ArrowUpRight className="h-3.5 w-3.5" /></div>
-            </div>
-          </article>
-        ))}
+              <blockquote className="mt-6 text-[15px] leading-7 text-[var(--kz-text-2)]">“{item.quote}”</blockquote>
+              <figcaption className="mt-7 flex items-center gap-3 border-t border-[var(--kz-border)] pt-5">
+                <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-sm font-extrabold text-[var(--kz-accent-text)]" aria-hidden="true">{item.author.charAt(0)}</span>
+                <span>
+                  <span className="block text-sm font-bold text-[var(--kz-text)]">{item.author}</span>
+                  <span className="block text-xs text-[var(--kz-muted)]">{item.role}</span>
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
-
-      <div className="mt-24 text-center">
-        <div className="kz-eyebrow mx-auto w-fit"><Quote className="h-3.5 w-3.5" /> Client feedback</div>
-        <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white sm:text-5xl">Confidence is earned in the delivery.</h2>
-        <p className="mx-auto mt-4 max-w-2xl text-slate-400">Feedback from software, startup, platform and education work.</p>
-      </div>
-
-      <div className="mt-10 grid gap-5 lg:grid-cols-2">
-        {testimonials.map((item, index) => (
-          <article key={`${item.author}-${index}`} className="kz-testimonial-card group relative overflow-hidden p-7 sm:p-8">
-            <Quote className="absolute -right-2 -top-4 h-24 w-24 text-white/[.025]" />
-            <div className="flex items-start justify-between gap-5">
-              <div><div className="text-sm font-bold text-white">{item.label}</div><div className="mt-1 text-[11px] uppercase tracking-[.14em] text-slate-500">{item.meta}</div></div>
-              <div className="flex gap-0.5" aria-label="5 out of 5 stars">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />)}</div>
-            </div>
-            <p className="mt-7 text-[15px] leading-7 text-slate-300">“{item.quote}”</p>
-            <div className="mt-7 flex items-center gap-3 border-t border-white/7 pt-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/15 bg-emerald-400/10 text-sm font-extrabold text-emerald-300">{item.author.charAt(0)}</div>
-              <div><div className="text-sm font-bold text-white">{item.author}</div><div className="text-xs text-slate-500">{item.role}</div></div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
+    </section>
+  </>
 );

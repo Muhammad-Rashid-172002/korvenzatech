@@ -1,81 +1,94 @@
+/**
+ * Build-time prerender + SEO output.
+ *
+ * Runs after `vite build` (client) and `vite build --ssr src/entry-server.tsx`.
+ * For every indexable route it writes dist/<route>/index.html containing:
+ *   - the fully rendered page markup (hydrated by the client bundle),
+ *   - route-specific title, description, canonical, robots, Open Graph and Twitter tags,
+ *   - exactly one JSON-LD @graph (Organization, WebSite, WebPage, BreadcrumbList, ...).
+ * It also writes dist/404.html (noindex) and dist/sitemap.xml from the same route list.
+ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const dist = path.resolve('dist');
+const ssrDir = path.resolve('dist-ssr');
 const baseFile = path.join(dist, 'index.html');
-if (!fs.existsSync(baseFile)) process.exit(0);
-const base = fs.readFileSync(baseFile, 'utf8');
-const site = 'https://korvenzatech.com';
-const og = `${site}/og-cover.png`;
+if (!fs.existsSync(baseFile)) {
+  console.error('[seo] dist/index.html not found — run the client build first.');
+  process.exit(1);
+}
+const ssrEntry = ['entry-server.js', 'entry-server.mjs'].map((f) => path.join(ssrDir, f)).find((f) => fs.existsSync(f));
+if (!ssrEntry) {
+  console.error('[seo] dist-ssr/entry-server.js not found — run `vite build --ssr src/entry-server.tsx --outDir dist-ssr` first.');
+  process.exit(1);
+}
 
-const services = {
-  'ai-solutions': ['AI Development & Business Automation Services | KorvenzaTech', 'AI assistants, private knowledge systems, workflow automation, document intelligence and multimodal product features designed around real business operations.'],
-  'api-development': ['Custom API Development & Integration Services | KorvenzaTech', 'Secure custom APIs, backend integrations, webhooks and connected software systems for mobile apps, websites, SaaS products and business platforms.'],
-  'mobile-app-development': ['Mobile App Development | Flutter, iOS & Android | KorvenzaTech', 'Professional mobile app development for Android and iOS, including Flutter apps, cloud backends, notifications, maps, payments and scalable product engineering.'],
-  'web-development': ['Website & Web App Development Services | KorvenzaTech', 'Modern corporate websites, SaaS websites, web applications and conversion-focused digital experiences with responsive engineering and technical SEO.'],
-  'custom-software': ['Custom Software Development Services | KorvenzaTech', 'Custom business software, internal platforms, dashboards, workflow systems, CRM/ERP solutions and operational tools built around your process.'],
-  'saas-development': ['SaaS Development & Product Engineering | KorvenzaTech', 'End-to-end SaaS development for MVPs and scalable products, including subscriptions, user workspaces, dashboards, APIs, cloud backends and admin systems.'],
-  'cloud-solutions': ['Cloud & Backend Development Services | KorvenzaTech', 'Cloud-ready backends, databases, authentication, storage, serverless systems, deployment and scalable infrastructure for modern digital products.'],
-  'ui-ux-design': ['UI/UX Design for Apps, SaaS & Websites | KorvenzaTech', 'Product-focused UI/UX design for mobile apps, SaaS platforms, websites and dashboards with clear user flows and maintainable design systems.'],
-  'digital-marketing': ['Technical SEO & Digital Growth Strategy | KorvenzaTech', 'Technical SEO, analytics, conversion optimization and digital growth strategy aligned with modern websites, software products and technology businesses.'],
-};
+const { render, ROUTES, getRouteMeta, buildStructuredData, canonicalFor } = await import(pathToFileURL(ssrEntry).href);
+const template = fs.readFileSync(baseFile, 'utf8');
 
-const pages = {
-  '/': ['KorvenzaTech | Software Development, AI, SaaS, Mobile & Web', 'KorvenzaTech builds custom software, SaaS platforms, AI solutions, mobile apps, websites, APIs and cloud systems for startups and growing businesses worldwide.'],
-  '/services': ['Software Development Services | AI, SaaS, Apps, Web & APIs | KorvenzaTech', 'Explore KorvenzaTech services across AI solutions, SaaS, custom software, mobile apps, websites, APIs, cloud infrastructure, UI/UX and digital growth.'],
-  '/work': ['Software Case Studies & Solution Blueprints | KorvenzaTech', 'Explore selected KorvenzaTech products and enterprise solution blueprints across education technology, marketplaces, AI, SaaS, APIs, cloud and product design.'],
-  '/work/ielts-ai-master': ['IELTS AI Master Case Study | KorvenzaTech', 'AI-powered education product case study covering speaking, writing, reading and listening workflows, Firebase architecture and mobile product delivery.'],
-  '/work/skilllink': ['SkillLink Marketplace Case Study | KorvenzaTech', 'On-demand services marketplace case study covering customer and worker flows, real-time job lifecycle, Firebase architecture and Google Maps integration.'],
-  '/industries': ['Industry Software Solutions | KorvenzaTech', 'Software and digital product solutions for healthcare, education, finance, e-commerce, logistics, real estate, marketplaces and professional services.'],
-  '/about': ['About KorvenzaTech | Software Engineering & Product Company', 'Learn about KorvenzaTech, our leadership, engineering philosophy, client-focused delivery model and approach to building modern digital products.'],
-  '/insights': ['Software, AI, SaaS & App Development Insights | KorvenzaTech', 'Practical guidance on AI, SaaS products, mobile apps, APIs, cloud systems, product architecture and digital growth.'],
-  '/careers': ['Technology Careers | KorvenzaTech', 'Explore engineering, product, design and growth opportunities at KorvenzaTech when roles are available.'],
-  '/contact': ['Contact KorvenzaTech | Software, AI & Product Enquiries', 'Contact KorvenzaTech for general enquiries, project and sales discussions, partnerships, WhatsApp follow-up and software development consultations.'],
-  '/start-project': ['Start a Software, AI, SaaS or App Project | KorvenzaTech', 'Share your product idea or business goal with KorvenzaTech and get a clear path for custom software, SaaS, AI, mobile, web, API or cloud development.'],
-};
-Object.entries(services).forEach(([id, meta]) => pages[`/services/${id}`] = meta);
+const esc = (s = '') => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+const jsonLd = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
 
-function esc(s='') { return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
-function build(route, [title, description]) {
-  const canonical = `${site}${route === '/' ? '/' : route}`;
-  let html = base;
-  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`)
-    .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?\s*>/, `<meta name="description" content="${esc(description)}" />`)
-    .replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?\s*>/, `<link rel="canonical" href="${canonical}" />`)
-    .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?\s*>/, `<meta property="og:title" content="${esc(title)}" />`)
-    .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?\s*>/, `<meta property="og:description" content="${esc(description)}" />`)
-    .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?\s*>/, `<meta property="og:url" content="${canonical}" />`)
-    .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?\s*>/, `<meta property="og:image" content="${og}" />`)
-    .replace(/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?\s*>/, `<meta name="twitter:title" content="${esc(title)}" />`)
-    .replace(/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?\s*>/, `<meta name="twitter:description" content="${esc(description)}" />`);
+function setTag(html, re, replacement) {
+  if (!re.test(html)) throw new Error(`[seo] template is missing a tag matching ${re}`);
+  return html.replace(re, replacement);
+}
 
-  const segments = route.split('/').filter(Boolean);
-  const breadcrumb = segments.length ? { '@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':segments.map((name,i)=>({'@type':'ListItem','position':i+1,'name':name.replaceAll('-',' '),'item':site+'/'+segments.slice(0,i+1).join('/')})) } : null;
-  const routeSchema = route.startsWith('/services/') ? {
-    '@context':'https://schema.org','@type':'Service','name':title.split('|')[0].trim(),'description':description,'url':canonical,
-    'provider':{'@type':'Organization','@id':site+'/#organization','name':'KorvenzaTech','url':site},'areaServed':'Worldwide'
-  } : {
-    '@context':'https://schema.org','@type': route.startsWith('/work/') ? 'CreativeWork' : 'WebPage','name':title,'description':description,'url':canonical,
-    'isPartOf':{'@type':'WebSite','name':'KorvenzaTech','url':site}
-  };
-  const orgSchema = {
-    '@context':'https://schema.org','@type':'Organization','@id':site+'/#organization',name:'KorvenzaTech',url:site,
-    logo:site+'/korvenza-logo.png',image:og,description:'Software development company building custom software, SaaS platforms, mobile apps, AI solutions, websites, APIs and cloud-ready systems.',
-    founder:[{'@type':'Person',name:'Muhammad Rashid',jobTitle:'Founder & CEO'},{'@type':'Person',name:'Muhammad Taha Amir',jobTitle:'Co-Founder'}],areaServed:'Worldwide',
-    contactPoint:[{'@type':'ContactPoint',contactType:'customer service',email:'info@korvenzatech.com',telephone:'+92-370-1691701'},{'@type':'ContactPoint',contactType:'sales',email:'sales@korvenzatech.com',telephone:'+92-370-1691701'}]
-  };
-  html = html.replace('</head>', `<script type="application/ld+json">${JSON.stringify(orgSchema)}</script><script type="application/ld+json">${JSON.stringify(routeSchema)}</script>${breadcrumb ? `<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>` : ''}</head>`);
+function buildPage(route) {
+  const meta = getRouteMeta(route);
+  const canonical = canonicalFor(route);
+  const robots = meta.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+  let html = template;
+  html = setTag(html, /<title>[\s\S]*?<\/title>/, `<title>${esc(meta.title)}</title>`);
+  html = setTag(html, /<meta name="description" content="[^"]*"\s*\/?>/, `<meta name="description" content="${esc(meta.description)}" />`);
+  html = setTag(html, /<meta name="robots" content="[^"]*"\s*\/?>/, `<meta name="robots" content="${robots}" />`);
+  html = setTag(html, /<link rel="canonical" href="[^"]*"\s*\/?>/, meta.noindex ? '' : `<link rel="canonical" href="${canonical}" />`);
+  html = setTag(html, /<meta property="og:type" content="[^"]*"\s*\/?>/, `<meta property="og:type" content="${meta.ogType}" />`);
+  html = setTag(html, /<meta property="og:title" content="[^"]*"\s*\/?>/, `<meta property="og:title" content="${esc(meta.title)}" />`);
+  html = setTag(html, /<meta property="og:description" content="[^"]*"\s*\/?>/, `<meta property="og:description" content="${esc(meta.description)}" />`);
+  html = setTag(html, /<meta property="og:url" content="[^"]*"\s*\/?>/, `<meta property="og:url" content="${canonical}" />`);
+  html = setTag(html, /<meta property="og:image" content="[^"]*"\s*\/?>/, `<meta property="og:image" content="${meta.image}" />`);
+  html = setTag(html, /<meta property="og:image:width" content="[^"]*"\s*\/?>/, `<meta property="og:image:width" content="${meta.imageWidth}" />`);
+  html = setTag(html, /<meta property="og:image:height" content="[^"]*"\s*\/?>/, `<meta property="og:image:height" content="${meta.imageHeight}" />`);
+  html = setTag(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/, `<meta name="twitter:title" content="${esc(meta.title)}" />`);
+  html = setTag(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${esc(meta.description)}" />`);
+  html = setTag(html, /<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${meta.image}" />`);
+  const extraHead = [
+    // Desktop only: there the hero poster is above the fold; on phones it sits below the headline.
+    route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w" imagesizes="620px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
+    meta.keywords ? `<meta name="keywords" content="${esc(meta.keywords)}" />` : '',
+    `<script type="application/ld+json" id="kz-schema">${jsonLd(buildStructuredData(route))}</script>`,
+  ].join('');
+  html = html.replace('</head>', `${extraHead}</head>`);
 
-  // Keep the React root visually clean. Previous builds injected a visible SEO shell here,
-  // which caused a one-second flash before hydration. Semantic fallback is now noscript-only.
-  const fallback = `<noscript><main style="max-width:980px;margin:0 auto;padding:72px 24px;font-family:system-ui;color:#0f172a"><h1>${esc(title.split('|')[0].trim())}</h1><p>${esc(description)}</p><p><a href="/services">Services</a> · <a href="/work">Work</a> · <a href="/about">About</a> · <a href="/contact">Contact</a></p></main></noscript>`;
-  html = html.replace('<div id="root"></div>', `<div id="root"></div>${fallback}`);
+  const appHtml = render(route);
+  html = setTag(html, /<div id="root"><\/div>/, `<div id="root">${appHtml}</div>`);
   return html;
 }
 
-for (const [route, meta] of Object.entries(pages)) {
-  if (route === '/') { fs.writeFileSync(baseFile, build(route, meta)); continue; }
+const routes = [...ROUTES];
+for (const route of routes) {
+  const html = buildPage(route);
+  if (route === '/') { fs.writeFileSync(baseFile, html); continue; }
   const dir = path.join(dist, ...route.split('/').filter(Boolean));
-  fs.mkdirSync(dir, {recursive:true});
-  fs.writeFileSync(path.join(dir,'index.html'), build(route, meta));
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'index.html'), html);
 }
+
+// Branded 404 (served by Vercel for unknown paths with a 404 status).
+fs.writeFileSync(path.join(dist, '404.html'), buildPage('/__not-found__'));
+
+// Sitemap from the same route list — only canonical, indexable URLs.
+const lastmod = new Date().toISOString().slice(0, 10);
+const urls = routes
+  .map((r) => getRouteMeta(r))
+  .filter((m) => !m.noindex)
+  .map((m) => `  <url><loc>${canonicalFor(m.path)}</loc><lastmod>${lastmod}</lastmod><changefreq>${m.changefreq}</changefreq><priority>${m.priority.toFixed(1)}</priority></url>`)
+  .join('\n');
+fs.writeFileSync(path.join(dist, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+
+// The SSR bundle is a build tool only; never deploy it.
+fs.rmSync(ssrDir, { recursive: true, force: true });
+console.log(`[seo] prerendered ${routes.length} routes + 404.html, wrote sitemap.xml`);

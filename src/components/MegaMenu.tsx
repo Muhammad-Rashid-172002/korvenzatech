@@ -47,7 +47,7 @@ const CATEGORIES = [
 export const MegaMenu: React.FC<MegaMenuProps> = ({ services, onSelectService, onClose }) => {
   return (
     <div 
-      className="absolute top-full left-0 w-full bg-[#080b12]/95 backdrop-blur-2xl border-b border-white/10 shadow-2xl py-8 px-6 transition-all duration-300 z-50 animate-in fade-in slide-in-from-top-2"
+      className="absolute top-full left-0 w-full bg-[var(--kz-bg)]/95 backdrop-blur-2xl border-b border-white/10 shadow-2xl py-8 px-6 transition-all duration-300 z-50 animate-in fade-in slide-in-from-top-2"
       onMouseLeave={onClose}
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -55,8 +55,8 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ services, onSelectService, o
           const IconComp = cat.icon;
           return (
             <div key={idx} className="space-y-4">
-              <div className="flex items-center gap-2 text-blue-400 font-semibold text-xs tracking-wider uppercase pb-2 border-b border-white/5">
-                <IconComp className="w-4 h-4 text-violet-400" />
+              <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs tracking-wider uppercase pb-2 border-b border-white/5">
+                <IconComp className="w-4 h-4 text-emerald-400" />
                 <span>{cat.name}</span>
               </div>
               <div className="space-y-3">
@@ -71,9 +71,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ services, onSelectService, o
                       }}
                       className="w-full text-left group p-2.5 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
                     >
-                      <div className="flex items-center justify-between text-sm font-medium text-slate-200 group-hover:text-blue-400">
+                      <div className="flex items-center justify-between text-sm font-medium text-slate-200 group-hover:text-emerald-400">
                         <span>{item.label}</span>
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-violet-400" />
+                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-emerald-400" />
                       </div>
                       <p className="text-xs text-slate-400 mt-1 line-clamp-1 font-normal">
                         {item.desc}
@@ -89,10 +89,10 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ services, onSelectService, o
 
       <div className="max-w-7xl mx-auto mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between text-xs text-slate-400">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-violet-400" />
+          <Sparkles className="w-4 h-4 text-emerald-400" />
           <span>Need help choosing? Talk directly with our senior technology architects.</span>
         </div>
-        <span className="text-blue-400 font-medium hover:underline cursor-pointer" onClick={onClose}>
+        <span className="text-emerald-400 font-medium hover:underline cursor-pointer" onClick={onClose}>
           Explore All Capabilities &rarr;
         </span>
       </div>

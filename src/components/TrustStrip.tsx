@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Technologies from the actual delivery stack (see case studies and tech stack data).
 const TECH_BADGES = [
   { name: 'Flutter', category: 'Mobile' },
   { name: 'React & Next.js', category: 'Web' },
@@ -10,32 +11,22 @@ const TECH_BADGES = [
   { name: 'Python', category: 'AI Engine' },
   { name: 'Multimodal AI', category: 'LLM Systems' },
   { name: 'Custom APIs', category: 'Integration' },
-  { name: 'PostgreSQL', category: 'Database' }
+  { name: 'PostgreSQL', category: 'Database' },
 ];
 
-export const TrustStrip: React.FC = () => {
-  return (
-    <section className="py-8 bg-[#04060a] border-y border-white/5 relative z-10 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            Built for ambitious businesses, startups, and modern enterprise teams
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 pt-2">
-            {TECH_BADGES.map((badge, idx) => (
-              <div
-                key={idx}
-                className="px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-slate-400 hover:text-slate-200 hover:border-white/20 hover:bg-white/[0.05] transition-all text-xs font-mono font-medium flex items-center gap-2 group grayscale hover:grayscale-0"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-500 group-hover:bg-violet-400 transition-colors" />
-                <span>{badge.name}</span>
-                <span className="text-[10px] text-slate-400 font-sans hidden sm:inline">({badge.category})</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+export const TrustStrip: React.FC = () => (
+  <section className="relative z-10 border-b border-[var(--kz-border)] bg-[var(--kz-bg)] py-10" aria-label="Technologies we build with">
+    <div className="kz-container flex flex-col items-center gap-6 lg:flex-row lg:gap-10">
+      <p className="kz-meta shrink-0 text-center lg:max-w-[15rem] lg:text-left">Built with a modern, proven stack</p>
+      <ul className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+        {TECH_BADGES.map((badge) => (
+          <li key={badge.name} className="group inline-flex items-center gap-2 rounded-full border border-[var(--kz-border)] bg-[var(--kz-surface)] px-3.5 py-2 text-[12.5px] font-semibold text-[var(--kz-text-2)] transition-colors hover:border-emerald-500/40">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/60 transition-colors group-hover:bg-emerald-400" aria-hidden="true" />
+            {badge.name}
+            <span className="hidden text-[11px] font-medium text-[var(--kz-muted)] sm:inline">{badge.category}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+);

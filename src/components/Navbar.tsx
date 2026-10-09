@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#08090B]/90 backdrop-blur-xl border-b border-slate-800 py-3 shadow-xl'
+          ? 'bg-[var(--kz-bg)]/90 backdrop-blur-xl border-b border-[var(--kz-border)] py-3 shadow-xl'
           : 'bg-transparent py-5'
       }`}
     >
@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
           <div className="flex flex-col text-left">
             <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1">
-              Korvenza<span className="text-indigo-400 font-extrabold">Tech</span>
+              Korvenza<span className="text-emerald-400 font-extrabold">Tech</span>
             </span>
             <span className="text-[10px] tracking-widest text-slate-400 uppercase font-mono font-medium -mt-1">
               Global Tech
@@ -65,10 +65,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 bg-slate-800/60 backdrop-blur-md border border-slate-700/60 rounded-full px-5 py-1.5 shadow-inner">
+        <nav className="hidden lg:flex items-center gap-1 bg-[var(--kz-surface-2)]/60 backdrop-blur-md border border-[var(--kz-border)] rounded-full px-5 py-1.5 shadow-inner">
           <button
             onClick={() => handleNavClick('hero')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Home
           </button>
@@ -80,10 +80,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <button
               onClick={() => handleNavClick('services')}
-              className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50 flex items-center gap-1"
+              className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50 flex items-center gap-1"
             >
               <span>Services</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMegaOpen ? 'rotate-180 text-indigo-400' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMegaOpen ? 'rotate-180 text-emerald-400' : ''}`} />
             </button>
 
             {isMegaOpen && (
@@ -97,42 +97,42 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => handleNavClick('how-we-help')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Solutions
           </button>
 
           <button
             onClick={() => handleNavClick('work')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Work
           </button>
 
           <button
             onClick={() => handleNavClick('industries')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Industries
           </button>
 
           <button
             onClick={() => handleNavClick('about')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             About
           </button>
 
           <button
             onClick={() => handleNavClick('insights')}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Insights
           </button>
 
           <button
             onClick={onOpenCareers}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-slate-700/50"
+            className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors rounded-full hover:bg-[var(--kz-surface-3)]/50"
           >
             Careers
           </button>
@@ -151,9 +151,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenProjectBrief}
             className="relative group overflow-hidden rounded-xl p-[1px] font-semibold text-xs transition-all duration-300 focus:outline-none"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-500 rounded-xl group-hover:opacity-100 transition-opacity" />
-            <span className="relative block px-4 py-2 bg-[#08090B] hover:bg-transparent rounded-[11px] text-white transition-all duration-200 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400 group-hover:animate-spin" />
+            <span className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 rounded-xl group-hover:opacity-100 transition-opacity" />
+            <span className="relative block px-4 py-2 bg-[var(--kz-bg)] hover:bg-transparent rounded-[11px] text-white transition-all duration-200 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 group-hover:animate-spin" />
               <span>Start a Project</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
             </span>
@@ -172,47 +172,47 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Slide-Over Drawer */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-[#080b12] border-b border-white/10 px-6 py-6 space-y-4 animate-in slide-in-from-top-5 duration-200">
+        <div className="lg:hidden bg-[var(--kz-bg)] border-b border-white/10 px-6 py-6 space-y-4 animate-in slide-in-from-top-5 duration-200">
           <div className="flex flex-col space-y-2 text-sm font-medium text-slate-300">
             <button
               onClick={() => handleNavClick('hero')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Home
             </button>
             <button
               onClick={() => handleNavClick('services')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Services & Capabilities
             </button>
             <button
               onClick={() => handleNavClick('how-we-help')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Solutions for Your Business
             </button>
             <button
               onClick={() => handleNavClick('work')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Featured Case Studies
             </button>
             <button
               onClick={() => handleNavClick('industries')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Industries Served
             </button>
             <button
               onClick={() => handleNavClick('about')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               About KorvenzaTech
             </button>
             <button
               onClick={() => handleNavClick('insights')}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Articles & Insights
             </button>
@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setIsMobileMenuOpen(false);
                 onOpenCareers();
               }}
-              className="text-left py-2 hover:text-violet-400 border-b border-white/5"
+              className="text-left py-2 hover:text-emerald-400 border-b border-white/5"
             >
               Careers & Opportunities
             </button>
@@ -243,7 +243,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setIsMobileMenuOpen(false);
                 onOpenProjectBrief();
               }}
-              className="w-full py-3 text-center text-xs font-bold text-white bg-gradient-to-r from-blue-600 via-blue-500 to-violet-500 rounded-xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
+              className="w-full py-3 text-center text-xs font-bold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-500 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
               <span>Start Your Project</span>

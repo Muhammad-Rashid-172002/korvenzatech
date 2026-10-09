@@ -1,11 +1,32 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-export const PageHero: React.FC<{eyebrow:string; title:React.ReactNode; description:string; primary?:string; onPrimary?:()=>void; secondary?:string; onSecondary?:()=>void}> = ({eyebrow,title,description,primary,onPrimary,secondary,onSecondary}) => <section className="relative pt-36 pb-20 overflow-hidden border-b border-white/7">
-  <div className="absolute inset-0 bg-grid-pattern opacity-40"/><div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[520px] bg-[radial-gradient(circle,rgba(14,165,233,.17),transparent_62%)]"/>
-  <div className="relative max-w-5xl mx-auto px-4 text-center">
-    <div className="inline-flex px-3 py-1 rounded-full border border-violet-400/20 bg-violet-400/8 text-violet-300 text-[10px] uppercase tracking-[.2em] font-bold">{eyebrow}</div>
-    <h1 className="mt-6 text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-[-.045em] text-white leading-[1.02]">{title}</h1>
-    <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-3xl mx-auto leading-8">{description}</p>
-    {(primary||secondary)&&<div className="mt-9 flex flex-wrap justify-center gap-3">{primary&&<button onClick={onPrimary} className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#635BFF] to-[#8B5CF6] text-sm font-bold shadow-xl shadow-blue-500/20 flex items-center gap-2">{primary}<ArrowRight className="w-4 h-4"/></button>}{secondary&&<button onClick={onSecondary} className="px-6 py-3.5 rounded-xl border border-white/10 bg-white/5 text-sm font-semibold text-slate-200 hover:bg-white/8">{secondary}</button>}</div>}
-  </div>
-</section>;
+import { Eyebrow } from './ui';
+
+type Props = {
+  eyebrow: string;
+  title: React.ReactNode;
+  description: string;
+  primary?: string;
+  onPrimary?: () => void;
+  secondary?: string;
+  onSecondary?: () => void;
+};
+
+/** Inner-page hero: the same cinematic language as the homepage, without the 3D cost. */
+export const PageHero: React.FC<Props> = ({ eyebrow, title, description, primary, onPrimary, secondary, onSecondary }) => (
+  <section className="kz-page-hero kz-cinematic relative overflow-hidden border-b border-white/[0.06] pt-36 pb-20 sm:pt-44 sm:pb-28">
+    <div className="bg-grid-pattern pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
+    <div className="pointer-events-none absolute left-1/2 top-24 h-px w-[min(900px,90%)] -translate-x-1/2 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" aria-hidden="true" />
+    <div className="kz-container relative text-center">
+      <Eyebrow className="kz-hero-enter mx-auto">{eyebrow}</Eyebrow>
+      <h1 className="kz-h1 kz-hero-enter mx-auto mt-7 max-w-5xl text-white" style={{ '--i': 1 } as React.CSSProperties}>{title}</h1>
+      <p className="kz-lead kz-hero-enter mx-auto mt-7 max-w-3xl" style={{ '--i': 2 } as React.CSSProperties}>{description}</p>
+      {(primary || secondary) && (
+        <div className="kz-hero-enter mt-10 flex flex-col justify-center gap-3 sm:flex-row" style={{ '--i': 3 } as React.CSSProperties}>
+          {primary && <button type="button" onClick={onPrimary} className="kz-btn kz-btn-primary">{primary}<ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></button>}
+          {secondary && <button type="button" onClick={onSecondary} className="kz-btn kz-btn-secondary">{secondary}</button>}
+        </div>
+      )}
+    </div>
+  </section>
+);

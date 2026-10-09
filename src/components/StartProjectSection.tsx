@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Sparkles, ArrowRight, CheckCircle, Send, Bot, Shield, Clock } from 'lucide-react';
+import React, { useId, useRef, useState } from 'react';
+import { Sparkles, CheckCircle, Send, Bot, Shield, Clock, AlertCircle } from 'lucide-react';
+import { SectionHeader } from './ui';
 import { ProjectBriefData } from '../types';
 
 interface StartProjectSectionProps {
@@ -38,9 +39,28 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     '$15,000–$50,000', '$50,000+', 'Not Sure Yet'
   ];
 
+  const [errors, setErrors] = useState<Partial<Record<'fullName' | 'email' | 'ideaDescription', string>>>({});
+  const uid = useId();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const validate = () => {
+    const next: typeof errors = {};
+    if (!formData.fullName.trim()) next.fullName = 'Please enter your name.';
+    if (!formData.email.trim()) next.email = 'Please enter your email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) next.email = 'Please enter a valid email address, e.g. name@company.com.';
+    if (formData.ideaDescription.trim().length < 3) next.ideaDescription = 'Please describe your idea or question in a sentence or two.';
+    setErrors(next);
+    if (Object.keys(next).length) {
+      const firstKey = Object.keys(next)[0];
+      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(`[name="${firstKey}"]`)?.focus());
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.email) return;
+    if (!validate()) return;
 
     setIsSubmitting(true);
     setSubmitError('');
@@ -57,7 +77,8 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
       setIsSubmitted(true);
     } catch (err: any) {
       console.error(err);
-      setSubmitError(err?.message || 'We could not submit your project brief right now. Please try again.');
+      const friendly = err instanceof SyntaxError || !err?.message ? 'We could not submit your project brief right now. Please try again, or email sales@korvenzatech.com.' : err.message;
+      setSubmitError(friendly);
     } finally {
       setIsSubmitting(false);
     }
@@ -74,6 +95,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
         body: JSON.stringify({ idea: formData.ideaDescription })
       });
       const data = await res.json();
+      if (!res.ok || data?.error) throw new Error(data?.error || 'Scope analysis unavailable');
       setAiAnalysis(data);
       if (data.recommendedService) {
         setFormData(prev => ({ ...prev, serviceNeeded: data.recommendedService }));
@@ -85,285 +107,177 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     }
   };
 
+  const field = (key: 'fullName' | 'email' | 'ideaDescription') => ({
+    id: `${uid}-${key}`,
+    name: key,
+    'aria-invalid': errors[key] ? true : undefined,
+    'aria-describedby': errors[key] ? `${uid}-${key}-error` : undefined,
+  });
+  const ErrorText = ({ k }: { k: 'fullName' | 'email' | 'ideaDescription' }) => errors[k] ? (
+    <p id={`${uid}-${k}-error`} className="kz-error flex items-center gap-1.5"><AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />{errors[k]}</p>
+  ) : null;
+  const chip = (active: boolean) => `min-h-[40px] rounded-full border px-4 text-[13px] font-semibold transition-all duration-300 ${active ? 'border-emerald-600 bg-emerald-700 text-white kz-on-accent shadow-[0_8px_20px_-10px_rgba(25,199,132,.8)]' : 'border-[var(--kz-border-strong)] bg-[var(--kz-surface-2)] text-[var(--kz-text-2)] hover:border-emerald-500/40'}`;
+  const update = (patch: Partial<ProjectBriefData>) => {
+    setFormData((prev) => ({ ...prev, ...patch }));
+    const keys = Object.keys(patch) as (keyof typeof errors)[];
+    if (keys.some((k) => errors[k])) setErrors((prev) => { const n = { ...prev }; keys.forEach((k) => delete n[k]); return n; });
+  };
+
   return (
-    <section id="start-project" className="py-24 bg-[#08090B] relative z-10 border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Start Your Journey</span>
-          </div>
+    <section id="start-project" className="kz-section kz-section-alt relative z-10" aria-labelledby={`${uid}-title`}>
+      <div className="kz-container">
+        <SectionHeader
+          align="center"
+          eyebrow="Start your journey"
+          title={<span id={`${uid}-title`}>Have an idea? Let’s build something valuable.</span>}
+          lead="Tell us what you’re trying to build or improve. You don’t need technical knowledge — just explain the idea in your own words."
+        />
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            Have an Idea? Let's Build Something Valuable.
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            Tell us what you're trying to build or improve. You don't need technical knowledge — just explain the idea in your own words.
-          </p>
-        </div>
-
-        {/* Form Container */}
-        <div className="max-w-4xl mx-auto p-8 sm:p-12 rounded-3xl glass-panel border border-slate-800 bg-[#17181F] relative overflow-hidden shadow-2xl">
-          
+        <div className="kz-reveal relative mx-auto mt-14 max-w-4xl overflow-hidden rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-surface)] p-6 shadow-[var(--kz-shadow-md)] sm:p-12">
           {isSubmitted ? (
-            <div className="text-center py-12 space-y-6 animate-in fade-in duration-300">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400 mx-auto">
-                <CheckCircle className="w-8 h-8" />
+            <div className="animate-in py-12 text-center" role="status" aria-live="polite">
+              <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/15 text-[var(--kz-accent-text)]">
+                <CheckCircle className="h-8 w-8" aria-hidden="true" />
               </div>
-
-              <h3 className="text-2xl font-bold text-white">
-                Brief Received Successfully!
-              </h3>
-
-              <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                Thank you. Our team will review your project details and respond with the most practical next step as soon as possible.
-              </p>
-
+              <h3 className="mt-6 text-2xl font-bold text-[var(--kz-text)]">Brief received successfully</h3>
+              <p className="mx-auto mt-3 max-w-md text-[15px] leading-7 text-[var(--kz-text-2)]">Thank you. Our team will review your project details and respond with the most practical next step as soon as possible.</p>
               <button
+                type="button"
                 onClick={() => {
                   setIsSubmitted(false);
-                  setFormData({
-                    inquiryType: defaultInquiryType,
-                    fullName: '',
-                    email: '',
-                    companyName: '',
-                    country: '',
-                    serviceNeeded: 'Not Sure Yet',
-                    budgetRange: '$5,000–$15,000',
-                    ideaDescription: '',
-                    preferredContact: 'Email'
-                  });
+                  setFormData({ inquiryType: defaultInquiryType, fullName: '', email: '', companyName: '', country: '', serviceNeeded: 'Not Sure Yet', budgetRange: '$5,000–$15,000', ideaDescription: '', preferredContact: 'Email' });
                   setAiAnalysis(null);
                   setSubmitError('');
                   setWebsiteTrap('');
+                  setErrors({});
                 }}
-                className="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-700/60"
+                className="kz-btn kz-btn-secondary mt-8"
               >
-                Submit Another Brief
+                Submit another brief
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-8 text-left">
-              
-              <div className="space-y-3">
-                <label className="text-xs font-semibold text-slate-300 block">What can we help with?</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-9 text-left">
+              {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
+              <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                <label htmlFor={`${uid}-website`}>Website</label>
+                <input id={`${uid}-website`} type="text" tabIndex={-1} autoComplete="off" value={websiteTrap} onChange={(e) => setWebsiteTrap(e.target.value)} />
+              </div>
+
+              <fieldset>
+                <legend className="kz-label">What can we help with?</legend>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {['Project / Sales', 'General Inquiry', 'Partnership', 'Careers'].map((type) => (
-                    <button key={type} type="button" onClick={() => setFormData({ ...formData, inquiryType: type as any })} className={`rounded-xl border px-3 py-3 text-[11px] font-semibold transition ${formData.inquiryType === type ? 'border-emerald-400/35 bg-emerald-400/10 text-emerald-200' : 'border-slate-700/60 bg-slate-900 text-slate-400 hover:text-white'}`}>{type}</button>
+                    <button key={type} type="button" aria-pressed={formData.inquiryType === type} onClick={() => update({ inquiryType: type as ProjectBriefData['inquiryType'] })} className={`${chip(formData.inquiryType === type)} !rounded-xl`}>{type}</button>
                   ))}
                 </div>
-                <p className="text-[10px] text-slate-500">Project / Sales briefs route to sales@korvenzatech.com. General, partnership and careers enquiries route to info@korvenzatech.com.</p>
-              </div>
+                <p className="mt-3 text-[12px] text-[var(--kz-muted)]">Project / Sales briefs route to sales@korvenzatech.com. General, partnership and careers enquiries route to info@korvenzatech.com.</p>
+              </fieldset>
 
-              {/* Contact Information Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-300">
-                    Full Name <span className="text-indigo-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Sarah Jenkins"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
-                  />
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor={`${uid}-fullName`} className="kz-label">Full name <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
+                  <input {...field('fullName')} type="text" autoComplete="name" required placeholder="e.g. Sarah Jenkins" value={formData.fullName} onChange={(e) => update({ fullName: e.target.value })} className="kz-field" />
+                  <ErrorText k="fullName" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-300">
-                    Work Email <span className="text-indigo-400">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. sarah@company.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
-                  />
+                <div>
+                  <label htmlFor={`${uid}-email`} className="kz-label">Work email <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
+                  <input {...field('email')} type="email" autoComplete="email" inputMode="email" required placeholder="e.g. sarah@company.com" value={formData.email} onChange={(e) => update({ email: e.target.value })} className="kz-field" />
+                  <ErrorText k="email" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-300">
-                    Company Name <span className="text-slate-500">(Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Acme Corp"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
-                  />
+                <div>
+                  <label htmlFor={`${uid}-company`} className="kz-label">Company name <span className="font-normal text-[var(--kz-muted)]">(optional)</span></label>
+                  <input id={`${uid}-company`} name="companyName" type="text" autoComplete="organization" placeholder="e.g. Acme Corp" value={formData.companyName} onChange={(e) => update({ companyName: e.target.value })} className="kz-field" />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-300">
-                    Country
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. United States, UAE, Germany"
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
-                  />
+                <div>
+                  <label htmlFor={`${uid}-country`} className="kz-label">Country</label>
+                  <input id={`${uid}-country`} name="country" type="text" autoComplete="country-name" placeholder="e.g. United States, UAE, Germany" value={formData.country} onChange={(e) => update({ country: e.target.value })} className="kz-field" />
                 </div>
               </div>
 
-              {/* Service Needed Selection */}
-              <div className="space-y-3">
-                <label className="text-xs font-semibold text-slate-300 block">
-                  What do you need help with?
-                </label>
+              <fieldset>
+                <legend className="kz-label">What do you need help with?</legend>
                 <div className="flex flex-wrap gap-2">
                   {servicesList.map((srv) => (
-                    <button
-                      key={srv}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, serviceNeeded: srv })}
-                      className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                        formData.serviceNeeded === srv
-                          ? 'bg-indigo-500 text-white border-indigo-400 border shadow-md'
-                          : 'bg-slate-900 text-slate-400 border-slate-700/60 border hover:border-slate-600 hover:text-white'
-                      }`}
-                    >
-                      {srv}
-                    </button>
+                    <button key={srv} type="button" aria-pressed={formData.serviceNeeded === srv} onClick={() => update({ serviceNeeded: srv })} className={chip(formData.serviceNeeded === srv)}>{srv}</button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
-              {/* Budget Range Selection */}
-              <div className="space-y-3">
-                <label className="text-xs font-semibold text-slate-300 block">
-                  Estimated Project Budget
-                </label>
+              <fieldset>
+                <legend className="kz-label">Estimated project budget</legend>
                 <div className="flex flex-wrap gap-2">
                   {budgetList.map((bgt) => (
-                    <button
-                      key={bgt}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, budgetRange: bgt })}
-                      className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                        formData.budgetRange === bgt
-                          ? 'bg-indigo-500 text-white border-indigo-400 border shadow-md'
-                          : 'bg-slate-900 text-slate-400 border-slate-700/60 border hover:border-slate-600 hover:text-white'
-                      }`}
-                    >
-                      {bgt}
-                    </button>
+                    <button key={bgt} type="button" aria-pressed={formData.budgetRange === bgt} onClick={() => update({ budgetRange: bgt })} className={chip(formData.budgetRange === bgt)}>{bgt}</button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
-              {/* Idea Description Area */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300">
-                    Tell us about your idea or business challenge
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={handleRunAiAnalysis}
-                    disabled={isAiAnalyzing || !formData.ideaDescription}
-                    className="text-[11px] text-indigo-400 hover:text-indigo-300 font-mono flex items-center gap-1 disabled:opacity-40"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    <span>{isAiAnalyzing ? 'Analyzing Scope...' : 'Analyze Idea with AI Scope Engine'}</span>
+              <div>
+                <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                  <label htmlFor={`${uid}-ideaDescription`} className="kz-label !mb-0">Tell us about your idea or business challenge <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
+                  <button type="button" onClick={handleRunAiAnalysis} disabled={isAiAnalyzing || !formData.ideaDescription} className="inline-flex items-center gap-1.5 self-start font-mono text-[11.5px] text-[var(--kz-accent-text)] hover:underline disabled:opacity-40">
+                    <Bot className="h-3.5 w-3.5" aria-hidden="true" />
+                    {isAiAnalyzing ? 'Analyzing scope…' : 'Analyze idea with AI scope engine'}
                   </button>
                 </div>
-
                 <textarea
-                  rows={4}
+                  {...field('ideaDescription')}
+                  rows={5}
                   required
-                  placeholder="Explain your goals in plain English... e.g. 'I want to build an iOS and Android app for users to book local fitness trainers and pay via credit card.'"
+                  placeholder="Explain your goals in plain English, e.g. ‘I want an iOS and Android app for users to book local fitness trainers and pay by card.’"
                   value={formData.ideaDescription}
-                  onChange={(e) => setFormData({ ...formData, ideaDescription: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400"
+                  onChange={(e) => update({ ideaDescription: e.target.value })}
+                  className="kz-field mt-2 resize-y"
                 />
+                <ErrorText k="ideaDescription" />
               </div>
 
-              {/* AI Scope Analysis Results Card */}
               {aiAnalysis && (
-                <div className="p-4 rounded-2xl bg-slate-900 border border-indigo-500/30 space-y-3 animate-in fade-in">
-                  <div className="flex items-center justify-between text-xs font-mono text-indigo-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Korvenza AI Scope Assessment</span>
-                    </span>
-                    <span>Est. Timeline: {aiAnalysis.estimatedTimeline}</span>
+                <div className="animate-in space-y-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/[.05] p-5" aria-live="polite">
+                  <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-[12px] font-bold text-[var(--kz-accent-text)]">
+                    <span className="flex items-center gap-1.5"><Sparkles className="h-4 w-4" aria-hidden="true" />Korvenza AI scope assessment</span>
+                    {aiAnalysis.estimatedTimeline && <span>Est. timeline: {aiAnalysis.estimatedTimeline}</span>}
                   </div>
-
-                  <p className="text-xs text-slate-200">
-                    {aiAnalysis.businessValueSummary}
-                  </p>
-
+                  <p className="text-[14px] leading-6 text-[var(--kz-text-2)]">{aiAnalysis.businessValueSummary}</p>
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {aiAnalysis.suggestedStack?.map((stk: string, sIdx: number) => (
-                      <span key={sIdx} className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700/60 text-[10px] font-mono text-slate-300">
-                        {stk}
-                      </span>
-                    ))}
+                    {aiAnalysis.suggestedStack?.map((stk: string) => <span key={stk} className="kz-tech-pill">{stk}</span>)}
                   </div>
                 </div>
               )}
 
-              {/* Preferred Contact Mode */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-300 block">
-                  Preferred Contact Method
-                </label>
-                <div className="flex gap-4 text-xs text-slate-300">
+              <fieldset>
+                <legend className="kz-label">Preferred contact method</legend>
+                <div className="flex flex-wrap gap-5 text-[14px] text-[var(--kz-text-2)]">
                   {['Email', 'WhatsApp', 'Video Call'].map((mode) => (
-                    <label key={mode} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="preferredContact"
-                        value={mode}
-                        checked={formData.preferredContact === mode}
-                        onChange={() => setFormData({ ...formData, preferredContact: mode as any })}
-                        className="accent-indigo-400"
-                      />
+                    <label key={mode} className="flex min-h-[40px] cursor-pointer items-center gap-2">
+                      <input type="radio" name="preferredContact" value={mode} checked={formData.preferredContact === mode} onChange={() => update({ preferredContact: mode as ProjectBriefData['preferredContact'] })} className="h-4 w-4 accent-emerald-600" />
                       <span>{mode}</span>
                     </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
-              {/* Submit CTA */}
-              <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-sm shadow-xl shadow-indigo-500/25 hover:scale-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Sending Brief...' : 'Discuss My Project'}</span>
+              {submitError && (
+                <div role="alert" className="flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/[.07] p-4 text-[14px] leading-6 text-[var(--kz-text)]">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" aria-hidden="true" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col items-start justify-between gap-5 border-t border-[var(--kz-border)] pt-7 sm:flex-row sm:items-center">
+                <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className="kz-btn kz-btn-primary !min-h-[52px] !px-7 disabled:cursor-wait disabled:opacity-60">
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                  {isSubmitting ? 'Sending brief…' : 'Discuss my project'}
                 </button>
-
-                <div className="flex items-center gap-4 text-xs text-slate-400 font-mono">
-                  <span className="flex items-center gap-1">
-                    <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>NDA Protection Included</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Clear follow-up process</span>
-                  </span>
+                <div className="flex flex-wrap items-center gap-4 font-mono text-[12px] text-[var(--kz-muted)]">
+                  <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />NDA available on request</span>
+                  <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />Clear follow-up process</span>
                 </div>
               </div>
-
             </form>
           )}
-
         </div>
-
       </div>
     </section>
   );

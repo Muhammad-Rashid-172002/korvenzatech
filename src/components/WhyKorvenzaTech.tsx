@@ -1,103 +1,48 @@
 import React from 'react';
-import { Target, Cpu, TrendingUp, MessageSquare, ShieldCheck, HeartHandshake, Sparkles } from 'lucide-react';
+import { Target, Cpu, TrendingUp, MessageSquare, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { SectionHeader } from './ui';
 
-export const WhyKorvenzaTech: React.FC = () => {
-  const pillars = [
-    {
-      title: 'Business-First Thinking',
-      desc: 'We focus on solving the actual business problem, not simply writing lines of code. Technical choices serve ROI.',
-      icon: Target
-    },
-    {
-      title: 'Modern Technology with Purpose',
-      desc: 'We select frameworks based on your long-term needs, maintainability, and budget — never passing trends.',
-      icon: Cpu
-    },
-    {
-      title: 'Scalable Engineering',
-      desc: 'Our software architectures are designed from day one to handle spikes in traffic and data growth effortlessly.',
-      icon: TrendingUp
-    },
-    {
-      title: 'Clear Jargon-Free Communication',
-      desc: 'You always know what is being built, why it matters, and when it will be delivered with bi-weekly live demos.',
-      icon: MessageSquare
-    },
-    {
-      title: 'Uncompromising Quality',
-      desc: 'User design, frontend performance, backend security, and QA testing are treated as one unified product discipline.',
-      icon: ShieldCheck
-    },
-    {
-      title: 'Long-Term Partnership',
-      desc: 'We continue maintaining, updating, and scaling your technology long after initial store or web deployment.',
-      icon: HeartHandshake
-    }
-  ];
+const pillars = [
+  { title: 'Business-first thinking', desc: 'We focus on solving the actual business problem, not simply writing lines of code. Technical choices serve your goals.', icon: Target },
+  { title: 'Modern technology with purpose', desc: 'We select frameworks based on your long-term needs, maintainability and budget — never passing trends.', icon: Cpu },
+  { title: 'Scalable engineering', desc: 'Architectures are planned from day one with growth in traffic and data in mind, so the product can evolve without a rewrite.', icon: TrendingUp },
+  { title: 'Clear, jargon-free communication', desc: 'You always know what is being built, why it matters and when it will be delivered, with regular progress reviews.', icon: MessageSquare },
+  { title: 'Uncompromising quality', desc: 'User design, frontend performance, backend security and QA testing are treated as one unified product discipline.', icon: ShieldCheck },
+  { title: 'Long-term partnership', desc: 'Maintenance, updates and scaling can continue after launch, based on the support agreement for your project.', icon: HeartHandshake },
+];
 
-  const trustMetrics = [
-    { label: 'Live Products Delivered', detail: 'Mobile & Web Apps' },
-    { label: 'AI-Powered Solutions', detail: 'Private RAG & reasoning engines' },
-    { label: 'Cross-Platform Expertise', detail: 'Flutter & React / Next.js' },
-    { label: 'Global-Ready Engineering', detail: 'Secure Cloud Infrastructure' }
-  ];
+const strengths = [
+  { label: 'Live products delivered', detail: 'Mobile & web apps' },
+  { label: 'AI-powered solutions', detail: 'Private RAG & reasoning engines' },
+  { label: 'Cross-platform expertise', detail: 'Flutter & React / Next.js' },
+  { label: 'Global-ready engineering', detail: 'Secure cloud infrastructure' },
+];
 
-  return (
-    <section className="py-24 bg-[#08090B] relative z-10 border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>The KorvenzaTech Advantage</span>
+export const WhyKorvenzaTech: React.FC = () => (
+  <section className="kz-section relative z-10" aria-labelledby="why-title">
+    <div className="kz-container">
+      <SectionHeader
+        eyebrow="The KorvenzaTech advantage"
+        title={<span id="why-title">Built differently. Engineered for results.</span>}
+        lead="We bridge business strategy and software engineering to create products that perform reliably from launch day forward."
+      />
+      <div className="mt-14 grid overflow-hidden rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-border)] gap-px md:grid-cols-2 lg:grid-cols-3">
+        {pillars.map(({ title, desc, icon: Icon }, i) => (
+          <div key={title} className="kz-reveal group bg-[var(--kz-surface)] p-8 transition-colors duration-500 hover:bg-[var(--kz-surface-2)]" style={{ '--d': i % 3 } as React.CSSProperties}>
+            <span className="kz-icon-orb !h-11 !w-11 transition-transform duration-500 group-hover:-translate-y-1"><Icon className="h-5 w-5" aria-hidden="true" /></span>
+            <h3 className="kz-h3 mt-6">{title}</h3>
+            <p className="mt-3 text-[14px] leading-7 text-[var(--kz-muted)]">{desc}</p>
           </div>
-
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            Built Differently. Engineered for Results.
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            We bridge the gap between business strategy and high-level software engineering, creating products that perform reliably from launch day forward.
-          </p>
-        </div>
-
-        {/* Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {pillars.map((pil, idx) => {
-            const IconComp = pil.icon;
-            return (
-              <div
-                key={idx}
-                className="p-7 rounded-2xl glass-panel border border-slate-800 hover:border-indigo-500/40 glass-panel-hover text-left space-y-4"
-              >
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                  <IconComp className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-white">{pil.title}</h3>
-                <p className="text-xs text-slate-300 leading-relaxed font-normal">
-                  {pil.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Qualitative Trust Metrics Strip */}
-        <div className="p-8 rounded-3xl bg-slate-800/80 border border-slate-700/60 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {trustMetrics.map((tm, idx) => (
-            <div key={idx} className="space-y-1">
-              <div className="text-sm sm:text-base font-extrabold text-indigo-400">
-                {tm.label}
-              </div>
-              <p className="text-[11px] text-slate-400 font-mono">
-                {tm.detail}
-              </p>
-            </div>
-          ))}
-        </div>
-
+        ))}
       </div>
-    </section>
-  );
-};
+      <dl className="kz-reveal mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--kz-radius-lg)] border border-[var(--kz-border)] bg-[var(--kz-border)] md:grid-cols-4">
+        {strengths.map((s) => (
+          <div key={s.label} className="bg-[var(--kz-surface-2)] p-6">
+            <dt className="text-[15px] font-bold text-[var(--kz-accent-text)]">{s.label}</dt>
+            <dd className="mt-1 font-mono text-[11px] text-[var(--kz-muted)]">{s.detail}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+);

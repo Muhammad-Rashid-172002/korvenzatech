@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowRight, ChevronDown, Menu, Moon, Sparkles, Sun, X } from 'lucide-react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ArrowRight, ChevronDown, Menu, Moon, Sun, X } from 'lucide-react';
 import { SERVICES_DATA } from '../data/companyData';
 import { ServiceItem } from '../types';
+import { Link } from '../lib/router';
 
 type Props = {
   path: string;
@@ -11,7 +12,7 @@ type Props = {
   onToggleTheme: () => void;
 };
 
-const nav = [
+const nav: [string, string][] = [
   ['/', 'Home'],
   ['/services', 'Services'],
   ['/work', 'Work'],
@@ -21,67 +22,155 @@ const nav = [
   ['/careers', 'Careers'],
 ];
 
-export const SiteNavbar: React.FC<Props> = ({ path, navigate, onSelectService, theme, onToggleTheme }) => {
+const isActive = (path: string, to: string) => (to === '/' ? path === '/' : path === to || path.startsWith(`${to}/`));
+
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const railRef = useRef<HTMLDivElement>(null);
+  const hoverAt = useRef(0);
+  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 18);
-    fn(); window.addEventListener('scroll', fn); return () => window.removeEventListener('scroll', fn);
+    const fn = () => setScrolled(window.scrollY > 24);
+    fn();
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
   }, []);
-  const go = (to: string) => { setMobile(false); setServicesOpen(false); navigate(to); };
 
-  return <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#08090B]/88 backdrop-blur-2xl border-b border-white/8 shadow-2xl shadow-black/20' : 'bg-transparent'}`}>
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-[76px] flex items-center justify-between">
-      <button onClick={() => go('/')} className="group flex items-center gap-3 text-left">
-        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-300 via-emerald-500 to-blue-600 p-[1px] shadow-lg shadow-indigo-500/20">
-          <div className="w-full h-full rounded-[11px] bg-[#111218] grid place-items-center overflow-hidden">
-            <img src="/korvenza-logo.png" alt="" className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110" />
+  // Close menus on route change and on Escape.
+  useEffect(() => { setMobile(false); setServicesOpen(false); }, [path]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMobile(false); setServicesOpen(false); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Sliding active-page indicator.
+  useIsoLayoutEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const measure = () => {
+      const active = rail.querySelector<HTMLElement>('[data-active="true"]');
+      if (!active) { setIndicator(null); return; }
+      setIndicator({ left: active.offsetLeft, width: active.offsetWidth });
+    };
+    measure();
+    document.fonts?.ready.then(measure).catch(() => {});
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [path]);
+
+  // On top of a hero the bar is transparent and uses dark (cinematic) tokens.
+  const onHero = !scrolled && !mobile;
+
+  return (
+    <header className={`kz-nav ${scrolled || mobile ? 'is-scrolled' : ''} ${onHero ? 'kz-cinematic' : ''}`} style={onHero ? { background: 'transparent' } : undefined}>
+      <div className="kz-container flex h-[72px] items-center justify-between gap-4 xl:h-[76px]">
+        <Link to="/" className="group flex shrink-0 items-center gap-3" aria-label="KorvenzaTech home">
+          <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl border border-[var(--kz-border-strong)] bg-[#0A1612] shadow-[0_8px_24px_-12px_rgba(25,199,132,.6)]">
+            <img src="/media/brand/logo-64.webp" width={32} height={32} alt="" className="h-8 w-8 object-contain transition-transform duration-500 group-hover:scale-110" />
+          </span>
+          <span className="leading-none">
+            <span className="block text-[17px] font-extrabold tracking-tight text-[var(--kz-text)]">Korvenza<span className="text-emerald-400">Tech</span></span>
+            <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[.28em] text-[var(--kz-muted)] min-[360px]:block">Build • Automate • Scale</span>
+          </span>
+        </Link>
+
+        <nav aria-label="Primary" className="hidden xl:block">
+          <div ref={railRef} className="kz-nav-rail">
+            {indicator && <span className="kz-nav-indicator" style={{ left: indicator.left, width: indicator.width }} aria-hidden="true" />}
+            {nav.map(([to, label]) => {
+              const active = isActive(path, to);
+              if (label !== 'Services') {
+                return <Link key={to} to={to} data-active={active} className="kz-nav-link relative z-[1]" aria-current={active ? 'page' : undefined}>{label}</Link>;
+              }
+              return (
+                <div key={to} className="relative z-[1]" onMouseEnter={() => { hoverAt.current = Date.now(); setServicesOpen(true); }} onMouseLeave={() => setServicesOpen(false)}>
+                  <div className="flex items-center" data-active={active}>
+                    <Link to={to} className="kz-nav-link pr-1" aria-current={active ? 'page' : undefined}>{label}</Link>
+                    <button
+                      type="button"
+                      className="grid h-8 w-6 place-items-center rounded-full text-[var(--kz-muted)] hover:text-[var(--kz-text)]"
+                      aria-expanded={servicesOpen}
+                      aria-controls="services-menu"
+                      aria-label="Show services"
+                      onClick={() => setServicesOpen((v) => (Date.now() - hoverAt.current < 500 ? true : !v))}
+                    >
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${servicesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                    </button>
+                  </div>
+                  {servicesOpen && (
+                    <div id="services-menu" className="kz-mega absolute left-1/2 top-full w-[640px] pt-3" style={{ transform: 'translateX(-50%)' }}>
+                      <div className="grid grid-cols-2 gap-1.5 rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)]">
+                        {SERVICES_DATA.slice(0, 8).map((s) => (
+                          <Link key={s.id} to={`/services/${s.id}`} className="group/item rounded-xl p-3 transition-colors hover:bg-[var(--kz-surface-2)]">
+                            <span className="block text-sm font-semibold text-[var(--kz-text)] group-hover/item:text-[var(--kz-accent-text)]">{s.title}</span>
+                            <span className="mt-1 block text-[12px] leading-5 text-[var(--kz-muted)] line-clamp-1">{s.shortDesc}</span>
+                          </Link>
+                        ))}
+                        <Link to="/services" className="col-span-2 mt-1 flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/[.07] px-4 py-3 text-[13px] font-semibold text-[var(--kz-accent-text)]">
+                          View all services <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-        </div>
-        <div>
-          <div className="text-[17px] font-extrabold tracking-tight text-white">Korvenza<span className="text-emerald-300">Tech</span></div>
-          <div className="text-[9px] uppercase tracking-[.28em] text-slate-500">Build • Automate • Scale</div>
-        </div>
-      </button>
+        </nav>
 
-      <nav className="hidden lg:flex items-center rounded-full border border-white/8 bg-white/[.035] p-1.5 backdrop-blur-xl">
-        {nav.map(([to,label]) => <div key={to} className="relative" onMouseEnter={() => label==='Services' && setServicesOpen(true)} onMouseLeave={() => label==='Services' && setServicesOpen(false)}>
-          <button onClick={() => go(to)} className={`px-4 py-2 rounded-full text-[12px] font-semibold transition-all flex items-center gap-1 ${path===to ? 'bg-white/8 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>{label}{label==='Services' && <ChevronDown className="w-3 h-3"/>}</button>
-          {label==='Services' && servicesOpen && <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 w-[620px]">
-            <div className="rounded-2xl border border-white/10 bg-[#0B0C10]/95 backdrop-blur-2xl p-4 shadow-2xl grid grid-cols-2 gap-2">
-              {SERVICES_DATA.slice(0,8).map(s => <a key={s.id} href={`/services/${s.id}`} onClick={(e) => { e.preventDefault(); go(`/services/${s.id}`); }} className="text-left p-3 rounded-xl hover:bg-white/6 border border-transparent hover:border-white/8 transition-all">
-                <div className="text-sm font-semibold text-white">{s.title}</div><div className="text-[11px] text-slate-500 mt-1 line-clamp-1">{s.shortDesc}</div>
-              </a>)}
-              <button onClick={() => go('/services')} className="col-span-2 mt-1 p-3 rounded-xl bg-gradient-to-r from-emerald-500/15 to-blue-500/10 border border-emerald-300/15 text-emerald-300 text-xs font-semibold">View all services →</button>
-            </div>
-          </div>}
-        </div>)}
-      </nav>
+        <div className="hidden items-center gap-3 xl:flex">
+          <button type="button" onClick={onToggleTheme} className="theme-toggle" aria-label="Toggle light and dark theme">
+            <span className="theme-toggle-option" data-mode="light"><Sun className="h-3.5 w-3.5" aria-hidden="true" /></span>
+            <span className="theme-toggle-option" data-mode="dark"><Moon className="h-3.5 w-3.5" aria-hidden="true" /></span>
+          </button>
+          <Link to="/contact" className="kz-nav-link">Contact</Link>
+          <Link to="/start-project" className="kz-btn kz-btn-primary !min-h-[42px] !px-4 !text-[13px]">
+            Start a project <ArrowRight className="kz-btn-arrow h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
+        </div>
 
-      <div className="hidden lg:flex items-center gap-3">
-        <button
-          onClick={onToggleTheme}
-          className="theme-toggle"
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          <span className={`theme-toggle-option ${theme === 'light' ? 'active' : ''}`}><Sun className="w-3.5 h-3.5" /></span>
-          <span className={`theme-toggle-option ${theme === 'dark' ? 'active' : ''}`}><Moon className="w-3.5 h-3.5" /></span>
-        </button>
-        <button onClick={() => go('/contact')} className="text-xs font-semibold text-slate-400 hover:text-white">Contact</button>
-        <button onClick={() => go('/start-project')} className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/25 transition-all"><Sparkles className="w-3.5 h-3.5"/> Start a Project <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"/></button>
+        <div className="flex items-center gap-2 xl:hidden">
+          <button type="button" onClick={onToggleTheme} className="mobile-theme-toggle" aria-label="Toggle light and dark theme">
+            <Sun className="kz-theme-icon-dark h-4 w-4" aria-hidden="true" />
+            <Moon className="kz-theme-icon-light h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobile((v) => !v)}
+            className="mobile-theme-toggle"
+            aria-expanded={mobile}
+            aria-controls="mobile-menu"
+            aria-label={mobile ? 'Close menu' : 'Open menu'}
+          >
+            {mobile ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+          </button>
+        </div>
       </div>
-      <div className="lg:hidden flex items-center gap-2">
-        <button onClick={onToggleTheme} className="mobile-theme-toggle" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-          {theme === 'dark' ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
-        </button>
-        <button onClick={() => setMobile(!mobile)} className="p-2 rounded-lg text-slate-300 bg-white/5">{mobile?<X/>:<Menu/>}</button>
-      </div>
-    </div>
-    {mobile && <div className="lg:hidden mx-4 mb-4 rounded-2xl border border-white/10 bg-[#0B0C10]/98 p-4 shadow-2xl">
-      <div className="grid gap-1">{nav.map(([to,label]) => <button key={to} onClick={() => go(to)} className="text-left px-4 py-3 rounded-xl text-sm text-slate-300 hover:bg-white/5">{label}</button>)}</div>
-      <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/8"><button onClick={()=>go('/contact')} className="py-3 rounded-xl border border-white/10 text-sm">Contact</button><button onClick={()=>go('/start-project')} className="py-3 rounded-xl bg-emerald-600 text-sm font-bold">Start Project</button></div>
-    </div>}
-  </header>
+
+      {mobile && (
+        <nav id="mobile-menu" aria-label="Mobile" className="kz-mobile-menu mx-4 mb-4 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)] xl:hidden">
+          <div className="grid gap-0.5">
+            {nav.map(([to, label]) => {
+              const active = isActive(path, to);
+              return (
+                <Link key={to} to={to} className={`flex min-h-[48px] items-center justify-between rounded-xl px-4 text-[15px] font-semibold ${active ? 'bg-[var(--kz-surface-2)] text-[var(--kz-text)]' : 'text-[var(--kz-text-2)]'}`}>
+                  {label}{active && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />}
+                </Link>
+              );
+            })}
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[var(--kz-border)] pt-3">
+            <Link to="/contact" className="kz-btn kz-btn-secondary">Contact</Link>
+            <Link to="/start-project" className="kz-btn kz-btn-primary">Start project</Link>
+          </div>
+        </nav>
+      )}
+    </header>
+  );
 };

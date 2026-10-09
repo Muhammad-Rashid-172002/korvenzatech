@@ -1,168 +1,90 @@
 import React from 'react';
 import { CASE_STUDIES } from '../data/companyData';
-import { ArrowRight, CheckCircle2, Sparkles, ExternalLink } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
+import { Link } from '../lib/router';
+import { SectionHeader } from './ui';
+import { projectImage } from '../data/media';
 
 interface FeaturedWorkProps {
   onNavigateCaseStudy: (studyId: string) => void;
   onStartProject: () => void;
 }
 
-export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onNavigateCaseStudy, onStartProject }) => {
-  return (
-    <section id="work" className="py-24 bg-[#08090B] relative z-10 border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Proven Engineering Outcomes</span>
-          </div>
+export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onStartProject }) => (
+  <section id="work" className="kz-section relative z-10" aria-labelledby="work-title">
+    <div className="kz-container">
+      <SectionHeader
+        eyebrow="Delivered products"
+        title={<span id="work-title">Featured products & case studies</span>}
+        lead="Selected products with transparent architecture, platform scope and delivered outcomes. No fabricated metrics — just what was actually built."
+      />
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            Featured Products & Case Studies
-          </h2>
-
-          <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            Selected products with transparent architecture, platform scope and delivered outcomes. We avoid fabricated metrics and keep the case study focused on what was actually built.
-          </p>
-        </div>
-
-        {/* Case Studies List */}
-        <div className="space-y-12">
-          {CASE_STUDIES.map((study, idx) => {
-            const isEven = idx % 2 === 0;
-
-            return (
-              <div
-                key={study.id}
-                className="rounded-3xl glass-panel border border-slate-800 hover:border-indigo-500/40 transition-all duration-300 p-8 sm:p-10 relative overflow-hidden group"
-              >
-                <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${isEven ? '' : 'lg:flex-row-reverse'}`}>
-                  
-                  {/* Text Details Column */}
-                  <div className={`lg:col-span-7 space-y-6 text-left ${isEven ? 'order-1' : 'order-1 lg:order-2'}`}>
-                    
-                    {/* Category & Industry */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-mono font-semibold">
-                        {study.category}
-                      </span>
-                      <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-medium">
-                        Platform: {study.platform}
-                      </span>
-                    </div>
-
-                    {/* Title & Tagline */}
-                    <div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-white group-hover:text-indigo-300 transition-colors">
-                        {study.name}
-                      </h3>
-                      <p className="text-sm font-semibold text-indigo-400 mt-1">
-                        {study.tagline}
-                      </p>
-                    </div>
-
-                    {/* Problem & Solution Breakdown */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                      <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                        <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider block">
-                          The Challenge:
-                        </span>
-                        <p className="text-xs text-slate-300 leading-relaxed">
-                          {study.problem}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                          KorvenzaTech Solution:
-                        </span>
-                        <p className="text-xs text-slate-300 leading-relaxed">
-                          {study.solution}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Important Metrics Bar */}
-                    <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 grid grid-cols-3 gap-2 text-center">
-                      {study.metrics.map((m, mIdx) => (
-                        <div key={mIdx}>
-                          <div className="text-base sm:text-xl font-extrabold text-indigo-400">
-                            {m.value}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-medium">
-                            {m.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Tech Stack Pills */}
-                    <div className="space-y-2">
-                      <span className="text-xs font-mono font-semibold text-slate-400 uppercase">
-                        Core Tech Stack:
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {study.coreTech.map((tech, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="pt-2 flex items-center gap-4">
-                      <button
-                        onClick={() => onNavigateCaseStudy(study.id)}
-                        className="px-6 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-xs transition-all shadow-md shadow-indigo-500/25 flex items-center gap-2"
-                      >
-                        <span>View Full Case Study</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-
+      <div className="mt-16 space-y-24 sm:space-y-32">
+        {CASE_STUDIES.map((study, idx) => {
+          const img = projectImage(study.id, study.imageSrc);
+          const flip = idx % 2 === 1;
+          return (
+            <article key={study.id} className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14" aria-labelledby={`study-${study.id}`}>
+              <div className={`kz-reveal lg:col-span-7 ${flip ? 'lg:order-2' : ''}`}>
+                <Link to={`/work/${study.id}`} className="kz-project group block" aria-label={`Open the ${study.name} case study`}>
+                  <div className="kz-project-media kz-reveal-img">
+                    <img src={img.src} srcSet={img.srcSet} sizes="(min-width: 1024px) 720px, 92vw" alt={`${study.name} — ${study.tagline}`} loading="lazy" decoding="async" width={1536} height={1024} />
                   </div>
-
-                  {/* Image / Graphic Visual Column */}
-                  <div className={`lg:col-span-5 relative ${isEven ? 'order-2' : 'order-2 lg:order-1'}`}>
-                    <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group-hover:scale-[1.02] transition-transform duration-300">
-                      <img
-                        src={study.imageSrc}
-                        alt={study.name}
-                        className="w-full h-64 sm:h-80 lg:h-96 object-cover object-center filter brightness-90 contrast-105 group-hover:brightness-100 transition-all"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#080b12] via-transparent to-transparent opacity-80" />
-                      
-                      <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-[#080b12]/90 backdrop-blur-md border border-white/10 text-xs text-slate-300 flex items-center justify-between">
-                        <span className="font-semibold text-white">{study.name} Overview</span>
-                        <span className="text-[10px] font-mono text-violet-400">Verified Case Outcome</span>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
+                </Link>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <button
-            onClick={onStartProject}
-            className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-violet-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 hover:scale-105 transition-all inline-flex items-center gap-2"
-          >
-            <span>Have a Similar Project? Request Discovery Call</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+              <div className={`kz-reveal lg:col-span-5 ${flip ? 'lg:order-1' : ''}`} style={{ '--d': 1 } as React.CSSProperties}>
+                <div className="flex flex-wrap gap-2">
+                  <span className="kz-eyebrow">{study.category}</span>
+                  <span className="kz-muted-pill">{study.platform}</span>
+                </div>
+                <h3 id={`study-${study.id}`} className="mt-6 text-3xl font-extrabold tracking-tight text-[var(--kz-text)] sm:text-4xl">{study.name}</h3>
+                <p className="mt-3 text-[16px] font-medium text-[var(--kz-accent-text)]">{study.tagline}</p>
 
+                <dl className="mt-7 space-y-5">
+                  <div>
+                    <dt className="kz-meta !text-[10px]">The challenge</dt>
+                    <dd className="mt-2 text-[14px] leading-7 text-[var(--kz-text-2)]">{study.problem}</dd>
+                  </div>
+                  <div>
+                    <dt className="kz-meta !text-[10px]">What we built</dt>
+                    <dd className="mt-2 text-[14px] leading-7 text-[var(--kz-text-2)]">{study.solution}</dd>
+                  </div>
+                </dl>
+
+                <dl className="mt-7 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-border)]">
+                  {study.metrics.map((m) => (
+                    <div key={m.label} className="bg-[var(--kz-surface)] p-4 text-center">
+                      <dt className="text-[10.5px] font-semibold uppercase tracking-[.12em] text-[var(--kz-muted)]">{m.label}</dt>
+                      <dd className="mt-1 text-lg font-extrabold text-[var(--kz-text)]">{m.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <ul className="mt-6 space-y-2">
+                  {study.outcome.slice(0, 3).map((o) => (
+                    <li key={o} className="flex gap-2.5 text-[13.5px] leading-6 text-[var(--kz-text-2)]"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />{o}</li>
+                  ))}
+                </ul>
+
+                <div className="mt-6 flex flex-wrap gap-1.5" aria-label="Core technology">
+                  {study.coreTech.map((t) => <span key={t} className="kz-tech-pill">{t}</span>)}
+                </div>
+
+                <Link to={`/work/${study.id}`} className="kz-btn kz-btn-secondary mt-8">View full case study <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+              </div>
+            </article>
+          );
+        })}
       </div>
-    </section>
-  );
-};
+
+      <div className="kz-reveal mt-24 flex flex-col items-start justify-between gap-6 rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-surface)] p-8 sm:flex-row sm:items-center sm:p-10">
+        <div>
+          <h3 className="text-2xl font-bold tracking-tight text-[var(--kz-text)]">Have a similar project?</h3>
+          <p className="mt-2 text-[var(--kz-muted)]">Tell us the goal and we’ll recommend a practical product and technical plan.</p>
+        </div>
+        <button type="button" onClick={onStartProject} className="kz-btn kz-btn-primary">Request a discovery call <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" /></button>
+      </div>
+    </div>
+  </section>
+);

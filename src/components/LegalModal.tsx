@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, ShieldCheck } from 'lucide-react';
 
 interface LegalModalProps {
@@ -7,6 +7,15 @@ interface LegalModalProps {
 }
 
 export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!type) return;
+    const prev = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('keydown', onKey); prev?.focus(); };
+  }, [type, onClose]);
   if (!type) return null;
 
   const contentMap = {
@@ -39,10 +48,12 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
   const activeContent = contentMap[type];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#080b12] border border-blue-500/30 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 space-y-6 text-left relative shadow-2xl">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="legal-title" ref={dialogRef} tabIndex={-1} className="outline-none bg-[var(--kz-bg)] border border-emerald-500/30 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8 space-y-6 text-left relative shadow-2xl">
         
         <button
+          type="button"
+          aria-label="Close"
           onClick={onClose}
           className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
         >
@@ -50,12 +61,12 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         </button>
 
         <div className="space-y-2 pt-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-violet-400 text-xs font-mono font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-mono font-semibold">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Legal Document</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">
+          <h2 id="legal-title" className="text-2xl sm:text-3xl font-bold text-white">
             {activeContent.title}
           </h2>
 
@@ -71,7 +82,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         <div className="pt-6 border-t border-white/10 flex justify-end">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs"
+            className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-700 text-white kz-on-accent font-semibold text-xs"
           >
             Acknowledge & Close
           </button>
