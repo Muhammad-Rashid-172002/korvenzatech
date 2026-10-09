@@ -174,6 +174,35 @@ export const PROCESS = {
   pulseSpeed: 0.35,
 } as const;
 
+/* -------------------------------------------------------- product phones */
+export const PRODUCT = {
+  /** Per case study (id from companyData): screen folder in /media/work, brand light, accent glow. */
+  apps: {
+    'ielts-ai-master': { dir: 'ielts', brand: '#2F5BEA', accent: '#E2384D' },
+    skilllink: { dir: 'skilllink', brand: '#6D5CF0', accent: '#A99BFF' },
+  } as Record<string, { dir: string; brand: string; accent: string }>,
+  /** Number of screens per app (screen-1..N-540.webp). */
+  screens: 4,
+  /** Start loading screen textures when the card is this close to the viewport. */
+  preloadMargin: '600px',
+  /** Seconds between screen swaps while hovered (desktop) / auto-cycling (touch). */
+  swapEvery: 1.5,
+  autoSwapEvery: 3.2,
+  /** Duration (s) of one screen transition. */
+  swapDuration: 0.6,
+  /** Phone body size (world units) and corner radius. Screen aspect is 390:844. */
+  body: { w: 1, h: 2.08, d: 0.1, r: 0.15 },
+  /** Body colour / finish (graphite). */
+  bodyColor: '#14171B',
+  /** Max hover tilt toward the pointer (radians). */
+  tilt: 0.16,
+  /** Camera distance and field of view. */
+  cameraZ: 5.5,
+  fov: 28,
+  /** Contact shadow under the phones (tier 2 only; tier 1 uses a soft blob). */
+  shadow: { opacity: 0.55, blur: 2.2, resolution: 256 },
+} as const;
+
 /* --------------------------------------------------------- motion (DOM/GSAP) */
 export const SCROLL = {
   /** Lenis smoothing: lower = heavier, longer glide. 0.1 is calm and premium. */

@@ -2,9 +2,10 @@ import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { AdaptiveDpr, PerformanceMonitor, View } from '@react-three/drei';
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three';
-import { RENDER } from './config';
+import { PRODUCT, RENDER } from './config';
 import { HeroScene } from './scenes/Hero';
 import { ProcessScene } from './scenes/Process';
+import { ProductScene } from './scenes/Product';
 
 export type Quality = { tier: 1 | 2; lite: boolean };
 
@@ -18,6 +19,18 @@ function useViewTarget(key: string, path: string) {
     return () => cancelAnimationFrame(id);
   }, [key, path]);
   return el;
+}
+
+/** All DOM tracks whose key starts with `prefix` (e.g. one per product card). */
+function useViewTargets(prefix: string, path: string) {
+  const [els, setEls] = useState<HTMLElement[]>([]);
+  useEffect(() => {
+    const find = () => setEls(Array.from(document.querySelectorAll<HTMLElement>(`[data-kz-view^="${prefix}"]`)));
+    find();
+    const id = requestAnimationFrame(find);
+    return () => cancelAnimationFrame(id);
+  }, [prefix, path]);
+  return els;
 }
 
 /**
@@ -56,11 +69,16 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
   const heroRef = useMemo(() => ({ current: hero as HTMLElement }), [hero]);
   const process = useViewTarget('process', path);
   const processRef = useMemo(() => ({ current: process as HTMLElement }), [process]);
+  const productEls = useViewTargets('product-', path);
+  const products = useMemo(
+    () => productEls.filter((el) => (el.dataset.kzView ?? '').replace('product-', '') in PRODUCT.apps).map((el) => ({ el, ref: { current: el } })),
+    [productEls],
+  );
   const [lite, setLite] = useState(tier === 1);
   const declines = useRef(0);
   const [dpr, setDpr] = useState<number>(RENDER.dpr[tier][1]);
   const quality = useMemo<Quality>(() => ({ tier, lite }), [tier, lite]);
-  const targets = useMemo(() => [hero, process], [hero, process]);
+  const targets = useMemo(() => [hero, process, ...products.map((p) => p.el)], [hero, process, products]);
   const eventSource = useMemo(() => document.getElementById('root') ?? undefined, []);
 
   return (
@@ -105,6 +123,13 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
           </Suspense>
         </View>
       )}
+      {products.map(({ el, ref }, i) => (
+        <View key={el.dataset.kzView} track={ref} index={10 + i}>
+          <Suspense fallback={null}>
+            <ProductScene track={el} quality={quality} app={(el.dataset.kzView ?? '').replace('product-', '')} />
+          </Suspense>
+        </View>
+      ))}
     </Canvas>
   );
 }

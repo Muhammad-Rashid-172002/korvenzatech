@@ -8,7 +8,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - [x] Hero
 - [x] Process journey
 - [x] Screenshot generation — **NEEDS RASHID REVIEW** (`tools/screens/contact-sheet.png`)
-- [ ] Product phones
+- [x] Product phones
 - [ ] Services bento
 - [ ] Tech orbit
 - [ ] CTA particles
@@ -84,3 +84,23 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Neutral demo data only: initials avatars, "Sample learner/essay" labels, PKR prices; no store ratings, download counts or user numbers. No app repos touched.
 - Output: `public/media/work/{ielts,skilllink}/screen-1..4.webp` (1170×2532 = 390×844 @3x, 54–90 KB each) + `screen-N-540.webp` texture variants (22–35 KB) for WebGL. Contact sheet: `tools/screens/contact-sheet.png`.
 - **KTX2 skipped (safer):** the Basis transcoder adds ~200 KB of WASM/JS, more than all 8 textures together (~220 KB WebP); 540px WebP textures use ~2.5 MB GPU each and load only near the viewport.
+
+### Product phones (5.4) — done
+
+**Files:** `src/components/three/scenes/Product.tsx` (new), `src/components/three/materials/PhoneScreen.ts` (new: screen + backdrop shaders), `Experience.tsx` (one View per product card), `config.ts` (`PRODUCT`), `src/components/home/HomeSections.tsx` (track per card, pill class, body class), `src/index.css`.
+
+**What it does:** each "Selected products" card gets two floating graphite phones showing the app screens, a brand light behind them (blue for IELTS AI Master, purple for SkillLink) and a contact shadow (tier 2; soft blob on tier 1). Hover (mouse): the front phone turns toward you and tilts with the pointer, and both phones push-scroll through the 4 screens every 1.5 s. Touch: screens auto-advance every 3.2 s while on screen. Textures (8 × ~28 KB) load only when a card is within 600 px of the viewport. The original project image stays as the poster and cross-fades out after the first 3D frame; tier 0 keeps the image.
+- **Pill contrast fix:** the platform pill now has a near-solid dark background (`.kz-project-pill`), AA on any poster or 3D backdrop.
+- The WebGL backdrop is drawn in clip space with rounded top corners matching the card radius, so the scissored rect never pokes out of the card. Cards are flex columns so the text panel always fills the card.
+- Image/alt text, links and copy unchanged.
+
+**Bundle (gzip):** main +0.2 KB (118.98) · Experience +4.4 KB (267.80, includes drei RoundedBox + ContactShadows) · CSS +0.1 KB · lazy textures ~220 KB total.
+
+**Lighthouse (local, `/`):** mobile Perf 90 · A11y 100 · BP 96 (sandbox fonts) · SEO 100. axe (11 routes × 2 themes): no violations.
+
+**Manual test checklist**
+- Laptop: scroll to "Proof, not inflated promises." → each card's image fades into two 3D phones on a dark brand-lit backdrop (~1 s after the card nears the screen). Hover a card → front phone turns to face you, follows the pointer slightly, screens slide up to the next app screen every ~1.5 s; leave → phones settle back. 60 FPS.
+- Check the card corners: no square dark corners outside the rounded card; the text part of the card fills to the bottom.
+- Light theme: media area stays dark/cinematic (as before), pill readable.
+- Android: phones visible (smaller), screens change every ~3 s on their own; tapping the card opens the case study.
+- `?kz3d=off`: original images, unchanged.

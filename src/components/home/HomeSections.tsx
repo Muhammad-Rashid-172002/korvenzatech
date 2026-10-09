@@ -81,14 +81,16 @@ export function HomeProjects() {
             return (
               <article key={c.id} className="kz-project kz-reveal group" style={{ '--d': i } as React.CSSProperties}>
                 <Link to={`/work/${c.id}`} className="block" aria-label={`${c.name} case study`}>
-                  <div className="kz-project-media kz-reveal-img">
+                  <div className="kz-project-media kz-reveal-img" data-ready="false">
+                    {/* Rectangle the shared WebGL canvas renders this product's phones into (poster image stays until the first 3D frame). */}
+                    <div data-kz-view={`product-${c.id}`} className="kz-view-track kz-view-track--product" aria-hidden="true" />
                     <img src={img.src} srcSet={img.srcSet} sizes="(min-width: 1024px) 600px, 92vw" alt={`${c.name} — ${c.tagline}`} loading="lazy" decoding="async" width={1536} height={1024} />
-                    <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
+                    <span className="kz-project-pill absolute left-4 top-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-semibold">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />{c.platform}
                     </span>
                   </div>
                 </Link>
-                <div className="p-7 sm:p-9">
+                <div className="kz-project-body p-7 sm:p-9">
                   <div className="kz-meta">{c.category}</div>
                   <h3 className="mt-3 text-2xl font-extrabold tracking-tight text-[var(--kz-text)] sm:text-3xl">
                     <Link to={`/work/${c.id}`} className="hover:text-[var(--kz-accent-text)]">{c.name}</Link>
