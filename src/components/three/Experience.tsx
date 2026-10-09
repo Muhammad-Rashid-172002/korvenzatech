@@ -4,6 +4,7 @@ import { AdaptiveDpr, PerformanceMonitor, View } from '@react-three/drei';
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three';
 import { RENDER } from './config';
 import { HeroScene } from './scenes/Hero';
+import { ProcessScene } from './scenes/Process';
 
 export type Quality = { tier: 1 | 2; lite: boolean };
 
@@ -53,11 +54,13 @@ function VisibilityLoop({ targets }: { targets: (HTMLElement | null)[] }) {
 export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }) {
   const hero = useViewTarget('hero', path);
   const heroRef = useMemo(() => ({ current: hero as HTMLElement }), [hero]);
+  const process = useViewTarget('process', path);
+  const processRef = useMemo(() => ({ current: process as HTMLElement }), [process]);
   const [lite, setLite] = useState(tier === 1);
   const declines = useRef(0);
   const [dpr, setDpr] = useState<number>(RENDER.dpr[tier][1]);
   const quality = useMemo<Quality>(() => ({ tier, lite }), [tier, lite]);
-  const targets = useMemo(() => [hero], [hero]);
+  const targets = useMemo(() => [hero, process], [hero, process]);
   const eventSource = useMemo(() => document.getElementById('root') ?? undefined, []);
 
   return (
@@ -92,6 +95,13 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
         <View track={heroRef} index={1}>
           <Suspense fallback={null}>
             <HeroScene key={hero.dataset.kzViewId ?? 'hero'} track={hero} quality={quality} />
+          </Suspense>
+        </View>
+      )}
+      {process && (
+        <View track={processRef} index={2}>
+          <Suspense fallback={null}>
+            <ProcessScene track={process} quality={quality} steps={Number(process.closest<HTMLElement>('[data-steps]')?.dataset.steps) || 7} />
           </Suspense>
         </View>
       )}

@@ -132,6 +132,48 @@ export const HERO = {
   overflowVh: 35,
 } as const;
 
+/* --------------------------------------------------------- process journey */
+export const PROCESS = {
+  /** Pin only at/above this viewport width (px). Below it the section is a normal tab list. */
+  pinMinWidth: 1024,
+  /** …and only when the viewport is at least this tall, so the pinned stage always fits. */
+  pinMinHeight: 680,
+  /** Extra scroll distance (vh) the stage stays pinned. 250 → the section spends ~350vh on screen. */
+  pinLengthVh: 250,
+  /** Distance between phase nodes along the path (world units). Larger = longer "flight" between phases. */
+  nodeSpacing: 3.2,
+  /** Sideways / vertical wander of the path (world units). 0 = straight line. */
+  wanderX: 1.5,
+  wanderY: 0.65,
+  /** Tube radius (core line) and halo radius. Thicker = bolder, more fill-rate on the halo. */
+  tubeRadius: 0.04,
+  haloRadius: 0.16,
+  /** Tube tessellation (segments along the path, radial sides). */
+  tubeSegments: { 1: 260, 2: 480 },
+  tubeSides: { 1: 6, 2: 10 },
+  /** Camera offset from the current phase point (x right, y up, z towards viewer). */
+  cameraOffset: [-1.6, 1.3, 4.6] as [number, number, number],
+  /** How far ahead (fraction of path) the camera looks; bigger = sees more upcoming phases. */
+  lookAhead: 0.1,
+  /** Where the current phase sits horizontally on screen (0 = left edge, 1 = right edge).
+   *  ~0.47 puts it in the gutter between the phase list and the frosted card. */
+  /** Fog start/end distance (world units): the path ahead melts into the section background. */
+  fog: [6, 22] as [number, number],
+  screenX: 0.47,
+  /** Node sizes (world units): core sphere radius, ring radius, glow sprite size. */
+  nodeCore: 0.085,
+  nodeRing: 0.17,
+  nodeGlow: 1.8,
+  /** Camera follow damping (higher = snappier, lower = floatier). */
+  cameraDamp: 3.2,
+  /** Field of view of the journey camera. */
+  fov: 42,
+  /** Floating dust particles around the path, per tier (0 cost when off-screen). */
+  dust: { 1: 140, 2: 360 },
+  /** Speed of the light pulse that runs along the travelled part of the tube. */
+  pulseSpeed: 0.35,
+} as const;
+
 /* --------------------------------------------------------- motion (DOM/GSAP) */
 export const SCROLL = {
   /** Lenis smoothing: lower = heavier, longer glide. 0.1 is calm and premium. */

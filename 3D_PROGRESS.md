@@ -6,7 +6,7 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 
 - [x] Foundation
 - [x] Hero
-- [ ] Process journey
+- [x] Process journey
 - [ ] Product phones (+ screenshot generation — NEEDS RASHID REVIEW)
 - [ ] Services bento
 - [ ] Tech orbit
@@ -56,3 +56,23 @@ Branch: `feature/3d-experience` · Stack: Vite 6 + React 19 + TS (prerendered SS
 - Nav links / hash links / "back to top" scroll smoothly and land below the sticky nav; chat widget and mobile menu scroll internally (not the page).
 - Android mid-range: tier 1 (`html[data-kz-tier="1"]`): no glass refraction, fewer particles, 45–60 FPS; mobile scroll still native-feeling. Low-end / Save-Data / reduced motion: poster only, no JS 3D download.
 - `?kz3d=off` → poster only; `?kz3d=lite` → tier 1 on desktop.
+
+### Process "Journey" — done
+
+**Files:** `src/components/ProcessTimeline.tsx`, `src/components/three/scenes/Process.tsx` (new), `src/components/three/materials/GlowTube.ts` (new shader), `src/components/three/Experience.tsx` (process view), `src/components/three/config.ts` (`PROCESS` block), `src/lib/scroll.ts` (pin via `gsap.matchMedia`), `src/lib/scrollStore.ts` (`pinRanges`, `scrollToY`), `src/index.css`.
+
+**What it does:** on ≥1024×680 screens with the 3D layer, the phase stage pins for 250vh (section ≈350vh). Scroll flies the camera along a glowing CatmullRom tube through 7 phase nodes (travelled part lit, pulse runs along it, current node ignites); the list's progress line fills continuously; the phase card cross-fades (frosted glass so the path glows through). Clicking a phase / arrow keys / "Next phase" glide (Lenis) to that phase's scroll position. All 7 phases are now always in the HTML (stacked tab panels, inactive ones `inert`) — better for SEO and no-JS. Phones/tablets, reduced motion and tier 0: no pin, no 3D, the same accessible tab list (now with a cross-fade and a progress line).
+
+**Bundle (gzip):** main +0.5 KB (118.76) · scroll chunk +0.3 KB (54.84) · Experience +2.4 KB (263.43) · CSS +0.3 KB.
+
+**Lighthouse (local, `/`):** mobile Perf 95 · A11y 100 · BP 96 (sandbox fonts) · SEO 100.
+
+**Known issues:** none found. Conflict note: the original section had `z-10` (would hide the canvas) — removed, same as the hero.
+
+**Manual test checklist**
+- Laptop: scroll into "From idea to launch" → the phase block locks in the middle of the screen; keep scrolling → phases 01→07 advance one by one, green line in the list grows, card cross-fades, a green path flies by behind the card with the current node glowing near the gap between list and card. After 07, the page releases and continues to the leadership section. Expected 55–60 FPS.
+- Click "05" while locked → page glides to phase 05. Tab to the list and use ↑/↓ → same. "Next phase" → next phase.
+- Scroll back up → phases reverse smoothly; nothing jumps when the lock releases at either end.
+- Resize window below 1024px wide (or under 680px tall) → lock disappears, normal tabs.
+- Light theme: path becomes a deep-green line (no glow), text stays readable on the frosted card.
+- Android: no lock; tapping phases switches the card instantly with a soft fade; the list line fills to the active phase.

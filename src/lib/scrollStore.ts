@@ -18,6 +18,15 @@ export const scrollStore = {
 /** Scrubbed per-section progress (0..1), keyed by section id (e.g. "hero"). */
 export const sectionProgress: Record<string, number> = {};
 
+/** Scroll ranges (px) of pinned sections, written on every ScrollTrigger refresh. */
+export const pinRanges: Record<string, { start: number; end: number }> = {};
+
+/** Scroll to an absolute Y position, cooperating with Lenis when it is active. */
+export function scrollToY(y: number, smooth = true) {
+  if (scrollStore.lenis) scrollStore.lenis.scrollTo(y, { immediate: !smooth });
+  else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : ('instant' as ScrollBehavior) });
+}
+
 /** Jump/scroll to the top, cooperating with Lenis when it is active. */
 export function scrollToTop(immediate = true) {
   if (scrollStore.lenis) scrollStore.lenis.scrollTo(0, { immediate });

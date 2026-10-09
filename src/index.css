@@ -551,3 +551,15 @@ html.lenis { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: clip; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Process "Journey" (components/ProcessTimeline.tsx + three/scenes/Process.tsx) */
+.kz-process { overflow-x: clip; }
+.kz-view-track--process { top: calc(50% - 50vh); height: 100vh; left: calc(50% - 50vw); right: auto; width: 100vw; display: none; }
+@media (min-width: 1024px) { .kz-process[data-pinned="true"] .kz-view-track--process { display: block; } }
+.kz-process-fill { background: linear-gradient(180deg, #19C784, #087F5B); transform-origin: top; transform: scaleY(var(--kz-fill, 0)); transition: transform 600ms var(--kz-ease-out); }
+.kz-process[data-pinned="true"] .kz-process-fill { transform: scaleY(var(--kz-fill-live, 0)); transition: none; }
+.kz-process-panel { background: var(--kz-surface); transition: opacity 420ms var(--kz-ease-out), transform 520ms var(--kz-ease-out), visibility 0s linear 420ms; }
+.kz-process-panel[data-active="false"] { opacity: 0; transform: translateY(10px); visibility: hidden; }
+.kz-process-panel[data-active="true"] { transition-delay: 0s; }
+.kz-process[data-pinned="true"] .kz-process-panel { background: color-mix(in oklab, var(--kz-surface) 58%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); }
+@media (prefers-reduced-motion: reduce) { .kz-process-panel, .kz-process-fill { transition: none; } }
