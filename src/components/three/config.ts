@@ -53,8 +53,12 @@ export const HERO = {
   cameraZ: 8.6,
   /** Scroll dolly: camera ends at cameraZ * dollyTo when the hero has scrolled out. */
   dollyTo: 0.62,
+  /** Exposure under AgX tone mapping (hero view only; other views keep ACES). */
+  agxExposure: 1.35,
   /** Size (world units) of the composition that maps onto the poster stage box. */
-  compositionSize: 5.6,
+  compositionSize: 6.6,
+  /** Composition half-width incl. the outer devices (world units): the stage is shrunk so this always fits on screen. */
+  halfWidth: 3.85,
   /** Mouse parallax: max camera offset (world units) and smoothing (higher = snappier). */
   parallax: 0.35,
   parallaxDamping: 2.2,
@@ -119,29 +123,79 @@ export const HERO = {
   packetSize: 0.34,
   /** Core glow sprite size (× crystal radius) and colour. */
   coreGlow: { size: 4.2, color: '#2fe0a0' },
-  panels: {
-    /** Frosted glass devices at real depths/angles: kind, size [w,h], position, rotation (rad),
-     *  bob amplitude/speed. One sits behind the crystal, one close to the camera. */
-    items: [
-      { kind: 'dashboard', size: [1.9, 1.18], pos: [2.15, 1.05, -0.7], rot: [0.12, -0.52, 0.04], bob: [0.07, 0.55] },
-      { kind: 'mobile', size: [0.7, 1.38], pos: [-2.35, -0.55, 0.55], rot: [-0.06, 0.58, -0.07], bob: [0.09, 0.7] },
-      { kind: 'dashboard', size: [1.6, 1.0], pos: [-0.9, 1.35, -2.6], rot: [0.08, 0.36, -0.05], bob: [0.05, 0.42] },
-      { kind: 'mobile', size: [0.58, 1.14], pos: [1.7, -1.45, 1.75], rot: [-0.18, -0.42, 0.1], bob: [0.08, 0.8] },
-    ] as { kind: 'dashboard' | 'mobile'; size: [number, number]; pos: [number, number, number]; rot: [number, number, number]; bob: [number, number] }[],
-    /** Glass slab thickness and corner radius (world units). */
-    depth: 0.07,
-    corner: 0.07,
-    /** Frosted glass: transmission (tier 2), roughness, tint, env reflections. Tier 1 uses plain translucency. */
-    transmission: 0.6,
-    roughness: 0.35,
-    tint: '#6FB79A',
-    envIntensity: 0.55,
-    /** Screen redraw rate (fps) per tier and dashboard animation cycle length (s). */
-    fps: { 1: 8, 2: 20 } as Record<number, number>,
-    cycle: 6.5,
-    /** Scroll: panels fly outward (position × (1 + flyOut)) as the hero scrolls away. */
-    flyOut: 1.6,
+  /** Glass "K" logo (Phase 3) — extruded from brand-source/k-mark.svg. */
+  k: {
+    /** Height of the K (world units). The old crystal was 2.3 across; the K is a bit larger. */
+    height: 3.05,
+    /** Extrusion depth, bevel size/thickness and bevel segments (smooth bevel). */
+    depth: 0.35,
+    bevel: 0.03,
+    bevelSegments: 3,
+    /** Normals are smoothed across angles below this (rounded bevel, crisp caps). */
+    creaseAngle: 0.6,
+    /** Glass tints: emerald body, smoky charcoal for the bar / upper stem (logo colours). */
+    tint: '#6BF5B8',
+    charcoalTint: '#55625D',
+    /** Physical transmission (tier 2). thickness/ior/dispersion (= chromatic aberration). */
+    transmission: { thickness: 1.2, roughness: 0.1, ior: 1.5, dispersion: 0.9, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.03 },
+    attenuationColor: '#21D08A',
+    attenuationDistance: 0.9,
+    /** Shards: total count, max triangle edge before subdividing, intro stagger (0..1 of the intro). */
+    shards: 100,
+    maxEdge: 0.24,
+    stagger: 0.55,
+    /** Where shards start: sideways spread and how far behind the logo (world units). */
+    flyRadius: 3.2,
+    flyDepth: 9,
+    /** Intro: delay after first frame, duration (s). Lock = end of intro → shockwave. */
+    introDelay: 0.15,
+    introDuration: 1.65,
+    /** Idle: float amplitude (world), rotation amplitude (rad, ±12°) and period (s), mouse tilt (rad). */
+    float: 0.07,
+    sway: 0.21,
+    swayPeriod: 9,
+    tilt: 0.18,
+    /** Hover: rotation speed multiplier and core brightness boost. */
+    hoverSpeed: 2.6,
+    hoverCore: 1.6,
+    /** Edge glow: tube radius, base intensity, sweep period (s). Circuit traces are brighter. */
+    edge: { radius: 0.0075, base: 0.32, period: 6, width: 0.3 },
+    trace: { radius: 0.007, base: 0.8 },
+    /** Shockwave ring: max radius (world), duration (s). Also ripples the network and floor. */
+    shock: { radius: 6.5, duration: 1.5 },
   },
+  devices: {
+    /** Four devices around the K at different depths. kind → screen; frame = phone | browser.
+     *  pos/rot are in composition space; `blur` < 1 = far, defocused screen (cheap DOF);
+     *  `target` = what clicking does (scroll to a case study or open the AI widget). */
+    items: [
+      { screen: 'ielts', frame: 'phone', pos: [-2.42, -0.72, 1.05], rot: [0.04, 0.46, 0.05], blur: 1, target: 'case:ielts-ai-master' },
+      { screen: 'skilllink', frame: 'phone', pos: [2.55, -1.12, 0.75], rot: [0.02, -0.48, -0.05], blur: 1, target: 'case:skilllink' },
+      { screen: 'agent', frame: 'browser', pos: [2.2, 1.42, -0.55], rot: [0.06, -0.38, 0.02], blur: 1, target: 'ai' },
+      { screen: 'dashboard', frame: 'browser', pos: [-2.25, 1.62, -3.3], rot: [0.08, 0.34, -0.03], blur: 0.42, target: '' },
+    ] as { screen: 'ielts' | 'skilllink' | 'dashboard' | 'agent'; frame: 'phone' | 'browser'; pos: [number, number, number]; rot: [number, number, number]; blur: number; target: string }[],
+    /** Phone body (w, h, depth, corner) and browser body (w, h, depth, corner), world units. */
+    phone: { w: 0.9, h: 1.9, d: 0.085, r: 0.13, bezel: 0.032 },
+    browser: { w: 2.3, h: 1.45, d: 0.055, r: 0.07, bezel: 0.028 },
+    /** Screen canvas scale (DPR) per tier; tier 1 screens are static frames. */
+    screenScale: { 1: 1.25, 2: 2 } as Record<number, number>,
+    /** Screen texture uploads per rendered frame (round-robin; 1 → each of 4 screens ≈ 15 fps at 60). */
+    uploadsPerFrame: 1,
+    /** Hover: pull toward the camera (world) and loop speed multiplier. */
+    hoverForward: 0.35,
+    hoverSpeed: 1.8,
+    /** Body finish. */
+    bodyColor: '#151A19',
+    /** Bob amplitude/speed. */
+    bob: [0.06, 0.6] as [number, number],
+    /** Scroll: devices fly outward (position × (1 + flyOut)). */
+    flyOut: 1.4,
+  },
+  /** Three particle depth layers: far stars, mid network (below), near bokeh. */
+  stars: { count: { 1: 220, 2: 520 } as Record<number, number>, radius: [9, 16] as [number, number], size: 0.05 },
+  bokeh: { count: { 1: 0, 2: 12 } as Record<number, number>, size: [0.35, 0.8] as [number, number], opacity: 0.16 },
+  /** Light pulses running along network links into the logo. */
+  pulses: { count: { 1: 4, 2: 10 } as Record<number, number>, speed: 0.55, size: 0.18 },
   floor: {
     /** Perspective grid floor below the crystal (local y), size, cell size and line glow. */
     y: -2.35,

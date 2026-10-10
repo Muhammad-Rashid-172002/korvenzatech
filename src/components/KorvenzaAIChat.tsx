@@ -357,6 +357,12 @@ function ProfessionalMessage({ text }: { text: string }) {
 
 export function KorvenzaAIChat() {
   const [open, setOpen] = useState(false);
+  // The hero's AI-agent device (3D) opens the widget via a window event.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener('kz:open-ai', onOpen);
+    return () => window.removeEventListener('kz:open-ai', onOpen);
+  }, []);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>(initialSuggestions);
   const [memory, setMemory] = useState('');

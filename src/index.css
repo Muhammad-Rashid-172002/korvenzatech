@@ -356,6 +356,14 @@ html[data-theme="light"] .kz-theme-icon-light, html[data-theme="dark"] .kz-theme
     linear-gradient(180deg, #06100D 0%, #07110E 55%, #081410 100%);
 }
 .kz-hero-vignette { background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(3,9,7,.75) 100%); }
+/* Film grain over the hero (cheap stand-in for a post-processing grain pass). Static under reduced motion. */
+.kz-hero-grain {
+  z-index: 2; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: kzGrain 1.2s steps(4) infinite;
+}
+@keyframes kzGrain { 0% { background-position: 0 0; } 25% { background-position: -37px 21px; } 50% { background-position: 53px -44px; } 75% { background-position: -18px 66px; } 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .kz-hero-grain { animation: none; } }
 .kz-hero-floor { background: radial-gradient(45% 38% at 50% 62%, rgba(25,199,132,.14), transparent 100%); }
 .kz-hero-stage { position: relative; aspect-ratio: 1 / 1; width: 100%; }
 .kz-hero-fallback { position: absolute; inset: 0; display: grid; place-items: center; perspective: 1200px; transition: opacity var(--kz-dur-slow) var(--kz-ease-out); }
