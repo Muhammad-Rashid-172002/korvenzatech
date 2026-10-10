@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { logo128 } from '../assets/brand';
 import {
   ArrowUp,
   Bot,
@@ -591,7 +592,7 @@ export function KorvenzaAIChat() {
         >
           <span className="korvenza-ai-launcher-glow" />
           <img
-            src="/media/brand/logo-128.webp"
+            src={logo128}
             alt=""
             className="relative z-10 h-8 w-8 object-contain"
           />
@@ -612,7 +613,7 @@ export function KorvenzaAIChat() {
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-[var(--kz-surface)] shadow-[0_0_28px_rgba(34,211,238,.08)]">
                 <img
-                  src="/media/brand/logo-128.webp"
+                  src={logo128}
                   alt="KorvenzaTech"
                   className="h-8 w-8 object-contain"
                 />
@@ -742,7 +743,7 @@ export function KorvenzaAIChat() {
                         <div className="flex items-start gap-3">
                           <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-emerald-300/10 bg-[var(--kz-surface)]">
                             <img
-                              src="/media/brand/logo-128.webp"
+                              src={logo128}
                               alt=""
                               className="h-5 w-5 object-contain"
                             />
@@ -790,7 +791,7 @@ export function KorvenzaAIChat() {
                   <div className="flex items-start gap-3">
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-emerald-300/10 bg-[var(--kz-surface)]">
                       <img
-                        src="/media/brand/logo-128.webp"
+                        src={logo128}
                         alt=""
                         className="h-5 w-5 object-contain"
                       />

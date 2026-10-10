@@ -28,6 +28,7 @@ export const COLORS = {
 /* -------------------------------------------------------------- device tiers */
 /** Tier thresholds live in ./tiers.ts (main-bundle safe) — re-exported here. */
 export { TIERS } from './tiers';
+import { logo256 } from '../../assets/brand';
 
 /* ---------------------------------------------------------------- renderer */
 export const RENDER = {
@@ -325,7 +326,7 @@ export const ORBIT = {
 /* ------------------------------------------------------------- CTA particles */
 export const CTA = {
   /** Logo image the K is sampled from (dark/opaque pixels become particles). */
-  logo: '/media/brand/logo-256.webp',
+  logo: logo256,
   /** Particle count per tier (1 = lite, 2 = full). Linear GPU cost. */
   count: { 1: 2200, 2: 6000 } as Record<number, number>,
   /** Size of the formed K (world units) and base point size (px at dpr 1). */

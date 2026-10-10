@@ -27,6 +27,12 @@ if (!ssrEntry) {
 
 const { render, ROUTES, getRouteMeta, buildStructuredData, canonicalFor } = await import(pathToFileURL(ssrEntry).href);
 const template = fs.readFileSync(baseFile, 'utf8');
+// Build stamp: every page and /build.json carry the commit + build time, so "which build is this
+// route serving?" is answerable from view-source (stale caches show an older stamp).
+import { execSync } from 'node:child_process';
+const commit = (process.env.VERCEL_GIT_COMMIT_SHA || (() => { try { return execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return 'unknown'; } })()).slice(0, 7);
+const builtAt = new Date().toISOString();
+const STAMP = `${commit} ${builtAt}`;
 
 const esc = (s = '') => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const jsonLd = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
@@ -60,7 +66,7 @@ function buildPage(route) {
     route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w" imagesizes="620px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
     `<script type="application/ld+json" id="kz-schema">${jsonLd(buildStructuredData(route))}</script>`,
   ].join('');
-  html = html.replace('</head>', `${extraHead}</head>`);
+  html = html.replace('</head>', `${extraHead}<meta name="kz-build" content="${STAMP}" /></head>`);
 
   const appHtml = render(route);
   html = setTag(html, /<div id="root"><\/div>/, `<div id="root">${appHtml}</div>`);
@@ -86,6 +92,7 @@ const urls = routes
   .filter((m) => !m.noindex)
   .map((m) => `  <url><loc>${canonicalFor(m.path)}</loc><lastmod>${lastmod}</lastmod><changefreq>${m.changefreq}</changefreq><priority>${m.priority.toFixed(1)}</priority></url>`)
   .join('\n');
+fs.writeFileSync(path.join(dist, 'build.json'), JSON.stringify({ commit, builtAt }) + '\n');
 fs.writeFileSync(path.join(dist, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 
 // The SSR bundle is a build tool only; never deploy it.

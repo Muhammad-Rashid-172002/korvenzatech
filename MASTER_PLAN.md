@@ -1,80 +1,108 @@
-# KorvenzaTech — Master Build Plan
+# KorvenzaTech — Master Plan (brief v3)
 
-Branch: `feature/master-build` (from `main` @ b7d2415, which already contains the full 3D experience).
-Previous logs: `3D_PROGRESS.md` (3D phases, kept as the detailed history). Its status is merged below.
+Branch: `feature/master-v3` (from `main` @ 5b5dcf8, which contains the v2 phases 1–3 + your merge).
+Supersedes the v2 checklist; finished v2 work is ticked below and its log is kept at the bottom.
+`3D_PROGRESS.md` = detailed history of the first 3D pass (status merged here).
 
-Legend: `[x]` done · `[~]` done earlier, upgrade pending in this plan · `[ ]` to do · **TODO(Rashid)** = something only you can supply.
+Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)** = only you can supply it.
 
 ## Architecture decisions & push-backs (read first)
+1. **No EffectComposer in the shared canvas.** Every section renders into a scissored drei `<View>`; a composer composites the whole canvas, so bloom/DOF would cost the hero's price on every section and breaks the other views. Equivalent looks are built per scene: additive emission (bloom), pre-blurred far device (DOF), dispersion (CA), CSS grain + vignette, AgX tone mapping switched for the hero view only. `@react-three/postprocessing` is therefore not installed. If you ever want true post, the hero moves to its own canvas (2nd WebGL context, ≈ +40 MB GPU) — not recommended.
+2. **No drei `MeshTransmissionMaterial`** — samples screen space and breaks inside offset Views; three's native physical transmission (+ `dispersion`) is used.
+3. **No drei `<Html>` inside Views** (positions against the full canvas) — labels are DOM, placed and checked at 1280/1440/1920.
+4. **No zustand** — a tiny ref-based module store (`lib/scrollStore.ts`) does the same with zero dependencies and zero re-renders.
+5. **Frameloop**: renders only while a 3D view is on screen and the tab is visible (= `demand` for idle cost).
+6. **Logo vector**: traced from your raster; a designer SVG is still the gold standard — TODO(Rashid, optional).
+7. **Build stamp**: every page has `<meta name="kz-build" content="<commit> <time>">` and `/build.json` exists — compare them to see instantly whether a route is served from an old cache.
+8. **verify-build** (`npm run verify`) is wired into `npm run build` once Phase 2.1/2.2 make it green (it currently fails, correctly, on the plain-text legal items and the unlinked "Read full article").
 
-1. **Post-processing (Bloom / DOF / grain / CA) is not used inside the shared canvas.** `EffectComposer` composites the *whole* canvas, but every section renders into its own scissored drei `<View>`; a composer would need to own the full frame every frame (the cost of the hero on every section) and breaks other views. Equivalent looks are built per scene instead: real additive emission for glow (core, edges, rings, packets), a pre-blurred far device for depth-of-field, grain + vignette as a cheap CSS overlay on the hero. If you want true post later, the hero would move to its own canvas (2nd WebGL context, ~+40 MB GPU) — I don't recommend it.
-2. **drei `MeshTransmissionMaterial` is not used.** It samples its refraction buffer in canvas screen space, which is wrong inside an offset `<View>` (verified: smeared content, invisible core). three's native physical transmission (+ `dispersion`) projects correctly and is used instead; same for the glass K.
-3. **drei `<Html>` labels are not used for hero labels.** Inside `<View>` they position against the full canvas, not the view; the existing DOM captions are accessible, crisp and already clear of the devices. They are re-placed so they never overlap at 1280/1440/1920.
-4. **zustand not installed** — a tiny module store does the same (ref-based reads in `useFrame`, zero re-renders).
-5. **Frameloop:** renders only while a 3D view is on screen and the tab is visible (equivalent to `demand` for idle cost; scroll-driven scenes animate every visible frame anyway).
-6. **Logo vector:** the new K is a shaded raster render. Its silhouette is traced exactly; the facets are re-drawn as clean flat gradients (`brand-source/k-logo.svg`). It reads correctly at all sizes, but a designer-made SVG would be the gold standard — **TODO(Rashid, optional)**.
+## Phase 1 — Deploy consistency
+- [x] 1.1 All 20 routes rebuilt and audited: every `dist/**/index.html` has the 9-service footer, the inline K, full content. (Legal links + article links → 2.1/2.2, enforced by 1.3.)
+- [x] 1.2 UI brand rasters are imported → content-hashed (`logo-128.[hash].webp`, `logo-256.[hash].webp`; logo-64 is inlined into the CSS). Stable `/media/brand/*` copies stay (now the new K) for old cached pages, manifest and JSON-LD.
+- [x] 1.3 `scripts/verify-build.ts` (`npm run verify`)
+- [x] 1.4 Hosting = Vercel (`vercel.json`; `server.ts` is the local/Node fallback). Cache headers fixed in both. Redeploy + purge steps in the log.
 
-## Phase 1 — Critical fixes
-- [x] 1.1 Live homepage not prerendered — diagnosed (see log), `meta keywords` removed, HTML revalidation headers added. **TODO(Rashid):** purge the CDN cache for `/` (details in log).
-- [x] 1.2 Visual bugs — label pills (AA), navbar dark band, spacing above "Problem-solving approach" / below "I have an idea", duplicate tech strip: all fixed earlier (3D_PROGRESS: Product phones, Global effects, Tech orbit); re-verified on this branch.
-- [x] 1.3 Footer lists all 9 services.
+## Phase 2 — Trust, legal & content
+- [ ] 2.1 /privacy, /terms, /cookies + footer links (lawyer review TODO)
+- [ ] 2.2 Three full Insight articles + routes, JSON-LD, progress bar; links wired
+- [ ] 2.3 Testimonials data model; hide placeholder entries; TODO list
+- [ ] 2.4 Leadership: Suliman single title; LinkedIn icons (hidden until URLs)
+- [ ] 2.5 Copy corrections (FAQ, process deliverables, CTA label, latency, benchmarks, industries split, tech list confirmation)
+- [ ] 2.6 Homepage shows all 9 services
+- [ ] 2.7 Full FAQ only on About #faq (+FAQPage JSON-LD); 3-question teasers on Home/Insights
+- [ ] 2.8 Careers copy per track
+- [ ] 2.9 Custom 404 with floating glass K
 
-## Phase 2 — Brand system: new K logo everywhere
-- [x] 2.1 Vector master (`brand-source/k-logo.svg`, `k-mark.svg`) + original raster kept (`brand-source/`, not deployed)
-- [x] 2.2 `scripts/build-brand.mjs` (sharp): favicon.ico/svg, apple-touch 180, manifest 192/512 + maskable, og-cover 1200×630, logo rasters
-- [x] 2.3 Inline SVG logo in navbar, footer, mobile menu (fixed size, no CLS)
-- [x] 2.4 Replaced everywhere; old logo files deleted (hero/3D scenes get the new K in Phase 3; CTA particles already sample the regenerated raster)
+## Phase 3 — Hero polish  ← **stop for review after this**
+- [x] (v2) Glass K, shard intro + shockwave, hover/click, shatter, low-tier version; 4 devices with live demo screens; rings/floor/particles; AgX
+- [ ] 3.1 Clear glass (not frosted), stronger key/rim lightformers, device + particles refracted behind the K
+- [ ] 3.2 Remove stem slit artifacts; ring streak no longer cuts through the K
+- [x] 3.3 Shard intro / hover / click / shatter / low tier (v2)
+- [ ] 3.4 IELTS phone + AI browser closer/larger (readable at 1440), others back + blurred, brighter screens, lighter phone UIs
+- [~] 3.5 Screen content — done in v2; agent scenario 1 to match the new tool list (read contract → … → "5 tasks completed · 6.2s"), values flying into a table in scenario 2, pause offscreen, static WebP frames on low tier
+- [ ] 3.6 Floor −40–50 %, faster fade, calm backdrop for "Connected systems"
+- [ ] 3.7 Composition up + ~10 % larger; nothing touches labels/edges at 1280/1440/1920; clean mobile
+- [~] 3.8 Post look (see push-back 1): AgX ✓, glow ✓, grain ✓, vignette ✓; DOF/CA refinement + MSAA check
 
-## Phase 3 — Hero: glass K + living device interfaces  ← **stop for review after this**
-- [x] Hero V2 surroundings (rings, floor, fog) — kept and polished
-- [x] 3.1 Extruded glass K (replaces crystal): shard fly-in intro + shockwave, idle float/sway/tilt, hover/click, shatter on scroll, low-tier version
-- [x] 3.2 Surroundings polish: 3 particle depth layers, network behind panels + pulses into the logo, labels never overlapping (1280/1440/1920), floor dash + ring-through-glass fixes, AgX/grain/vignette/DOF look
-- [x] 3.3 Devices: 2 phones (island, bezel, buttons) + 2 browsers; live code-drawn screens (IELTS, SkillLink, SaaS dashboard, AI agent with 3 scenarios); hover/click interactions; static frames on low tier
-- [ ] **Waiting for your review of the hero look before Phase 6.1.**
-
-## Phase 6.1 — AI security (early)
-- [ ] Bundle scan for secrets; serverless proxy with rate limit, input/token caps, daily cost cap, scoped system prompt, fallback; env var list
+## Phase 6.1 — AI security
+- [ ] Bundle secret scan; serverless proxy with rate limit, input/token caps, daily cost cap, scoped prompt, fallback; env var list
 
 ## Phase 4 — 3D storytelling
-- [ ] 4.1 Exploded build (new section)
-- [~] 4.2 Services bento — SVG micro-scenes + tilt/glow/magnetic done; WebGL micro-scenes + foil shader pending
-- [~] 4.3 Selected products — 3D phones done; scroll rotation, X-ray architecture toggle pending
-- [ ] 4.4 Tech ball pit (rapier) — replaces orbit
-- [x] 4.5 Process journey — done (3D_PROGRESS)
-- [ ] 4.6 Global reach globe (new section)
-- [~] 4.7 Leadership — fog + parallax done; light sweep, LinkedIn TODO links, single title for Suliman pending
-- [~] 4.8 Testimonials — draggable row done; auto-drift + new card structure + placeholders pending
-- [~] 4.9 Final CTA — particle K done (old logo); new K sampling, warp-tunnel transition, booking button pending
+- [ ] 4.1 Exploded build (new)
+- [~] 4.2 Services living bento (SVG micro-scenes + tilt/glow/magnetic done; WebGL scenes, foil shader, all 9)
+- [~] 4.3 Selected products (3D phones done; scroll rotation, X-ray architecture, pill contrast)
+- [ ] 4.4 Tech ball pit (rapier)
+- [~] 4.5 Process journey (built in the first 3D pass; you report the live site shows the click-based version → verify why)  ← **stop for review after this**
+- [ ] 4.6 Global reach globe + time zones
+- [~] 4.7 Leadership (fog + parallax done; light sweep)
+- [~] 4.8 Testimonials (draggable row done; auto-drift, tilt)
+- [~] 4.9 Final CTA (particle K done; new-K sampling from the SVG, warp tunnel, booking button)
 - [ ] 4.10 Footer 3D wordmark
 
 ## Phase 5 — Global motion system
-- [~] Lenis, progress bar, cursor (dot/ring/View), magnetic CTAs, CountUp, route curtain — done; "Drag" cursor state, shader wipe, SplitText on all pages pending
+- [~] Lenis, progress bar, cursor, magnetic CTAs, CountUp, route curtain done; "Drag" cursor, shader wipe, theme blend check, SplitText site-wide, inner-page motion
 
-## Phase 6.2–6.3 — Ask Korvenza AI upgrade
-- [ ] Orb, chips, rich cards (estimate/case study/booking), form prefill, streaming; scope engine on /start-project
+## Phase 6.2–6.3 — Ask Korvenza AI as project assistant
+- [ ] Orb, chips, rich cards, form prefill, streaming; scope engine on /start-project
 
-## Phase 7 — Pages, content & trust
-- [ ] 7.1 Insights article pages · [ ] 7.2 Legal pages · [ ] 7.3 Custom 404 · [ ] 7.4 Honest positioning · [ ] 7.5 Careers copy · [ ] 7.6 International clients section · [ ] 7.7 Engagement models · [ ] 7.8 Booking · [ ] 7.9 Social proof strip · [ ] 7.10 Case studies
+## Phase 7 — International conversion
+- [ ] 7.1 International clients section · [ ] 7.2 Engagement models · [ ] 7.3 Booking · [ ] 7.4 Badge strip · [ ] 7.5 Case studies · [ ] 7.6 Start-project form hardening
 
 ## Phase 8 — Engineering, security & SEO
-- [ ] 8.1 Forms · [ ] 8.2 Security headers · [ ] 8.3 SEO/JSON-LD · [ ] 8.4 Analytics/error tracking
+- [ ] 8.1 Security headers/CSP · [ ] 8.2 JSON-LD + sitemap · [ ] 8.3 Analytics/error tracking · [ ] 8.4 Accessibility pass
 
 ## Phase 9 — Final QA & handover
-- [ ] QA matrix, Lighthouse before/after, screenshots, final summary, consolidated TODO list
+- [ ] QA matrix, Lighthouse before/after, screenshots, final summary, consolidated TODO
 
 ---
 
-## Consolidated TODO(Rashid) (grows as we go)
-- Purge CDN/hosting cache for `/` and check response headers (see 1.1).
-- App-screen recreations review (`tools/screens/contact-sheet.png`).
+## Consolidated TODO(Rashid)
+- Purge the Cloudflare/CDN cache **for everything** (not just `/`) and redeploy — see Phase 1 log.
+- Uncommitted local edit in `src/components/AboutSection.tsx` on your machine (an older version of the file). I have not touched it; commit or discard it yourself.
+- `Claude outputs/*.png` (review screenshots) are committed in the repo (~2.5 MB). Suggest removing them from git and adding `Claude outputs/` to `.gitignore`.
+- App-screen recreations review (`tools/screens/contact-sheet.png`); hero device demo wording.
 - "Rony Sultana" testimonial (two different roles).
 - Optional: designer-made SVG of the K.
-- Hero device screens are illustrative recreations with DEMO labels (names "Ali R.", "Northwind Retail (demo client)", "Demo Supplies Co.", all numbers). Check you're happy with the wording; nothing real is shown.
-- After deploy: re-share korvenzatech.com on LinkedIn/WhatsApp once so their link-preview caches pick up the new og-cover.
+- After deploy: re-share korvenzatech.com on LinkedIn/WhatsApp so link previews refresh.
 
 ---
 
-## Log
+## Log (v3)
+
+### Phase 1 — Deploy consistency ✅
+**1.1** `npm run build` writes 20 routes; each has the 9-service footer, inline K logo and full server-rendered content (420–2,260 words). The live site is mixed: `/` serves the current build, `/insights` an older one (6-service footer, `logo-64.webp`) — the same deployment can't produce both, so a cache in front of Vercel is still serving old HTML for the sub-routes (most likely only `/` was purged last time).
+**1.2** `scripts/build-brand.mjs` also writes `src/assets/brand/logo-{64,128,256}.webp`; `src/assets/brand/index.ts` imports them, so the shipped URLs are content-hashed. Used by the AI widget avatar, the CTA particle K and the route-curtain mark. The build-brand script no longer overwrites `og-cover.png` unless run with `--og` / `--og-hero`.
+**1.3** `scripts/verify-build.ts` checks every route for: footer with the 9 service links and `/privacy` `/terms` `/cookies` links, inline K logo, no legacy logo files, title/description/canonical, ≥120 words in `<main>`, no unlinked "Read full article", no plain-text legal items. Today it reports exactly the known gaps (legal links on 20 routes, Insights article links) → becomes part of `npm run build` when 2.1/2.2 land.
+**1.4 Hosting.** Vercel (`vercel.json`, README). Headers now: `/assets/*` 1 year immutable (hashed), `/media/*` 1 hour + revalidate, every HTML route `max-age=0, must-revalidate` (+ `CDN-Cache-Control`). `server.ts` (Node fallback) used to send `immutable` 1-year headers for every image including `/media/brand/logo-64.webp` — fixed to the same policy. Build stamp in every page + `/build.json`.
+**What you do (once, after pushing this branch and merging):**
+1. Vercel → Project → Deployments → latest Production → ⋯ → **Redeploy** (untick "Use existing Build Cache").
+2. If the domain is proxied by Cloudflare (orange cloud in DNS): Cloudflare → Caching → Configuration → **Purge Everything**; Rules → remove any "Cache Everything" rule that matches HTML.
+3. Check: open `https://korvenzatech.com/build.json` and view-source of `/insights` → the `kz-build` meta must show the same commit. Footer must list 9 services.
+- Files: `scripts/verify-build.ts`, `scripts/build-brand.mjs`, `scripts/generate-seo-pages.mjs`, `src/assets/brand/*`, `src/vite-env.d.ts`, `src/components/KorvenzaAIChat.tsx`, `src/components/three/config.ts`, `src/index.css`, `vercel.json`, `server.ts`, `package.json`, `MASTER_PLAN.md`.
+- Bundle (gzip): main ±0; CSS +0.1 KB (inlined 64 px mark).
+- Test (laptop): after the steps above, `/insights`, `/about`, `/services` show the 9-service footer and the new K; `/build.json` matches. Android: same pages in Chrome after a hard refresh.
+
+## Archive — v2 build log (feature/master-build, merged to main as 5b5dcf8)
 
 ### Phase 1 — Critical fixes ✅
 **1.1 Live homepage.** `dist/index.html` is complete (full homepage, ~1,900 words). Live `https://korvenzatech.com/index.html` serves this new page, but `https://korvenzatech.com/` serves a *different* document: the very first version of the site (`git show 05370c5:index.html` — `theme-color #08110f`, 25 words, h1 "KorvenzaTech"). Same deployment, different URL → `/` is answered from a **stale cache in front of the app**, not from the build. There is no rewrite/SPA fallback in the repo that could cause it (`vercel.json` has only headers; no netlify/firebase/_redirects/.htaccess files).

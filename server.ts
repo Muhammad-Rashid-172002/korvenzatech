@@ -114,14 +114,19 @@ async function start() {
       immutable: false,
       maxAge: '1h',
       setHeaders(res, filePath) {
-        if (/\.(js|css|woff2?|png|jpg|jpeg|webp|svg)$/.test(filePath)) {
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        }
+        // Only Vite's content-hashed bundle files may be cached forever. Stable names
+        // (/media/*, favicons, og-cover) revalidate hourly; HTML always revalidates, so a
+        // deploy is visible immediately on every route.
+        const rel = path.relative(distPath, filePath).replace(/\\/g, '/');
+        if (rel.startsWith('assets/')) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        else if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        else res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
       },
     }));
     app.get('*', (req, res) => {
       const cleanPath = req.path.replace(/^\/+|\/+$/g, '');
       const routeIndex = cleanPath ? path.join(distPath, cleanPath, 'index.html') : path.join(distPath, 'index.html');
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
       res.sendFile(routeIndex, (error) => {
         if (error) res.status(404).sendFile(path.join(distPath, '404.html'));
       });

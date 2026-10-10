@@ -12,6 +12,7 @@
  *   media/brand/apple-touch-icon.png (180), icon-192.png, icon-512.png, icon-maskable-512.png
  *   media/brand/logo-{64,128,256,512}.webp + logo-512.png (Organization logo), k-logo.svg, k-mark.svg
  *   og-cover.png (1200×630)
+ *   src/assets/brand/logo-{64,128,256}.webp — imported by the app, so the shipped URLs are content-hashed
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -105,12 +106,17 @@ await save('media/brand/icon-maskable-512.png', await sharp(await tile(512, k102
 // ---- UI logo rasters (chat avatar, curtain mark, Organization logo)
 for (const s of [64, 128, 256, 512]) {
   const buf = await rasterSquare(s, 0.04);
-  await save(`media/brand/logo-${s}.webp`, await sharp(buf).webp({ quality: 88, alphaQuality: 90 }).toBuffer());
+  const webp = await sharp(buf).webp({ quality: 88, alphaQuality: 90 }).toBuffer();
+  await save(`media/brand/logo-${s}.webp`, webp); // stable URL (kept so old cached pages still get the new K)
+  if (s <= 256) { // UI copies imported by the app → Vite content-hashes them (logo-64.[hash].webp)
+    const p = path.join(root, 'src/assets/brand', `logo-${s}.webp`);
+    fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, webp); written.push(`src/assets/brand/logo-${s}.webp`);
+  }
   if (s === 512) await save('media/brand/logo-512.png', await sharp(buf).png({ compressionLevel: 9 }).toBuffer());
 }
 
-// ---- og-cover 1200×630
-{
+// ---- og-cover 1200×630 (only with --og / --og-hero, so a plain rerun never overwrites a hero-render cover)
+if (ogHero || args.includes('--og')) {
   const W = 1200, H = 630;
   const bg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
   <defs>
