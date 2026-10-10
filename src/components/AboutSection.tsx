@@ -38,6 +38,7 @@ export const AboutSection: React.FC = () => (
               <h4 className="kz-h3 mt-5 !text-[17px]">{title}</h4>
               <p className="mt-2 text-[14px] leading-6 text-[var(--kz-muted)]">{desc}</p>
             </div>
+            
           ))}
         </div>
       </div>
