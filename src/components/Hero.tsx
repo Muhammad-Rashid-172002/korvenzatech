@@ -22,6 +22,7 @@ export const Hero: React.FC<HeroProps> = () => {
     <section id="hero" className="kz-hero kz-cinematic relative overflow-hidden" aria-labelledby="hero-title">
       <div className="kz-fine-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
       <div className="kz-hero-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="kz-hero-grain pointer-events-none absolute inset-0" aria-hidden="true" />
       {/* Rectangle the shared WebGL canvas renders the hero scene into (extends below the hero so dissolve particles can flow into the next section). */}
       <div data-kz-view="hero" className="kz-view-track kz-view-track--hero" aria-hidden="true" />
 
@@ -67,8 +68,8 @@ export const Hero: React.FC<HeroProps> = () => {
         <div className="relative lg:col-span-6 xl:col-span-6">
           <div className="kz-hero-enter relative mx-auto w-full max-w-[380px] sm:max-w-[520px] lg:max-w-none lg:-mr-8 xl:-mr-16" style={{ '--i': 2 } as React.CSSProperties}>
             <HeroStage />
-            <div className="kz-hero-caption left-2 top-[12%]"><i aria-hidden="true" />Design · Build · Scale</div>
-            <div className="kz-hero-caption bottom-[14%] right-4"><i aria-hidden="true" />Connected systems</div>
+            <div className="kz-hero-caption left-1/2 top-[1%] -translate-x-1/2 whitespace-nowrap"><i aria-hidden="true" />Design · Build · Scale</div>
+            <div className="kz-hero-caption bottom-[9%] left-1/2 -translate-x-1/2 whitespace-nowrap"><i aria-hidden="true" />Connected systems</div>
           </div>
         </div>
       </div>

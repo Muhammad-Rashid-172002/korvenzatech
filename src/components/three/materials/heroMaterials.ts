@@ -4,9 +4,9 @@
  * the R3F portal note in Experience.tsx).
  */
 import {
-  CanvasTexture, SRGBColorSpace, Color, CylinderGeometry, DoubleSide, EdgesGeometry, InstancedMesh, Matrix4,
+  CanvasTexture, SRGBColorSpace, Color, CylinderGeometry, DoubleSide, InstancedMesh, Matrix4,
   Mesh, MeshBasicMaterial, PlaneGeometry, PMREMGenerator, Quaternion, Scene, ShaderMaterial, Vector3,
-  type BufferGeometry, type WebGLRenderer,
+  type WebGLRenderer,
 } from 'three';
 import { COLORS, HERO } from '../config';
 import { AddEquation, CustomBlending, OneFactor, SrcAlphaFactor, ZeroFactor, type Material } from 'three';
@@ -57,25 +57,27 @@ export function buildLightformerEnv(gl: WebGLRenderer) {
 }
 
 /**
- * Facet edges as thin instanced cylinders (real thickness, MSAA-smooth — WebGL
- * line width is always 1px). A light sweep travels across them periodically.
+ * Glowing line work as thin instanced cylinders (real thickness, MSAA-smooth — WebGL
+ * line width is always 1px). `segs` = flat [x0,y0,z0,x1,y1,z1, …]. A light sweep
+ * travels diagonally across them every `period` seconds; back-face lines (z < 0) are
+ * dimmer so the front contour reads first. uFlash adds a global flash (lock moment).
  */
-export function buildEdges(geo: BufferGeometry) {
-  const edges = new EdgesGeometry(geo, 1);
-  const p = edges.attributes.position.array as ArrayLike<number>;
-  const count = p.length / 6;
-  const cyl = new CylinderGeometry(1, 1, 1, 6, 1, true);
+export function buildSegmentGlow(segs: ArrayLike<number>, opts: { radius: number; base: number; period: number; width: number; span: number; backDim?: number; sides?: number }) {
+  const count = segs.length / 6;
+  const cyl = new CylinderGeometry(1, 1, 1, opts.sides ?? 6, 1, true);
   const mat = lightAdditive(new ShaderMaterial({
     toneMapped: false,
     uniforms: {
       uTime: { value: 0 },
       uColor: { value: new Color(COLORS.accent) },
       uHot: { value: new Color(COLORS.ice) },
-      uBase: { value: HERO.crystal.edges.base },
-      uPeriod: { value: HERO.crystal.edges.sweepPeriod },
-      uWidth: { value: HERO.crystal.edges.sweepWidth },
-      uRadius: { value: HERO.crystal.radius },
+      uBase: { value: opts.base },
+      uPeriod: { value: opts.period },
+      uWidth: { value: opts.width },
+      uRadius: { value: opts.span },
+      uBackDim: { value: opts.backDim ?? 1 },
       uFade: { value: 1 },
+      uFlash: { value: 0 },
     },
     vertexShader: /* glsl */ `
       varying vec3 vLocal;
@@ -85,36 +87,55 @@ export function buildEdges(geo: BufferGeometry) {
         gl_Position = projectionMatrix * modelViewMatrix * lp;
       }`,
     fragmentShader: /* glsl */ `
-      uniform float uTime, uBase, uPeriod, uWidth, uRadius, uFade;
+      uniform float uTime, uBase, uPeriod, uWidth, uRadius, uFade, uBackDim, uFlash;
       uniform vec3 uColor, uHot;
       varying vec3 vLocal;
       void main() {
-        // Sweep plane travels diagonally across the crystal once per period.
         float k = fract(uTime / uPeriod) * 2.0 - 0.5;           // -0.5 .. 1.5
         float along = dot(normalize(vec3(0.6, 0.75, 0.3)), vLocal) / (uRadius * 2.0) + 0.5;
         float sweep = exp(-pow((along - k) / uWidth, 2.0) * 4.0);
-        vec3 col = uColor * (uBase + sweep * 2.2) + uHot * sweep * 0.9;
+        float face = vLocal.z < 0.0 ? uBackDim : 1.0;
+        vec3 col = (uColor * (uBase + sweep * 2.2) + uHot * (sweep * 0.9 + uFlash)) * face;
         gl_FragColor = vec4(col * uFade, 1.0);
       }`,
   }));
   const mesh = new InstancedMesh(cyl, mat, count);
   const a = new Vector3(), b = new Vector3(), mid = new Vector3(), dir = new Vector3();
   const q = new Quaternion(), up = new Vector3(0, 1, 0), m = new Matrix4(), sc = new Vector3();
-  const r = HERO.crystal.edges.radius;
+  const r = opts.radius;
   for (let i = 0; i < count; i++) {
-    a.set(p[i * 6], p[i * 6 + 1], p[i * 6 + 2]);
-    b.set(p[i * 6 + 3], p[i * 6 + 4], p[i * 6 + 5]);
+    a.set(segs[i * 6], segs[i * 6 + 1], segs[i * 6 + 2]);
+    b.set(segs[i * 6 + 3], segs[i * 6 + 4], segs[i * 6 + 5]);
     mid.copy(a).add(b).multiplyScalar(0.5);
     dir.copy(b).sub(a);
-    const len = dir.length();
+    const len = dir.length() + r * 2; // overlap at corners so joints stay closed
     q.setFromUnitVectors(up, dir.normalize());
     m.compose(mid, q, sc.set(r, len, r));
     mesh.setMatrixAt(i, m);
   }
   mesh.instanceMatrix.needsUpdate = true;
   mesh.frustumCulled = false;
-  edges.dispose();
   return { mesh, mat, dispose: () => { cyl.dispose(); mat.dispose(); mesh.dispose(); } };
+}
+
+/**
+ * Shockwave: a thin bright ring expanding in the logo plane (lock moment, click).
+ * uR = current radius (world), uW = ring width, uA = intensity.
+ */
+export function createShockwaveMaterial() {
+  return lightAdditive(new ShaderMaterial({
+    toneMapped: false,
+    uniforms: { uR: { value: 0 }, uW: { value: 0.12 }, uA: { value: 0 }, uColor: { value: new Color(COLORS.accent) }, uHot: { value: new Color(COLORS.ice) } },
+    vertexShader: /* glsl */ `varying vec2 vP; void main() { vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `
+      uniform float uR, uW, uA; uniform vec3 uColor, uHot; varying vec2 vP;
+      void main() {
+        float d = length(vP) - uR;
+        float ring = exp(-pow(d / uW, 2.0)) + 0.35 * exp(-pow((d + uW * 2.5) / (uW * 3.0), 2.0));
+        if (ring * uA < 0.003) discard;
+        gl_FragColor = vec4(mix(uColor, uHot, 0.5) * ring * uA, 1.0);
+      }`,
+  }));
 }
 
 /**
@@ -122,8 +143,8 @@ export function buildEdges(geo: BufferGeometry) {
  * fading tail of length uTrail behind it, faint base everywhere else. uDraw
  * (0→1) reveals the ring on load like a pen stroke.
  */
-export function createRingMaterial() {
-  return lightAdditive(new ShaderMaterial({
+export function createRingMaterial(pass: 'main' | 'rt' = 'main') {
+  const m = lightAdditive(new ShaderMaterial({
     toneMapped: false,
     uniforms: {
       uHead: { value: 0 },
@@ -131,6 +152,7 @@ export function createRingMaterial() {
       uBase: { value: HERO.ringBase },
       uDraw: { value: 0 },
       uFade: { value: 1 },
+      uOn: { value: 1 },
       uColor: { value: new Color(COLORS.accent) },
       uHot: { value: new Color(COLORS.ice) },
     },
@@ -143,7 +165,7 @@ export function createRingMaterial() {
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: /* glsl */ `
-      uniform float uHead, uTrail, uDraw, uFade, uBase;
+      uniform float uHead, uTrail, uDraw, uFade, uBase, uOn;
       uniform vec3 uColor, uHot;
       varying vec2 vUv; varying float vFres;
       void main() {
@@ -156,9 +178,25 @@ export function createRingMaterial() {
         vec3 col = mix(uColor, uHot, clamp(head + tail * 0.25, 0.0, 1.0)) * i;
         // pen tip glow while drawing in
         col += uHot * exp(-abs(vUv.x - uDraw) * 120.0) * step(uDraw, 0.999) * 1.5;
-        gl_FragColor = vec4(col * uFade, 1.0);
+        gl_FragColor = vec4(col * uFade * uOn, 1.0);
       }`,
   }));
+  // 'rt' twin: lives in the opaque list so three's transmission pass sees it (the glass K
+  // refracts the rings behind it); it outputs only into that render target.
+  if (pass === 'rt') m.transparent = false;
+  return m;
+}
+
+/**
+ * Gate a mesh to one render pass: 'rt' = only three's transmission render target,
+ * 'main' = only the visible frame. The material needs a `uOn` uniform.
+ */
+export function gateToPass(mesh: Mesh, mat: ShaderMaterial, pass: 'main' | 'rt') {
+  mesh.onBeforeRender = (renderer) => {
+    const inRT = !!renderer.getRenderTarget();
+    mat.uniforms.uOn.value = (pass === 'rt') === inRT ? 1 : 0;
+    mat.uniformsNeedUpdate = true;
+  };
 }
 
 /**
@@ -178,6 +216,8 @@ export function createGridMaterial() {
       uColor: { value: new Color(COLORS.accent) },
       uTime: { value: 0 },
       uFade: { value: 1 },
+      uShockR: { value: -10 },
+      uShockA: { value: 0 },
     },
     vertexShader: /* glsl */ `
       varying vec2 vXZ;
@@ -187,22 +227,26 @@ export function createGridMaterial() {
         gl_Position = projectionMatrix * viewMatrix * wp;
       }`,
     fragmentShader: /* glsl */ `
-      uniform float uCell, uFadeR, uOpacity, uTime, uFade;
+      uniform float uCell, uFadeR, uOpacity, uTime, uFade, uShockR, uShockA;
       uniform vec3 uColor;
       varying vec2 vXZ;
-      void main() {
-        vec2 g = vXZ / uCell;
+      // Anti-aliased grid line that fades out where cells get smaller than a few pixels
+      // (grazing angles / distance) instead of breaking into dashed fragments.
+      float gridLine(vec2 g) {
         vec2 w = fwidth(g);
-        vec2 l = abs(fract(g - 0.5) - 0.5) / w;
-        float line = 1.0 - min(min(l.x, l.y), 1.0);
-        vec2 g4 = vXZ / (uCell * 4.0);
-        vec2 w4 = fwidth(g4);
-        vec2 l4 = abs(fract(g4 - 0.5) - 0.5) / w4;
-        float major = 1.0 - min(min(l4.x, l4.y), 1.0);
+        vec2 l = abs(fract(g - 0.5) - 0.5) / max(w, 1e-4);
+        vec2 lod = 1.0 - smoothstep(0.12, 0.45, w);
+        vec2 a = (1.0 - min(l, 1.0)) * lod;
+        return max(a.x, a.y);
+      }
+      void main() {
+        float line = gridLine(vXZ / uCell);
+        float major = gridLine(vXZ / (uCell * 4.0));
         float r = length(vXZ);
         float fade = smoothstep(uFadeR, uFadeR * 0.15, r);
         // a slow pulse ring travelling outward from under the crystal
         float pulse = exp(-pow(r - mod(uTime * 1.2, uFadeR * 1.2), 2.0) * 1.5) * 0.6;
+        pulse += exp(-pow((r - uShockR) * 2.5, 2.0)) * uShockA * 2.0;
         float a = (line * 0.55 + major * 0.45) * fade * uOpacity * (1.0 + pulse);
         gl_FragColor = vec4(uColor * (0.7 + pulse), a * uFade);
         #include <colorspace_fragment>

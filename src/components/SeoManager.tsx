@@ -26,7 +26,7 @@ export function SeoManager({ path }: { path: string }) {
     setMeta('description', meta.description);
     setMeta('robots', meta.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
     const kw = document.head.querySelector('meta[name="keywords"]');
-    if (meta.keywords) setMeta('keywords', meta.keywords); else kw?.remove();
+    kw?.remove(); // meta keywords is ignored by search engines; never emitted
     setMeta('og:type', meta.ogType, true);
     setMeta('og:site_name', 'KorvenzaTech', true);
     setMeta('og:title', meta.title, true);

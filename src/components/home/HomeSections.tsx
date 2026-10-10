@@ -5,6 +5,7 @@ import { Link, useRouter } from '../../lib/router';
 import { Eyebrow, SectionHeader } from '../ui';
 import { projectImage } from '../../data/media';
 import { BentoScene } from './BentoScene';
+import { BrandMark } from '../BrandMark';
 
 const ICONS: Record<string, React.FC<{ className?: string }>> = { Bot, Network, Smartphone, Globe, Code, Layers, Cloud, Layout, TrendingUp };
 
@@ -161,6 +162,7 @@ export function NotFound() {
     <section className="kz-page-hero kz-cinematic relative flex min-h-[80vh] items-center overflow-hidden pt-32 pb-20">
       <div className="bg-grid-pattern pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
       <div className="kz-container relative text-center">
+        <BrandMark size={72} className="mx-auto mb-8 drop-shadow-[0_18px_40px_rgba(25,199,132,.35)]" />
         <Eyebrow className="mx-auto">404</Eyebrow>
         <h1 className="kz-h1 mx-auto mt-6 max-w-3xl text-white">This page doesn’t exist.</h1>
         <p className="kz-lead mx-auto mt-6 max-w-xl">The link may be outdated or mistyped. These pages will get you back on track.</p>

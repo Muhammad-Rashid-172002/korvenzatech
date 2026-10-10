@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, Globe, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 import { ServiceItem } from '../types';
 import { SERVICES_DATA } from '../data/companyData';
+import { BrandMark } from './BrandMark';
 import { Link } from '../lib/router';
 
 interface FooterProps {
@@ -22,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
           <div className="lg:col-span-4">
             <Link to="/" className="inline-flex items-center gap-3" aria-label="KorvenzaTech home">
               <span className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-[#0A1612]">
-                <img src="/media/brand/logo-64.webp" width={34} height={34} alt="" className="h-[34px] w-[34px] object-contain" loading="lazy" />
+                <BrandMark size={30} />
               </span>
               <span className="text-lg font-extrabold tracking-tight text-white">Korvenza<span className="text-emerald-400">Tech</span></span>
             </Link>
@@ -49,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
             <div>
               <h2 className="kz-meta !text-[#C3D1CA]">Services</h2>
               <ul className="mt-4 space-y-1.5">
-                {SERVICES_DATA.slice(0, 6).map((srv) => (
+                {SERVICES_DATA.map((srv) => (
                   <li key={srv.id}><Link to={`/services/${srv.id}`} className={linkCls}>{srv.title}</Link></li>
                 ))}
               </ul>
