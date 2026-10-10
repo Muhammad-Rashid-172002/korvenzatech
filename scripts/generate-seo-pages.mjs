@@ -58,7 +58,6 @@ function buildPage(route) {
   const extraHead = [
     // Desktop only: there the hero poster is above the fold; on phones it sits below the headline.
     route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w" imagesizes="620px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
-    meta.keywords ? `<meta name="keywords" content="${esc(meta.keywords)}" />` : '',
     `<script type="application/ld+json" id="kz-schema">${jsonLd(buildStructuredData(route))}</script>`,
   ].join('');
   html = html.replace('</head>', `${extraHead}</head>`);

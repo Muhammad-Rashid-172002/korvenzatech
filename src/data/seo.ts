@@ -52,7 +52,6 @@ const STATIC: Record<string, { title: string; description: string; name: string;
     title: 'KorvenzaTech | Software Development, AI, SaaS, Mobile & Web',
     description: 'Software development company building custom software, SaaS platforms, AI solutions, Flutter mobile apps, websites, APIs and cloud systems for growing businesses.',
     name: 'Home',
-    keywords: 'KorvenzaTech, software development company, custom software development, Flutter app development, AI development and integration, SaaS product development, web application development, business automation',
     changefreq: 'weekly', priority: 1.0,
   },
   '/services': { title: 'Software Development Services: AI, SaaS, Apps & APIs | KorvenzaTech', description: 'Explore KorvenzaTech services across AI solutions, SaaS, custom software, mobile apps, websites, APIs, cloud infrastructure, UI/UX and digital growth.', name: 'Services', changefreq: 'weekly', priority: 0.9 },

@@ -10,3 +10,4 @@ coverage/
 .env
 /Users/app/Desktop/Company_web/korvenza/.env
 .env.example.vite/
+tools/qa/

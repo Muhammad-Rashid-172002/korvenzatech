@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
             <div>
               <h2 className="kz-meta !text-[#C3D1CA]">Services</h2>
               <ul className="mt-4 space-y-1.5">
-                {SERVICES_DATA.slice(0, 6).map((srv) => (
+                {SERVICES_DATA.map((srv) => (
                   <li key={srv.id}><Link to={`/services/${srv.id}`} className={linkCls}>{srv.title}</Link></li>
                 ))}
               </ul>
