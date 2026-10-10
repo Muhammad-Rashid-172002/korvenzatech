@@ -18,7 +18,7 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 
 ## Phase 1 — Deploy consistency
 - [x] 1.1 All 20 routes rebuilt and audited: every `dist/**/index.html` has the 9-service footer, the inline K, full content. (Legal links + article links → 2.1/2.2, enforced by 1.3.)
-- [x] 1.2 UI brand rasters are imported → content-hashed (`logo-128.[hash].webp`, `logo-256.[hash].webp`; logo-64 is inlined into the CSS). Stable `/media/brand/*` copies stay (now the new K) for old cached pages, manifest and JSON-LD.
+- [x] 1.2 UI brand rasters are imported → content-hashed (`logo-128.[hash].webp`, `logo-256.[hash].webp`; `logo-64.[hash].webp` for the route-curtain mark). Stable `/media/brand/*` copies stay (now the new K) for old cached pages, manifest and JSON-LD.
 - [x] 1.3 `scripts/verify-build.ts` (`npm run verify`)
 - [x] 1.4 Hosting = Vercel (`vercel.json`; `server.ts` is the local/Node fallback). Cache headers fixed in both. Redeploy + purge steps in the log.
 
@@ -99,7 +99,7 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 2. If the domain is proxied by Cloudflare (orange cloud in DNS): Cloudflare → Caching → Configuration → **Purge Everything**; Rules → remove any "Cache Everything" rule that matches HTML.
 3. Check: open `https://korvenzatech.com/build.json` and view-source of `/insights` → the `kz-build` meta must show the same commit. Footer must list 9 services.
 - Files: `scripts/verify-build.ts`, `scripts/build-brand.mjs`, `scripts/generate-seo-pages.mjs`, `src/assets/brand/*`, `src/vite-env.d.ts`, `src/components/KorvenzaAIChat.tsx`, `src/components/three/config.ts`, `src/index.css`, `vercel.json`, `server.ts`, `package.json`, `MASTER_PLAN.md`.
-- Bundle (gzip): main ±0; CSS +0.1 KB (inlined 64 px mark).
+- Bundle (gzip): main ±0, CSS ±0 (logos are separate hashed files).
 - Test (laptop): after the steps above, `/insights`, `/about`, `/services` show the 9-service footer and the new K; `/build.json` matches. Android: same pages in Chrome after a hard refresh.
 
 ## Archive — v2 build log (feature/master-build, merged to main as 5b5dcf8)

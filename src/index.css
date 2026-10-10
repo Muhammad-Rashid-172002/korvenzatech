@@ -705,7 +705,7 @@ html.kz-cursor-on .kz-cursor { opacity: 1; }
 .kz-curtain { position: fixed; inset: 0; z-index: calc(var(--kz-z-modal) + 5); pointer-events: none; display: none; place-items: center; background: radial-gradient(60% 50% at 50% 60%, #0E3B2B, #07110E 70%); clip-path: inset(0 0 0 0); }
 .kz-curtain.is-on { display: grid; }
 .kz-curtain.is-leaving { clip-path: inset(0 0 100% 0); transition: clip-path 620ms cubic-bezier(.76, 0, .24, 1); }
-.kz-curtain-mark { width: 44px; height: 44px; border-radius: 12px; background: url(./assets/brand/logo-64.webp) center / 32px no-repeat, #0A1612; border: 1px solid rgba(110, 221, 176, .2); transition: opacity 300ms, transform 620ms var(--kz-ease-out); }
+.kz-curtain-mark { width: 44px; height: 44px; border-radius: 12px; background: url(./assets/brand/logo-64.webp?no-inline) center / 32px no-repeat, #0A1612; border: 1px solid rgba(110, 221, 176, .2); transition: opacity 300ms, transform 620ms var(--kz-ease-out); }
 .kz-curtain.is-leaving .kz-curtain-mark { opacity: 0; transform: translateY(-30px); }
 
 /* AI widget: breathing glow on the launcher, spring open for the panel */
