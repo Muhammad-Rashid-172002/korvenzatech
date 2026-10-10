@@ -4,7 +4,7 @@
  * build-time prerenderer (scripts/generate-seo-pages.mjs) so both always agree.
  * Only verified company information is used here.
  */
-import { CASE_STUDIES, SERVICES_DATA } from './companyData';
+import { CASE_STUDIES, FAQ_ITEMS, SERVICES_DATA } from './companyData';
 import { ARTICLES } from './articles';
 import { LEGAL } from './legal';
 
@@ -123,7 +123,7 @@ const organization = {
     { '@type': 'Person', name: 'Muhammad Taha Amir', jobTitle: 'Co-Founder' },
   ],
   employee: [
-    { '@type': 'Person', name: 'Suliman', jobTitle: ['Chief Operating Officer (COO)', 'Software Engineer'] },
+    { '@type': 'Person', name: 'Suliman', jobTitle: 'Chief Operating Officer (COO)' },
   ],
   contactPoint: [
     { '@type': 'ContactPoint', contactType: 'customer service', email: 'info@korvenzatech.com', telephone: '+92-370-1691701', availableLanguage: ['English', 'Urdu', 'Pashto'] },
@@ -176,6 +176,10 @@ export function buildStructuredData(path: string) {
     if (service.faqs.length) {
       graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: service.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
     }
+  }
+
+  if (path === '/about') {
+    graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: FAQ_ITEMS.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) });
   }
 
   const article = ARTICLES.find((a) => `/insights/${a.slug}` === path);

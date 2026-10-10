@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TECH_STACK } from '../data/companyData';
+import { TECH_STACK_VISIBLE as TECH_STACK } from '../data/companyData';
 import { SectionHeader } from './ui';
 
 // The "Built with" list (formerly the separate strip under the hero), consolidated here next to the orbit.

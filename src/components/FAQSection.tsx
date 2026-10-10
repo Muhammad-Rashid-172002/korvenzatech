@@ -1,18 +1,27 @@
 import React, { useId, useState } from 'react';
 import { FAQ_ITEMS } from '../data/companyData';
-import { Plus, Search } from 'lucide-react';
+import { ArrowRight, Plus, Search } from 'lucide-react';
+import { Link } from '../lib/router';
 import { SectionHeader } from './ui';
 
-export const FAQSection: React.FC = () => {
+/** Questions shown in the short version on Home and Insights. */
+const TEASER = ['What does KorvenzaTech do?', 'How much does custom software or mobile app development cost?', 'Do you work with international clients?'];
+
+/**
+ * The full FAQ lives on /about#faq (with FAQPage JSON-LD). `teaser` renders three of the
+ * questions plus a link there — used on Home and Insights so the content isn't duplicated.
+ */
+export const FAQSection: React.FC<{ teaser?: boolean }> = ({ teaser = false }) => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const [searchTerm, setSearchTerm] = useState('');
   const uid = useId();
 
   const q = searchTerm.toLowerCase();
-  const filteredFaqs = FAQ_ITEMS.filter((item) => item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q));
+  const source = teaser ? FAQ_ITEMS.filter((f) => TEASER.includes(f.question)) : FAQ_ITEMS;
+  const filteredFaqs = source.filter((item) => item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q));
 
   return (
-    <section id="faq" className="kz-section kz-section-alt relative z-10" aria-labelledby="faq-title">
+    <section id={teaser ? 'faq-teaser' : 'faq'} className="kz-section kz-section-alt relative z-10" aria-labelledby="faq-title">
       <div className="kz-container grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
@@ -21,6 +30,9 @@ export const FAQSection: React.FC = () => {
               title={<span id="faq-title">Frequently asked questions</span>}
               lead="Everything you need to know about working with KorvenzaTech — answered simply and honestly."
             />
+            {teaser ? (
+              <Link to="/about#faq" className="kz-link kz-reveal mt-8">See all {FAQ_ITEMS.length} questions <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+            ) : (
             <div className="kz-reveal relative mt-8 max-w-sm">
               <label htmlFor={`${uid}-search`} className="sr-only">Search questions</label>
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--kz-muted)]" aria-hidden="true" />
@@ -33,6 +45,7 @@ export const FAQSection: React.FC = () => {
                 className="kz-field !pl-11"
               />
             </div>
+            )}
           </div>
         </div>
 

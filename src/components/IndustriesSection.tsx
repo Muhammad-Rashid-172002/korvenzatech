@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { INDUSTRIES_DATA } from '../data/companyData';
+import { CASE_STUDIES, INDUSTRIES_DATA } from '../data/companyData';
+import { Link } from '../lib/router';
 import { IndustryItem } from '../types';
 import { 
   Activity, GraduationCap, Dumbbell, DollarSign, ShoppingBag, Building, Truck, Briefcase, 
@@ -21,20 +22,35 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
     <section id="industries" className="kz-section kz-section-alt relative z-10 border-t border-[var(--kz-border)]">
       <div className="kz-container">
         
-        {/* Section Header */}
-        <div className="kz-reveal text-center max-w-3xl mx-auto space-y-5 mb-14">
-          <div className="kz-eyebrow mx-auto">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Domain Experience</span>
-          </div>
+        {/* Where we've delivered: only industries backed by shipped work, each linked to its case study. */}
+        <div className="kz-reveal mx-auto mb-14 max-w-3xl space-y-5 text-center">
+          <div className="kz-eyebrow mx-auto"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /><span>Where we've delivered</span></div>
+          <h2 className="kz-h2">Shipped products, not slideware</h2>
+          <p className="kz-lead">Two industries where we have designed, built and shipped our own products. Open each case study for the architecture and the decisions behind it.</p>
+        </div>
+        <div className="mb-20 grid gap-5 md:grid-cols-2">
+          {[
+            { id: 'ielts-ai-master', industry: 'Education & EdTech', Icon: GraduationCap },
+            { id: 'skilllink', industry: 'Marketplaces & On-demand services', Icon: Briefcase },
+          ].map(({ id, industry, Icon }, i) => {
+            const study = CASE_STUDIES.find((c) => c.id === id);
+            if (!study) return null;
+            return (
+              <Link key={id} to={`/work/${id}`} className="kz-card kz-card-hover kz-reveal group block p-7" style={{ '--d': i } as React.CSSProperties}>
+                <span className="kz-icon-orb !h-10 !w-10"><Icon className="h-5 w-5" aria-hidden="true" /></span>
+                <div className="kz-meta mt-5 !text-[var(--kz-accent-text)]">{industry}</div>
+                <h3 className="mt-2 text-xl font-bold text-[var(--kz-text)]">{study.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-[var(--kz-muted)]">{study.tagline}</p>
+                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--kz-accent-text)]">Read the case study <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+              </Link>
+            );
+          })}
+        </div>
 
-          <h2 className="kz-h2">
-            Technology Tailored for Different Industries
-          </h2>
-
-          <p className="kz-lead">
-            Every sector has unique regulatory, operational, and user expectations. We design software engineered specifically for your domain.
-          </p>
+        {/* What we can build: capability by industry (not a claim of past clients there). */}
+        <div className="kz-reveal mx-auto mb-10 max-w-3xl space-y-4 text-center">
+          <h2 className="kz-h3">What we can build for your industry</h2>
+          <p className="text-[15px] leading-7 text-[var(--kz-muted)]">The same engineering applies across sectors. Pick yours to see the kind of system we would design for it.</p>
         </div>
 
         {/* Industry Cards Grid */}
@@ -68,7 +84,7 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
                 {selectedIndustry.name}
               </span>
             </div>
-            <span className="text-xs font-mono text-emerald-400">Industry Solution Blueprint</span>
+            <span className="text-xs font-mono text-emerald-400">Solution blueprint</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -80,7 +96,7 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
 
               <div className="p-4 rounded-xl bg-[var(--kz-surface-2)]/80 border border-white/5 space-y-1">
                 <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                  Core Industry Challenge We Solve:
+                  Common challenge in this sector:
                 </span>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   {selectedIndustry.problemSolved}
@@ -89,7 +105,7 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
 
               <div className="space-y-2 pt-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Typical Solutions We Deliver:
+                  What we can build:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selectedIndustry.exampleSolutions.map((sol, idx) => (
@@ -107,7 +123,7 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
                 Building a product in {selectedIndustry.name}?
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Our architects can share relevant industry benchmarks and technical frameworks.
+                Tell us how your operation works today — we'll suggest a practical architecture and the first version worth building.
               </p>
               <button
                 onClick={onStartProject}

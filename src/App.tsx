@@ -39,6 +39,12 @@ const ArticlePage = lazy(() => import('./components/content/ArticlePage'));
 const LegalPage = lazy(() => import('./components/content/LegalPage'));
 const PageFallback = () => <div className="min-h-[100svh]" aria-hidden="true" />;
 
+const CAREER_TRACKS = [
+  { title: 'Engineering', text: 'Flutter, React/TypeScript, Node.js and Firebase engineers who ship production features end to end — from data model and API to the screen a user taps.', signals: ['Shipped apps or web products you can show', 'Clean, reviewed code and sensible tests', 'Comfort with APIs, auth and real-time data'] },
+  { title: 'Design & Product', text: 'Product designers and product thinkers who turn a vague business goal into clear flows, a usable interface and a scope a small team can deliver.', signals: ['Case studies that explain the why, not just screens', 'Design systems and handoff that engineers love', 'Writing that makes decisions easy'] },
+  { title: 'Growth & Operations', text: 'People who keep projects and clients moving: delivery coordination, client communication, technical SEO, content and the systems behind a growing studio.', signals: ['Clear written English with international clients', 'Organised, proactive follow-through', 'Comfort with analytics and simple automation'] },
+];
+
 const STATIC_ROUTES = ['/', '/services', '/work', '/industries', '/about', '/insights', '/careers', '/contact', '/start-project', ...LEGAL.map((d) => `/${d.slug}`)];
 
 export const normalizePath = (p: string) => (p.length > 1 ? p.replace(/\/+$/, '') : p) || '/';
@@ -130,7 +136,7 @@ function App({ initialPath }: { initialPath?: string }) {
   </>;
   else if (path === '/insights') content = <>
     <PageHero eyebrow="Knowledge Hub" title={<>Practical thinking for <span className="gradient-text-cyan">modern digital products.</span></>} description="Clear, useful articles on AI, app development, software architecture, APIs, cloud systems and digital product strategy." />
-    <InsightsSection /><FAQSection />
+    <InsightsSection /><FAQSection teaser />
   </>;
   else if (path === '/careers') content = <>
     <PageHero eyebrow="Careers" title={<>Build technology that <span className="gradient-text-cyan">people actually use.</span></>} description="We value curiosity, ownership, clear communication and engineers who care about the product — not only the code." primary="Send your profile" onPrimary={() => navigate('/contact')} />
@@ -138,12 +144,15 @@ function App({ initialPath }: { initialPath?: string }) {
       <div className="kz-container">
         <SectionHeader eyebrow="Disciplines" title="Where great people fit in." lead="Open roles are published here only when they are active. Strong portfolios and thoughtful applications are always welcome." />
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
-          {['Engineering', 'Design & Product', 'Growth & Operations'].map((x, i) => (
-            <div key={x} className="premium-card kz-reveal p-8" style={{ '--d': i } as React.CSSProperties}>
+          {CAREER_TRACKS.map((t, i) => (
+            <div key={t.title} className="premium-card kz-reveal flex flex-col p-8" style={{ '--d': i } as React.CSSProperties}>
               <div className="kz-meta !text-[var(--kz-accent-text)]">0{i + 1}</div>
-              <h3 className="kz-h3 mt-5">{x}</h3>
-              <p className="mt-3 text-sm leading-7 text-[var(--kz-muted)]">We welcome strong portfolios and thoughtful applications. Open roles are published here only when active.</p>
-              <div className="mt-6 text-xs text-[var(--kz-muted)]">No fabricated vacancies • Remote-friendly collaboration</div>
+              <h3 className="kz-h3 mt-5">{t.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--kz-muted)]">{t.text}</p>
+              <ul className="mt-5 space-y-2 text-[13px] text-[var(--kz-text-2)]">
+                {t.signals.map((sig) => <li key={sig} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true" />{sig}</li>)}
+              </ul>
+              <div className="mt-auto pt-6 text-xs text-[var(--kz-muted)]">No fabricated vacancies • Remote-friendly collaboration</div>
             </div>
           ))}
         </div>
@@ -195,7 +204,7 @@ function App({ initialPath }: { initialPath?: string }) {
     <TechStackSection />
     <ProcessTimeline onStartProject={startProject} />
     <LeadershipTestimonialsSection />
-    <FAQSection />
+    <FAQSection teaser />
     <ClosingCTA />
   </>;
   else content = <NotFound />;

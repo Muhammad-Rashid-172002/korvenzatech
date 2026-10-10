@@ -16,7 +16,7 @@ export const SERVICES_DATA: ServiceItem[] = [
       'Document Analysis & Extraction Engines',
       'Personalized Recommendation Systems',
       'Custom language-model integrations',
-      'Computer Vision & Image Understanding',
+      'Image understanding with multimodal AI',
       'Natural Language Analytics & Summarization'
     ],
     deliverables: [
@@ -48,7 +48,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     iconName: 'Network',
     shortDesc: 'Secure connections that allow your apps, websites, payment systems, and business tools to talk to each other.',
     businessValue: 'Unify separate software tools into one seamless workflow so data updates everywhere instantly without manual copy-pasting.',
-    technicalDescription: 'High-throughput RESTful and GraphQL APIs, webhooks, rate-limited gateway architectures, and OAuth2 authentication handlers.',
+    technicalDescription: 'High-throughput RESTful APIs, webhooks, rate-limited gateway architectures, and OAuth2 authentication handlers.',
     whoNeedsIt: 'Companies connecting legacy systems to new mobile apps, integrating third-party payment gateways, or sharing data with partner platforms.',
     features: [
       'High-Performance REST & Backend APIs',
@@ -86,7 +86,7 @@ export const SERVICES_DATA: ServiceItem[] = [
     technicalDescription: 'Cross-platform Flutter & native iOS/Android development with state-managed architectures, background sync, and biometrics.',
     whoNeedsIt: 'Entrepreneurs launching app ideas or established businesses providing dedicated mobile access to their services.',
     features: [
-      'iOS & Android Cross-Platform Development (Flutter/React Native)',
+      'iOS & Android Cross-Platform Development (Flutter)',
       'Native Android & iOS Engineering',
       'Firebase & Custom Cloud Backends',
       'Real-Time Push Notifications & Messaging',
@@ -483,7 +483,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     number: '05',
     title: 'Quality Testing & Security',
     description: 'We rigorously test load performance, mobile responsiveness, edge case handling, and cybersecurity protection before launch.',
-    deliverable: 'QA Verification & Security Compliance Certificate'
+    deliverable: 'QA & Security Test Report'
   },
   {
     number: '06',
@@ -495,19 +495,23 @@ export const PROCESS_STEPS: ProcessStep[] = [
     number: '07',
     title: 'Growth & Support',
     description: 'We monitor uptime, patch software, update third-party APIs, and continuously help you scale features as your business grows.',
-    deliverable: 'SLA Maintenance & Ongoing Optimization'
+    deliverable: 'Maintenance Plan & Ongoing Optimization'
   }
 ];
 
+/**
+ * Items marked `unconfirmed` are hidden on the site until Rashid confirms the team has
+ * shipped production work with them (MASTER_PLAN → TODO). Not deleted, just hidden.
+ */
 export const TECH_STACK: TechStackCategory[] = [
   {
     category: 'Mobile Applications',
     description: 'Cross-platform and native engineering for smartphones.',
     items: [
       { name: 'Flutter', description: 'Unified iOS and Android codebase with high 60fps performance' },
-      { name: 'Android Native (Kotlin)', description: 'Deep hardware and system integration for Android' },
-      { name: 'iOS Native (Swift)', description: 'High-performance Apple ecosystem engineering' },
-      { name: 'React Native', description: 'Cross-platform mobile apps powered by React' }
+      { name: 'Android Native (Kotlin)', description: 'Deep hardware and system integration for Android', unconfirmed: true },
+      { name: 'iOS Native (Swift)', description: 'High-performance Apple ecosystem engineering', unconfirmed: true },
+      { name: 'React Native', description: 'Cross-platform mobile apps powered by React', unconfirmed: true }
     ]
   },
   {
@@ -527,7 +531,8 @@ export const TECH_STACK: TechStackCategory[] = [
       { name: 'Node.js / Express', description: 'High-throughput event-driven microservices' },
       { name: 'Python (FastAPI)', description: 'Optimal engine for AI models and data analytics' },
       { name: 'Firebase Backend', description: 'Real-time database, authentication, and cloud functions' },
-      { name: 'GraphQL / REST APIs', description: 'Structured communication layers for client applications' }
+      { name: 'REST APIs', description: 'Structured, versioned communication layers for client applications' },
+      { name: 'GraphQL', description: 'Flexible query APIs for complex client data needs', unconfirmed: true }
     ]
   },
   {
@@ -537,15 +542,15 @@ export const TECH_STACK: TechStackCategory[] = [
       { name: 'Multimodal AI API', description: 'Multimodal intelligence for text, vision, and reasoning' },
       { name: 'Language AI', description: 'Advanced natural language processing and agent execution' },
       { name: 'RAG Infrastructure', description: 'Private vector search over company documents' },
-      { name: 'Computer Vision', description: 'Image recognition and automated inspection models' }
+      { name: 'Computer Vision', description: 'Image recognition and automated inspection models', unconfirmed: true }
     ]
   },
   {
     category: 'Cloud & Infrastructure',
     description: 'Global hosting environments built for high availability.',
     items: [
-      { name: 'Google Cloud Platform', description: 'Enterprise cloud hosting, Cloud Run, and BigQuery' },
-      { name: 'Amazon Web Services (AWS)', description: 'Scalable cloud infrastructure, S3, and ECS' },
+      { name: 'Google Cloud Platform', description: 'Cloud hosting, Cloud Run and Firebase services' },
+      { name: 'Amazon Web Services (AWS)', description: 'Scalable cloud infrastructure and S3 storage' },
       { name: 'Docker & Containers', description: 'Consistent application environments across cloud servers' },
       { name: 'CI/CD Pipelines', description: 'Automated testing and zero-downtime deployment' }
     ]
@@ -556,7 +561,7 @@ export const TECH_STACK: TechStackCategory[] = [
 export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'What does KorvenzaTech do?',
-    answer: 'KorvenzaTech is a global technology company that designs, builds, automates, and scales digital products. We develop AI systems, mobile applications, custom web platforms, APIs, cloud infrastructure, and technical growth strategies for businesses of all sizes.'
+    answer: 'KorvenzaTech is a founder-led software and AI product studio based in Pakistan, working with clients internationally. We design, build, automate, and scale digital products. We develop AI systems, mobile applications, custom web platforms, APIs, cloud infrastructure, and technical growth strategies for businesses of all sizes.'
   },
   {
     question: 'Can you help if I only have an idea and no technical background?',
@@ -600,7 +605,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: 'How do I start a project with KorvenzaTech?',
-    answer: 'Simply click "Start Your Project" or fill out our project inquiry form. Share a brief description of what you want to build, and our team will review it and respond with the most practical next step.'
+    answer: 'Simply click "Start a project" or fill out our project inquiry form. Share a brief description of what you want to build, and our team will review it and respond with the most practical next step.'
   }
 ];
 
@@ -633,3 +638,6 @@ export const OPEN_ROLES: OpenRole[] = [
     requirements: ['3+ years with Next.js, React & TypeScript', 'Tailwind CSS mastery', 'REST / GraphQL API design', 'Database experience (Firestore/PostgreSQL)']
   }
 ];
+
+/** Tech list as shown on the site (confirmed items only). */
+export const TECH_STACK_VISIBLE: TechStackCategory[] = TECH_STACK.map((c) => ({ ...c, items: c.items.filter((i) => !i.unconfirmed) }));

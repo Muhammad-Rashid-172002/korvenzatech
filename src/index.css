@@ -738,3 +738,19 @@ html.kz-cursor-on .kz-cursor { opacity: 1; }
 .kz-read-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: calc(var(--kz-z-sticky) + 2); pointer-events: none; }
 .kz-read-progress > div { height: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, #087F5B, #19C784 60%, #A6EBCD); }
 body:has(.kz-read-progress) .kz-progress { display: none; }
+
+/* ---------- 404 floating glass K --------------------------------------- */
+.kz-glass-k { position: relative; width: 129px; height: 150px; perspective: 900px; }
+.kz-glass-k-float { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: kzGlassFloat 7s var(--kz-ease-in-out) infinite; }
+.kz-glass-k-float > svg { position: absolute; inset: 0; margin: auto; }
+.kz-glass-k-glow { filter: blur(22px) saturate(1.4); opacity: .55; transform: translateZ(-30px) scale(1.08); }
+.kz-glass-k-body { opacity: .9; filter: drop-shadow(0 0 1px rgba(210,245,229,.9)) drop-shadow(0 18px 30px rgba(25,199,132,.35)); }
+.kz-glass-k-sheen { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(115deg, transparent 30%, rgba(236,251,244,.85) 45%, rgba(166,235,205,.25) 52%, transparent 62%) 0 0 / 250% 100% no-repeat;
+  -webkit-mask: url(/media/brand/k-mark.svg) center / contain no-repeat; mask: url(/media/brand/k-mark.svg) center / contain no-repeat;
+  animation: kzGlassSheen 6s var(--kz-ease-in-out) infinite; }
+.kz-glass-k-shadow { position: absolute; left: 50%; bottom: -26px; width: 110px; height: 14px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(25,199,132,.35), transparent); filter: blur(4px); animation: kzGlassShadow 7s var(--kz-ease-in-out) infinite; }
+@keyframes kzGlassFloat { 0%, 100% { transform: translateY(0) rotateY(-12deg) rotateX(4deg); } 50% { transform: translateY(-14px) rotateY(12deg) rotateX(-3deg); } }
+@keyframes kzGlassSheen { 0%, 20% { background-position: 120% 0; } 70%, 100% { background-position: -40% 0; } }
+@keyframes kzGlassShadow { 0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); } 50% { opacity: .6; transform: translateX(-50%) scale(.82); } }
+@media (prefers-reduced-motion: reduce) { .kz-glass-k-float, .kz-glass-k-sheen, .kz-glass-k-shadow { animation: none; } }

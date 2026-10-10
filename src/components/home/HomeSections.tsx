@@ -44,7 +44,7 @@ export function HomeServices() {
             <span className="kz-link mt-8">Explore {lead.title} <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></span>
           </Link>
 
-          {rest.slice(0, 6).map((s, i) => {
+          {rest.map((s, i) => {
             const Icon = ICONS[s.iconName] || Code;
             return (
               <Link key={s.id} to={`/services/${s.id}`} data-kz-tilt="8" className="kz-card kz-card-hover kz-tilt kz-reveal group flex flex-col p-6" style={{ '--d': (i % 2) + 1 } as React.CSSProperties}>
@@ -157,20 +157,44 @@ export function ClosingCTA() {
   );
 }
 
+/** Helpful exits from a dead link. */
+const LOST_LINKS = [
+  { to: '/services', title: 'Services', text: 'AI, apps, SaaS, web, APIs and cloud' },
+  { to: '/work', title: 'Our work', text: 'Products we have shipped' },
+  { to: '/insights', title: 'Insights', text: 'Practical articles' },
+  { to: '/contact', title: 'Contact', text: 'Talk to the team' },
+];
+
 export function NotFound() {
   return (
-    <section className="kz-page-hero kz-cinematic relative flex min-h-[80vh] items-center overflow-hidden pt-32 pb-20">
+    <section className="kz-page-hero kz-cinematic relative flex min-h-[90vh] items-center overflow-hidden pt-32 pb-20">
       <div className="bg-grid-pattern pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
       <div className="kz-container relative text-center">
-        <BrandMark size={72} className="mx-auto mb-8 drop-shadow-[0_18px_40px_rgba(25,199,132,.35)]" />
+        {/* Floating glass K: the logo with a refraction-style light sweep (CSS only, still under reduced motion). */}
+        <div className="kz-glass-k mx-auto mb-10" aria-hidden="true">
+          <div className="kz-glass-k-float">
+            <BrandMark size={150} className="kz-glass-k-glow" />
+            <BrandMark size={150} className="kz-glass-k-body" />
+            <span className="kz-glass-k-sheen" />
+          </div>
+          <span className="kz-glass-k-shadow" />
+        </div>
         <Eyebrow className="mx-auto">404</Eyebrow>
         <h1 className="kz-h1 mx-auto mt-6 max-w-3xl text-white">This page doesn’t exist.</h1>
         <p className="kz-lead mx-auto mt-6 max-w-xl">The link may be outdated or mistyped. These pages will get you back on track.</p>
-        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link to="/" className="kz-btn kz-btn-primary">Back to home</Link>
-          <Link to="/services" className="kz-btn kz-btn-secondary">Services</Link>
-          <Link to="/contact" className="kz-btn kz-btn-secondary">Contact</Link>
+        <div className="mt-10 flex justify-center">
+          <Link to="/" className="kz-btn kz-btn-primary !w-auto">Back to home</Link>
         </div>
+        <ul className="mx-auto mt-12 grid max-w-4xl gap-3 text-left sm:grid-cols-2 lg:grid-cols-4">
+          {LOST_LINKS.map((l) => (
+            <li key={l.to}>
+              <Link to={l.to} className="kz-card kz-card-hover group block p-5">
+                <span className="flex items-center justify-between text-[15px] font-bold text-white">{l.title}<ArrowUpRight className="h-4 w-4 text-[#8EA098] transition-colors group-hover:text-emerald-300" aria-hidden="true" /></span>
+                <span className="mt-1 block text-[13px] text-[#8EA098]">{l.text}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

@@ -25,13 +25,13 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 ## Phase 2 — Trust, legal & content
 - [x] 2.1 /privacy, /terms, /cookies + footer links (lawyer review TODO)
 - [x] 2.2 Three full Insight articles + routes, JSON-LD, progress bar; links wired
-- [ ] 2.3 Testimonials data model; hide placeholder entries; TODO list
-- [ ] 2.4 Leadership: Suliman single title; LinkedIn icons (hidden until URLs)
-- [ ] 2.5 Copy corrections (FAQ, process deliverables, CTA label, latency, benchmarks, industries split, tech list confirmation)
-- [ ] 2.6 Homepage shows all 9 services
-- [ ] 2.7 Full FAQ only on About #faq (+FAQPage JSON-LD); 3-question teasers on Home/Insights
-- [ ] 2.8 Careers copy per track
-- [ ] 2.9 Custom 404 with floating glass K
+- [x] 2.3 Testimonials data model; hide placeholder entries; TODO list
+- [x] 2.4 Leadership: Suliman single title; LinkedIn icons (hidden until URLs)
+- [x] 2.5 Copy corrections (FAQ, process deliverables, CTA label, latency, benchmarks, industries split, tech list confirmation)
+- [x] 2.6 Homepage shows all 9 services
+- [x] 2.7 Full FAQ only on About #faq (+FAQPage JSON-LD); 3-question teasers on Home/Insights
+- [x] 2.8 Careers copy per track
+- [x] 2.9 Custom 404 with floating glass K
 
 ## Phase 3 — Hero polish  ← **stop for review after this**
 - [x] (v2) Glass K, shard intro + shockwave, hover/click, shatter, low-tier version; 4 devices with live demo screens; rings/floor/particles; AgX
@@ -81,7 +81,14 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - Uncommitted local edit in `src/components/AboutSection.tsx` on your machine (an older version of the file). I have not touched it; commit or discard it yourself.
 - `Claude outputs/*.png` (review screenshots) are committed in the repo (~2.5 MB). Suggest removing them from git and adding `Claude outputs/` to `.gitignore`.
 - App-screen recreations review (`tools/screens/contact-sheet.png`); hero device demo wording.
-- "Rony Sultana" testimonial (two different roles).
+- **Testimonials** (`src/data/people.ts`; quotes are never edited, entries stay hidden until complete):
+  - "Mobile App Client" (Flutter app quote) — HIDDEN: send the client's full name, role, company, country; optional photo + Fiverr/LinkedIn link.
+  - "Jahid" (student grade portal quote) — HIDDEN: send full name, role and the institution's name (+ country).
+  - "Rony Sultana" ×2 — SHOWN, both now "Business Owner" (was Business Owner / Entrepreneur): confirm the correct role, that these are two different projects, and send company + country (+ optional photo, verification link).
+  - Star ratings are no longer shown: tell me the real rating per review (e.g. from Fiverr) if you want them back.
+- **LinkedIn URLs** for Muhammad Rashid, Muhammad Taha Amir and Suliman (`src/data/people.ts`, icons appear automatically).
+- **Tech list — confirm what you have shipped in production.** Shown now: Flutter · React · Next.js · TypeScript · Tailwind CSS · Node.js/Express · Python (FastAPI) · Firebase · REST APIs · Multimodal AI API · Language AI · RAG · Google Cloud · AWS (S3) · Docker · CI/CD. **Hidden until you confirm:** Kotlin (Android native), Swift (iOS native), React Native, GraphQL, Computer Vision; BigQuery and ECS removed from the cloud descriptions. Also confirm Next.js, FastAPI, Docker, AWS — I left them visible because they weren't on your list of doubts.
+- **Formal SLAs:** process phase 7 now says "Maintenance Plan & Ongoing Optimization"; tell me if you do sign SLAs and I'll restore the wording.
 - Optional: designer-made SVG of the K.
 - Lawyer review of /privacy, /terms, /cookies (written for GDPR/UK-GDPR awareness; governing law set to Pakistan). Confirm which Gemini API plan is used (free-tier prompts may be used by Google to improve products — if so, switch to a paid plan or say so in the privacy policy).
 - After deploy: re-share korvenzatech.com on LinkedIn/WhatsApp so link previews refresh.
@@ -144,3 +151,15 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - Files: `src/data/legal.ts`, `src/data/articles.ts`, `src/components/content/{Prose,LegalPage,ArticlePage}.tsx`, `InsightsSection.tsx`, `Footer.tsx`, `App.tsx`, `src/data/seo.ts`, `src/data/companyData.ts`, `src/types.ts`, `src/index.css`, `package.json`.
 - Bundle (gzip): main −1.1 KB (119.6; the old modal text left the main bundle). Article and legal pages are lazy chunks (9.2 KB / 4.5 KB) — prerender now uses React `prerenderToNodeStream`, which waits for lazy chunks, so their full text is still in the HTML.
 - Test: footer → Privacy/Terms/Cookie policy open real pages (also in a new tab); /insights → each card opens its article; on an article the thin bar at the top fills as you read; Android: same, text readable without zoom.
+
+### Phase 2.3–2.9 — Trust & content ✅
+**2.3 Testimonials** moved to `src/data/people.ts` with a real data model (name, role, company, country, photo, project type, quote, optional rating and verification link, `complete`). Only complete entries render: currently the two Rony Sultana cards (one consistent role). "Mobile App Client" (placeholder name) and "Jahid" (no full name/institution) are hidden, not deleted. Stars render only when a real rating is supplied — none is recorded, so none are shown. Quote text untouched.
+**2.4 Leadership** — Suliman shows only "COO (Chief Operating Officer)" (card, image alt, Organization JSON-LD, and the AI assistant's knowledge now agree). LinkedIn icon per leader, hidden while the URL is empty.
+**2.5 Copy** — FAQ: "a founder-led software and AI product studio based in Pakistan, working with clients internationally"; process deliverables "QA & Security Test Report" and "Maintenance Plan & Ongoing Optimization"; FAQ CTA "Start a project"; AI pipeline demo "Target latency: under 1 s · Illustrative pipeline"; Industries: honest CTA copy and a new split — **Where we've delivered** (EdTech → IELTS AI Master, Marketplaces → SkillLink, linked to the case studies) above **What we can build for your industry** (the existing explorer, relabelled as capability, not experience). Tech list: unconfirmed items hidden via an `unconfirmed` flag (data kept), removed from the 3D tech orbit and service copy. Six dead components removed (old modals, MegaMenu, ClientExperienceSection — they contained "SLA" / "NDA & Privacy Guarantee" claims).
+**2.6** Homepage services grid shows all 9 (lead card + 8).
+**2.7** Full FAQ (12 questions + search) only on `/about#faq`, with `FAQPage` JSON-LD there; Home and Insights show a 3-question teaser with "See all 12 questions →".
+**2.8 Careers** — distinct copy and "what we look for" signals for Engineering, Design & Product, Growth & Operations; still no fabricated vacancies.
+**2.9 404** — floating glass K (CSS 3D tilt + light sweep masked to the K silhouette, still under reduced motion), "Back to home" and four helpful links.
+- Files: `src/data/people.ts`, `LeadershipTestimonialsSection.tsx`, `src/data/companyData.ts`, `src/types.ts`, `IndustriesSection.tsx`, `AIFeatureSection.tsx`, `TechStackSection.tsx`, `three/scenes/Orbit.tsx`, `FAQSection.tsx`, `home/HomeSections.tsx`, `App.tsx`, `src/data/seo.ts`, `lib/assistantKnowledge.ts`, `lib/handlers.ts`, `src/index.css`; removed 6 unused components.
+- Bundle (gzip): main 121.3 KB (+1.7 vs 2.2: 9-service grid, careers copy, people model), CSS 21.5 KB (+0.4).
+- Test (laptop + Android): Home → services grid has 9 cards; FAQ shows 3 questions and "See all 12 questions" jumps to About's FAQ; About → Suliman's card shows one title; testimonials show only the Rony Sultana cards without stars; /industries → two "Where we've delivered" cards open the case studies; /careers → three different descriptions; any wrong URL (e.g. /abc) → floating K 404 with links.

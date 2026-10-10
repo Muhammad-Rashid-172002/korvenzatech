@@ -42,7 +42,7 @@ export interface IndustryItem {
 export interface TechStackCategory {
   category: string;
   description: string;
-  items: { name: string; description: string; tag?: string }[];
+  items: { name: string; description: string; tag?: string; unconfirmed?: boolean }[];
 }
 
 export interface ProcessStep {

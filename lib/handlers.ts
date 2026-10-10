@@ -28,7 +28,7 @@ function sanitizeSuggestionList(value: unknown): string[] {
 // Verified team profile image (same asset used on the website's Leadership section).
 const SULIMAN_PROFILE = {
   name: 'Suliman',
-  role: 'Software Engineer • COO (Chief Operating Officer)',
+  role: 'COO (Chief Operating Officer)',
   image: '/team/coo.png',
 };
 

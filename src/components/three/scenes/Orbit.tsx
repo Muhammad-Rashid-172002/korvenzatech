@@ -11,8 +11,8 @@ import { useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import { AdditiveBlending, CanvasTexture, Color, Group, MathUtils, Raycaster, Sprite, SpriteMaterial, SRGBColorSpace, Vector2, Vector3 } from 'three';
 import {
-  siDocker, siFastapi, siFirebase, siFlutter, siGooglecloud, siGraphql, siKotlin, siNextdotjs, siNodedotjs,
-  siPostgresql, siPython, siReact, siSwift, siTailwindcss, siTypescript, type SimpleIcon,
+  siDocker, siFastapi, siFirebase, siFlutter, siGooglecloud, siNextdotjs, siNodedotjs,
+  siPostgresql, siPython, siReact, siTailwindcss, siTypescript, type SimpleIcon,
 } from 'simple-icons';
 import { COLORS, ORBIT } from '../config';
 import { useThemeBlend } from '../hooks/useThemeBlend';
@@ -25,16 +25,13 @@ type Tool = { name: string; group: string; icon?: SimpleIcon; text?: string; hex
 // Every entry appears in the stack lists on the page (companyData TECH_STACK / "Built with" list).
 const TOOLS: Tool[] = [
   { name: 'Flutter', group: 'Mobile', icon: siFlutter, hex: siFlutter.hex },
-  { name: 'Kotlin', group: 'Android native', icon: siKotlin, hex: siKotlin.hex },
-  { name: 'Swift', group: 'iOS native', icon: siSwift, hex: siSwift.hex },
-  { name: 'React', group: 'Web & React Native', icon: siReact, hex: siReact.hex },
+  { name: 'React', group: 'Web', icon: siReact, hex: siReact.hex },
   { name: 'Next.js', group: 'Web', icon: siNextdotjs, hex: 'FFFFFF' },
   { name: 'TypeScript', group: 'Web', icon: siTypescript, hex: siTypescript.hex },
   { name: 'Tailwind CSS', group: 'UI', icon: siTailwindcss, hex: siTailwindcss.hex },
   { name: 'Node.js', group: 'Backend', icon: siNodedotjs, hex: siNodedotjs.hex },
   { name: 'Python', group: 'AI engine', icon: siPython, hex: siPython.hex },
   { name: 'FastAPI', group: 'APIs', icon: siFastapi, hex: siFastapi.hex },
-  { name: 'GraphQL', group: 'APIs', icon: siGraphql, hex: siGraphql.hex },
   { name: 'Firebase', group: 'Cloud DB', icon: siFirebase, hex: siFirebase.hex },
   { name: 'PostgreSQL', group: 'Database', icon: siPostgresql, hex: siPostgresql.hex },
   { name: 'Google Cloud', group: 'Cloud', icon: siGooglecloud, hex: siGooglecloud.hex },

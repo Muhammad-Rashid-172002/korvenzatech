@@ -1,65 +1,9 @@
 import React, { useRef } from 'react';
-import { ArrowLeft, ArrowRight, Quote, Star } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, Linkedin, Quote, Star } from 'lucide-react';
 import { Eyebrow, SectionHeader } from './ui';
 import { useTilt } from '../lib/motion';
 
-type Leader = {
-  name: string;
-  role: string;
-  roleDetail?: string;
-  image: string;
-  srcSet: string;
-  description: string;
-};
-
-// Names, roles and photographs are the verified ones already used on the site.
-const leaders: Leader[] = [
-  {
-    name: 'Muhammad Rashid',
-    role: 'Founder & CEO',
-    image: '/team/muhammad-rashid.png',
-    srcSet: '/media/team/muhammad-rashid-480.webp 480w, /media/team/muhammad-rashid-960.webp 780w',
-    description: 'Leads product vision, engineering direction, client solutions, and the long-term technology strategy behind KorvenzaTech.',
-  },
-  {
-    name: 'Muhammad Taha Amir',
-    role: 'Co-Founder',
-    image: '/team/co-founder.jpg',
-    srcSet: '/media/team/co-founder-480.webp 480w, /media/team/co-founder-960.webp 960w',
-    description: 'Supports company growth, operations, client coordination, delivery planning, and the leadership systems that keep KorvenzaTech projects moving with clarity.',
-  },
-  {
-    name: 'Suliman',
-    role: 'COO (Chief Operating Officer)',
-    roleDetail: 'Software Engineer',
-    image: '/team/coo.png',
-    srcSet: '/media/team/coo-480.webp 480w, /media/team/coo-960.webp 960w',
-    description: 'Oversees day-to-day operations, project execution, and the processes that keep KorvenzaTech delivery running smoothly and on schedule.',
-  },
-];
-
-const testimonials = [
-  {
-    label: 'Mobile App Client', meta: 'Startup Product',
-    quote: 'KorvenzaTech demonstrated strong Flutter expertise from planning through delivery. The team built a polished, responsive mobile experience with clean architecture, thoughtful UX, and excellent attention to detail. Communication stayed clear throughout the project, and the final product felt stable, professional, and ready for real users.',
-    author: 'Mobile App Client', role: 'Startup Founder',
-  },
-  {
-    label: 'Platform Modernization', meta: 'Scalable System Design',
-    quote: 'We had already built our system with another team, but it did not scale well. After working with KorvenzaTech, the platform was rebuilt around a much stronger system design. The difference in architecture, stability, and long-term scalability was clear, and the system has continued to perform reliably.',
-    author: 'Rony Sultana', role: 'Business Owner',
-  },
-  {
-    label: 'Education Platform', meta: 'Student Grade Portal',
-    quote: 'The student grade portal has significantly streamlined our academic operations. Students can access their grades quickly and securely, while the administrative workload for staff has been reduced. The system is easy to use, dependable, and has made the overall process much more efficient.',
-    author: 'Jahid', role: 'Education Client',
-  },
-  {
-    label: 'Product Delivery', meta: 'Growth Platform',
-    quote: 'KorvenzaTech shipped our platform on time with a smooth, well-managed delivery process. Communication was clear, the architecture was clean, and we finally had a product we could scale with confidence. The team stayed practical, responsive, and focused on the outcome.',
-    author: 'Rony Sultana', role: 'Entrepreneur',
-  },
-];
+import { LEADERS, VISIBLE_TESTIMONIALS, type Leader } from '../data/people';
 
 function Portrait({ leader, featured = false, index }: { leader: Leader; featured?: boolean; index: number }) {
   const tiltRef = useTilt<HTMLDivElement>(featured ? 4 : 5, 7);
@@ -74,7 +18,7 @@ function Portrait({ leader, featured = false, index }: { leader: Leader; feature
               src={leader.image}
               srcSet={leader.srcSet}
               sizes={sizes}
-              alt={`Portrait of ${leader.name}, ${leader.role}${leader.roleDetail ? ` and ${leader.roleDetail}` : ''} at KorvenzaTech`}
+              alt={`Portrait of ${leader.name}, ${leader.role} at KorvenzaTech`}
               loading="lazy"
               decoding="async"
               width={featured ? 960 : 480}
@@ -85,7 +29,11 @@ function Portrait({ leader, featured = false, index }: { leader: Leader; feature
           <div className="kz-portrait-meta">
             <span className="kz-portrait-role">{leader.role}</span>
             <h3 id={`leader-${index}`} className={`mt-3 font-extrabold tracking-tight text-white ${featured ? 'text-3xl sm:text-4xl' : 'text-2xl'}`}>{leader.name}</h3>
-            {leader.roleDetail && <p className="mt-1 text-[13px] font-semibold text-[#A6EBCD]">{leader.roleDetail}</p>}
+            {leader.linkedin && (
+              <a href={leader.linkedin} target="_blank" rel="noopener noreferrer" className="kz-portrait-link mt-3 inline-grid h-9 w-9 place-items-center rounded-lg border border-white/15 bg-black/30 text-[#C3D1CA] hover:text-white" aria-label={`${leader.name} on LinkedIn`}>
+                <Linkedin className="h-4 w-4" aria-hidden="true" />
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -118,25 +66,35 @@ function TestimonialsRow() {
       </div>
       {/* Draggable row (mouse drag with inertia via lib/interactions.ts); native swipe / scroll / keyboard everywhere. */}
       <div ref={row} id="testimonials-row" className="kz-drag-row mt-5" data-kz-drag-scroll="" tabIndex={0} role="region" aria-label="Client testimonials">
-        {testimonials.map((item, index) => (
-          <figure key={`${item.author}-${index}`} data-kz-tilt="6" className="kz-testimonial-card kz-tilt kz-reveal relative overflow-hidden p-7 sm:p-9" style={{ '--d': index % 2 } as React.CSSProperties}>
+        {VISIBLE_TESTIMONIALS.map((item, index) => (
+          <figure key={`${item.name}-${index}`} data-kz-tilt="6" className="kz-testimonial-card kz-tilt kz-reveal relative overflow-hidden p-7 sm:p-9" style={{ '--d': index % 2 } as React.CSSProperties}>
             <Quote className="absolute -right-2 -top-3 h-24 w-24 text-emerald-500/[.06]" aria-hidden="true" />
             <div className="flex items-start justify-between gap-5">
               <div>
-                <div className="text-sm font-bold text-[var(--kz-text)]">{item.label}</div>
-                <div className="kz-meta mt-1.5 !text-[10px]">{item.meta}</div>
+                <div className="text-sm font-bold text-[var(--kz-text)]">{item.projectType}</div>
+                {item.projectDetail && <div className="kz-meta mt-1.5 !text-[10px]">{item.projectDetail}</div>}
               </div>
-              <div className="flex gap-0.5" role="img" aria-label="Rated 5 out of 5">
-                {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />)}
-              </div>
+              {/* Stars only when the client actually rated us on the source platform. */}
+              {item.rating ? (
+                <div className="flex gap-0.5" role="img" aria-label={`Rated ${item.rating} out of 5`}>
+                  {Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3.5 w-3.5 ${i < item.rating! ? 'fill-amber-400 text-amber-400' : 'text-amber-400/40'}`} aria-hidden="true" />)}
+                </div>
+              ) : null}
             </div>
             <blockquote className="mt-6 text-[15px] leading-7 text-[var(--kz-text-2)]">“{item.quote}”</blockquote>
             <figcaption className="mt-7 flex items-center gap-3 border-t border-[var(--kz-border)] pt-5">
-              <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-sm font-extrabold text-[var(--kz-accent-text)]" aria-hidden="true">{item.author.charAt(0)}</span>
-              <span>
-                <span className="block text-sm font-bold text-[var(--kz-text)]">{item.author}</span>
-                <span className="block text-xs text-[var(--kz-muted)]">{item.role}</span>
+              {item.photo
+                ? <img src={item.photo} alt="" width={40} height={40} loading="lazy" className="h-10 w-10 rounded-full object-cover" />
+                : <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-sm font-extrabold text-[var(--kz-accent-text)]" aria-hidden="true">{item.name.charAt(0)}</span>}
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-[var(--kz-text)]">{item.name}</span>
+                <span className="block text-xs text-[var(--kz-muted)]">{[item.role, item.company, item.country].filter(Boolean).join(' · ')}</span>
               </span>
+              {item.verifyUrl && (
+                <a href={item.verifyUrl} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[var(--kz-accent-text)] hover:underline">
+                  {item.verifyLabel ?? 'Verify'} <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                </a>
+              )}
             </figcaption>
           </figure>
         ))}
@@ -164,11 +122,11 @@ export const LeadershipTestimonialsSection: React.FC = () => (
 
         <div className="mt-16 grid gap-12 sm:mt-20 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-5" data-kz-parallax="3">
-            <Portrait leader={leaders[0]} featured index={0} />
+            <Portrait leader={LEADERS[0]} featured index={0} />
           </div>
           <div className="grid gap-12 sm:grid-cols-2 sm:gap-8 lg:col-span-7 lg:pt-24" data-kz-parallax="-4">
-            <Portrait leader={leaders[1]} index={1} />
-            <Portrait leader={leaders[2]} index={2} />
+            <Portrait leader={LEADERS[1]} index={1} />
+            <Portrait leader={LEADERS[2]} index={2} />
           </div>
         </div>
       </div>
@@ -180,9 +138,9 @@ export const LeadershipTestimonialsSection: React.FC = () => (
           align="center"
           eyebrow="Client feedback"
           title={<span id="testimonials-title">Confidence is earned in the delivery.</span>}
-          lead="Feedback from software, startup, platform and education work."
+          lead="In our clients' own words. Every name shown here is a real client."
         />
-        <TestimonialsRow />
+        {VISIBLE_TESTIMONIALS.length > 0 && <TestimonialsRow />}
       </div>
     </section>
   </>

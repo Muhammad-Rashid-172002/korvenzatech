@@ -138,8 +138,8 @@ export const AIFeatureSection: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1">
-                <span>Latency: &lt; 0.8s</span>
-                <span>Status: Secure Private AI Pipeline</span>
+                <span>Target latency: under 1 s</span>
+                <span>Illustrative pipeline</span>
               </div>
             </div>
 
