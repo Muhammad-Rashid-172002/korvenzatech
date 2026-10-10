@@ -1,4 +1,4 @@
-import { TIERS } from '../config';
+import { TIERS } from '../tiers';
 
 export type Tier = 0 | 1 | 2;
 export type TierInfo = { tier: Tier; reason: string; renderer: string };

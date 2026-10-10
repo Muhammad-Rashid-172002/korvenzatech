@@ -249,3 +249,31 @@ All 11 items done on `feature/3d-experience` (one commit per section; testimonia
 3. Fix the live-site cache for `/` (see "Prerender check").
 4. Decide on patching the upstream R3F portal leak (see Known issues).
 5. Testimonial "Rony Sultana" text — untouched, as agreed.
+
+---
+
+### Hero V2 — done
+
+**Files:** `src/components/three/scenes/Hero.tsx` (rewritten), `materials/heroMaterials.ts` (new: light-panel env, glowing edges, light-trail rings, grid floor, glass backdrop, alpha-safe additive blending), `materials/heroPanels.ts` (new: live device screens), `config.ts` (`HERO` V2 block), `tiers.ts` (new), `hooks/useDeviceTier.ts`, `Experience.tsx` (persistent hero camera), `src/index.css`, `public/media/hero/sculpture-{640,1100}.webp` (new poster rendered from the V2 scene).
+
+**What changed (vs. the flat V1):**
+1. **Crystal:** 25 % larger; real glass lit by a Lightformer-style environment (soft white key top-left, emerald rim right, teal strip behind, dim fill below); glowing emerald facet edges (thin instanced tubes, MSAA-smooth) with a light sweep every ~3.6 s; an emissive inner core that counter-rotates and beats like a heart (emissive 1 → 2.5), magnified and fractured through the glass, with a pulsing glow behind it.
+2. **Rings:** thick tube rings that read as light trails (bright head, long fading tail, faint glass tube elsewhere), 2–3 bright data packets per ring at different speeds, and a pen-stroke draw-in on load (staggered).
+3. **Panels:** rounded frosted-glass slabs with thickness (transmission 0.6, roughness 0.35, clearcoat 1, emissive border) at fixed depths and 20–35° angles — one behind the crystal, one near the camera — each bobbing and swaying on its own. Live screens: the dashboard's line chart draws itself, bars grow/overshoot/settle, KPIs tick; phones shimmer their list rows and pulse the CTA (canvas textures, 20 fps on tier 2 / 8 fps tier 1).
+4. **Depth:** the flat CSS grid hands over to a 3D perspective grid floor that recedes into exponential dark-green fog (with a slow pulse travelling outward), plus a faint blurred reflection on tier 2. Camera tilts slightly down so the floor reads.
+
+**Deviations (safer option):**
+- **No drei `MeshTransmissionMaterial` / `<Environment>`**: MTM samples its refraction buffer in canvas screen space, which is wrong inside a drei `<View>` whose rect is offset/taller than the canvas (the hero view extends 35vh below the hero) — the glass showed smeared, misplaced content and the core was invisible. Used three's native physical transmission instead (`thickness 1.5, roughness 0.05, ior 1.5`, `dispersion` for chromatic aberration), which projects correctly per view. No backside pass / anisotropic blur / temporal distortion as a result (three's double-sided transmission produced a milky fill). `<Environment>` + `<Lightformer>` would add another React portal (the R3F leak noted above) — the same four light panels are rendered once into a PMREM map in plain three.js instead.
+- **Bloom:** still not possible per View; the heartbeat glow, packets, ring heads and edges use real additive emission so they glow without a post pass.
+- **Transparent-canvas fixes:** three's transmission pass clears to half-white on a transparent canvas (= milky glass) → a backdrop plane visible only inside that pass gives the glass the hero's green to refract; three's `AdditiveBlending` also adds alpha (dim glow turned into opaque black bands) → custom RGB-only additive blending for all glow materials.
+- **Tier 1 / lite:** clear-coat translucent glass instead of transmission, no reflector, no transmissive panels, 8 fps screens — grid floor, rings, edges and core kept.
+- Persistent hero camera (three keeps one transmission target per camera and never frees it) and a zero-size guard during route changes.
+
+**Bundle (gzip):** main 119.6 KB (−1.7 KB: config/tunables moved out of the main bundle into a lazy shared chunk) · Experience 95.2 KB (+3.5 KB) · poster 25/50 KB (was 102/173 KB).
+
+**Lighthouse (local, `/`, poster path):** mobile 98 · desktop 100; A11y 100, SEO 100, CLS 0. Console clean across forced-3D, lite, reduced-motion, WebGL-off and the 20-route walk; heap trend unchanged (~0.4 MB per 20 navigations).
+
+**Manual test checklist**
+- Laptop (Chrome, good GPU): within ~1 s the poster cross-fades to the live hero; rings draw themselves in one after another; packets run along them; the crystal edges catch a passing light sweep every few seconds; the core visibly "beats" inside the glass. Panels drift at different depths; watch the right dashboard: chart line draws, bars bounce up and settle. Grid floor recedes into green haze, faint reflection under the crystal. Move the mouse → parallax/tilt. Scroll → dive + dissolve as before. Expect 50–60 FPS on integrated GPUs (transmission is the heaviest part; PerformanceMonitor drops to lite on sustained low FPS).
+- Android mid-range (tier 1): same composition with simpler glass, no reflection; 45–60 FPS.
+- `?kz3d=off` / reduced motion: new poster (still frame of this scene), flat CSS grid kept.

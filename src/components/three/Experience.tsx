@@ -17,7 +17,7 @@ const elIds = new WeakMap<Element, number>();
 let elSeq = 0;
 const elKey = (el: Element) => { let k = elIds.get(el); if (k === undefined) { k = ++elSeq; elIds.set(el, k); } return `v${k}`; };
 import { PRODUCT, RENDER } from './config';
-import { HeroScene } from './scenes/Hero';
+import { HeroCamera, HeroScene } from './scenes/Hero';
 import { ProcessScene } from './scenes/Process';
 import { ProductScene } from './scenes/Product';
 import { OrbitScene } from './scenes/Orbit';
@@ -140,6 +140,7 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
       <VisibilityLoop targets={targets} />
       {/* Persistent views (see useViewSlots); a scene mounts only while its section is on the page. */}
       <View track={refs.hero as React.MutableRefObject<HTMLElement>} index={1}>
+        <HeroCamera />
         <Suspense fallback={null}>{hero && <HeroScene key={elKey(hero)} track={hero} quality={quality} />}</Suspense>
       </View>
       <View track={refs.process as React.MutableRefObject<HTMLElement>} index={2}>

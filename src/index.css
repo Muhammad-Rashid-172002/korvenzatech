@@ -710,3 +710,9 @@ html.kz-cursor-on .kz-cursor { opacity: 1; }
   .korvenza-ai-shell { animation: korvenzaAiOpen .2s linear both; }
   .kz-curtain, .kz-cursor, .kz-progress { display: none !important; }
 }
+
+/* Hero V2: the flat CSS grid hands over to the 3D perspective floor once the live scene renders. */
+#hero .kz-fine-grid { transition: opacity 900ms var(--kz-ease-out); }
+#hero[data-kz3d="ready"] .kz-fine-grid { opacity: 0 !important; }
+/* Hero V2 poster is a render of the live scene (with its own backdrop): feather its square edges. */
+.kz-hero-poster { -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); }

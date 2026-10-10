@@ -26,25 +26,8 @@ export const COLORS = {
 } as const;
 
 /* -------------------------------------------------------------- device tiers */
-/**
- * Tier 0 → no WebGL at all (static poster): no WebGL, software rasteriser,
- *          Save-Data, or prefers-reduced-motion.
- * Tier 1 → "lite": phones/tablets, ≤ TIER1_MAX_CORES cores, ≤ TIER1_MAX_MEMORY GB,
- *          or a known mobile GPU. No transmission, fewer particles, lower DPR.
- * Tier 2 → "full": desktop-class GPU — everything on.
- */
-export const TIERS = {
-  /** Logical CPU cores at or below which a device is treated as tier 1. */
-  TIER1_MAX_CORES: 4,
-  /** navigator.deviceMemory (GB) at or below which a device is tier 1. */
-  TIER1_MAX_MEMORY: 4,
-  /** Viewport width (px) below which we always use the lite tier. */
-  TIER1_MAX_WIDTH: 767,
-  /** GPU renderer strings that indicate a mobile/low-power GPU (→ tier 1). */
-  MOBILE_GPU: /mali|adreno|powervr|apple gpu|sgx|tegra|videocore|intel\(r\) (hd|uhd) graphics [0-9]{3}\b/i,
-  /** GPU renderer strings that mean "no real GPU" (→ tier 0, poster only). */
-  SOFTWARE_GPU: /swiftshader|llvmpipe|softpipe|software|basic render/i,
-} as const;
+/** Tier thresholds live in ./tiers.ts (main-bundle safe) — re-exported here. */
+export { TIERS } from './tiers';
 
 /* ---------------------------------------------------------------- renderer */
 export const RENDER = {
@@ -78,33 +61,97 @@ export const HERO = {
   /** Max crystal tilt toward the cursor (radians). */
   crystalTilt: 0.22,
   /** Idle rotation speeds (radians / second). */
-  spin: { crystal: 0.16, rings: [0.07, -0.05, 0.035], panels: 0.06, network: -0.025 },
+  spin: { crystal: 0.16, network: -0.025 },
 
   crystal: {
-    radius: 0.92,
-    /** Transmission material (tier 2 only). `samples`/`resolution` are the main
-     *  cost drivers: each frame the scene is re-rendered into a resolution² buffer. */
-    transmission: { samples: 6, resolution: 512, thickness: 0.65, roughness: 0.06, ior: 1.42, chromaticAberration: 0.06, anisotropicBlur: 0.12, distortion: 0.12, distortionScale: 0.4, temporalDistortion: 0.06 },
+    /** Outer glass crystal radius (V2: +25% so it is clearly the hero). */
+    radius: 1.15,
+    /** Real glass (tier 2 only). `samples`/`resolution` are the main cost drivers: the scene is
+     *  re-rendered into a resolution² buffer each frame (twice with backside). */
+    /** Physically-based glass (tier 2): three's native transmission, double-sided (back faces
+     *  refract too), `dispersion` = chromatic aberration. See 3D_PROGRESS.md for why not drei's
+     *  MeshTransmissionMaterial (it samples screen-space and breaks inside offset drei Views). */
+    transmission: { thickness: 1.5, roughness: 0.05, ior: 1.5, dispersion: 1.6, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.02 },
+    /** Transmission buffer resolution scale (1 = full view resolution; lower = cheaper, softer). */
+    transmissionScale: 0.75,
+    /** Glass tint: clear with an emerald cast (attenuation colours light as it travels through). */
+    tint: '#E9FFF5',
+    attenuationColor: '#3FE0A6',
+    attenuationDistance: 10,
+    /** Glowing facet edges: tube radius (world units), base glow, shimmer sweep period (s) and width. */
+    edges: { radius: 0.01, base: 0.6, sweepPeriod: 3.6, sweepWidth: 0.35 },
+    /** Inner emissive core: size relative to the crystal, heartbeat (bpm) and emissive range. */
+    core: { scale: 0.34, color: '#06402C', emissive: '#14C483', bpm: 54, emissiveMin: 1, emissiveMax: 2.5, spin: -0.5 },
     /** Cursor light that makes facets near the pointer light up. */
     cursorLight: { intensity: 14, distance: 3.2 },
   },
-  rings: [
-    /** radius, tube, tilt x, tilt y — three thin glowing orbits on different axes. */
-    { radius: 1.75, tube: 0.011, rx: 1.28, ry: 0.1 },
-    { radius: 2.15, tube: 0.008, rx: 1.62, ry: -0.42 },
-    { radius: 2.55, tube: 0.006, rx: 0.42, ry: 0.9 },
+  /** Image-based lighting built from procedural light panels (no HDR download). Each is a bright
+   *  emissive plane rendered once into a PMREM env map: what the glass reflects and refracts. */
+  lightformers: [
+    /** Large soft white key, top-left. */
+    { color: '#FFFFFF', intensity: 1.8, position: [-4.5, 4.5, 3.5] as [number, number, number], scale: [4, 2.6] as [number, number] },
+    /** Emerald rim strip on the right. */
+    { color: '#19C784', intensity: 7, position: [5.5, 0.2, 0.5] as [number, number, number], scale: [0.7, 7] as [number, number] },
+    /** Cool teal strip behind. */
+    { color: '#2DD4BF', intensity: 4, position: [0, 1.2, -6] as [number, number, number], scale: [9, 0.6] as [number, number] },
+    /** Dim fill below. */
+    { color: '#A6EBCD', intensity: 0.7, position: [0, -6, 0] as [number, number, number], scale: [10, 10] as [number, number] },
   ],
+  /** What the glass 'sees' behind it (transmission backdrop) — the hero background tone. */
+  glassBackdrop: '#1F5440',
+  /** Env-map strength on the glass/panels. */
+  envIntensity: 1.15,
+  /** Exponential fog density (dark green); higher = space fades sooner. */
+  fogDensity: 0.055,
+  rings: [
+    /** radius, tube thickness, tilt x, tilt y, trail head speed (rev/s), packet count + speeds. */
+    { radius: 2.05, tube: 0.042, rx: 1.28, ry: 0.1, speed: 0.11, packets: [0.17, -0.09] },
+    { radius: 2.5, tube: 0.034, rx: 1.62, ry: -0.42, speed: -0.08, packets: [0.12, 0.21, -0.06] },
+    { radius: 2.95, tube: 0.028, rx: 0.42, ry: 0.9, speed: 0.06, packets: [-0.14, 0.08] },
+  ],
+  /** Ring draw-in on load (s) and stagger between rings (s). Trail length = fraction of the ring lit. */
+  ringDrawIn: 1.6,
+  ringStagger: 0.25,
+  ringTrail: 0.75,
+  /** Brightness of the unlit part of each ring (0 = invisible, 0.2 = faint glass tube). */
+  ringBase: 0.2,
+  /** Data packet sprite size (world units). */
+  packetSize: 0.34,
+  /** Core glow sprite size (× crystal radius) and colour. */
+  coreGlow: { size: 4.2, color: '#2fe0a0' },
   panels: {
-    /** "UI" planes orbiting the core: kind, size [w,h], orbit radius, orbit phase, height. */
+    /** Frosted glass devices at real depths/angles: kind, size [w,h], position, rotation (rad),
+     *  bob amplitude/speed. One sits behind the crystal, one close to the camera. */
     items: [
-      { kind: 'dashboard', size: [1.7, 1.05], radius: 2.35, phase: 0.4, y: 0.75 },
-      { kind: 'mobile', size: [0.62, 1.22], radius: 2.1, phase: 2.3, y: -0.55 },
-      { kind: 'dashboard', size: [1.45, 0.9], radius: 2.55, phase: 3.9, y: -0.2 },
-      { kind: 'mobile', size: [0.55, 1.1], radius: 2.25, phase: 5.2, y: 0.9 },
-    ],
-    opacity: 0.92,
-    /** Scroll: panels fly outward to radius * (1 + flyOut) as the hero scrolls away. */
-    flyOut: 1.8,
+      { kind: 'dashboard', size: [1.9, 1.18], pos: [2.15, 1.05, -0.7], rot: [0.12, -0.52, 0.04], bob: [0.07, 0.55] },
+      { kind: 'mobile', size: [0.7, 1.38], pos: [-2.35, -0.55, 0.55], rot: [-0.06, 0.58, -0.07], bob: [0.09, 0.7] },
+      { kind: 'dashboard', size: [1.6, 1.0], pos: [-0.9, 1.35, -2.6], rot: [0.08, 0.36, -0.05], bob: [0.05, 0.42] },
+      { kind: 'mobile', size: [0.58, 1.14], pos: [1.7, -1.45, 1.75], rot: [-0.18, -0.42, 0.1], bob: [0.08, 0.8] },
+    ] as { kind: 'dashboard' | 'mobile'; size: [number, number]; pos: [number, number, number]; rot: [number, number, number]; bob: [number, number] }[],
+    /** Glass slab thickness and corner radius (world units). */
+    depth: 0.07,
+    corner: 0.07,
+    /** Frosted glass: transmission (tier 2), roughness, tint, env reflections. Tier 1 uses plain translucency. */
+    transmission: 0.6,
+    roughness: 0.35,
+    tint: '#6FB79A',
+    envIntensity: 0.55,
+    /** Screen redraw rate (fps) per tier and dashboard animation cycle length (s). */
+    fps: { 1: 8, 2: 20 } as Record<number, number>,
+    cycle: 6.5,
+    /** Scroll: panels fly outward (position × (1 + flyOut)) as the hero scrolls away. */
+    flyOut: 1.6,
+  },
+  floor: {
+    /** Perspective grid floor below the crystal (local y), size, cell size and line glow. */
+    y: -2.35,
+    size: 26,
+    cell: 0.55,
+    lineOpacity: 0.55,
+    /** Radius (world units) over which the floor fades into the page — no hard edges. */
+    fadeRadius: 9,
+    /** Reflection (tier 2 only, not lite): blur, strength, resolution. Kept faint. */
+    reflector: { resolution: 512, blur: [400, 120] as [number, number], mixBlur: 1, mixStrength: 0.9, mixContrast: 1, depthScale: 1.1, minDepthThreshold: 0.35, maxDepthThreshold: 1.4, opacity: 0.55 },
   },
   network: {
     /** Points in the "connected systems" field per tier. Lines are O(n²) per frame. */

@@ -1,0 +1,277 @@
+/**
+ * Hero V2 building blocks: light-panel environment, glowing edge / ring / grid
+ * shaders and a radial alpha mask. Pure three.js (no extra drei portals — see
+ * the R3F portal note in Experience.tsx).
+ */
+import {
+  CanvasTexture, SRGBColorSpace, Color, CylinderGeometry, DoubleSide, EdgesGeometry, InstancedMesh, Matrix4,
+  Mesh, MeshBasicMaterial, PlaneGeometry, PMREMGenerator, Quaternion, Scene, ShaderMaterial, Vector3,
+  type BufferGeometry, type WebGLRenderer,
+} from 'three';
+import { COLORS, HERO } from '../config';
+import { AddEquation, CustomBlending, OneFactor, SrcAlphaFactor, ZeroFactor, type Material } from 'three';
+
+/**
+ * True light-additive blending for a transparent canvas: add RGB, never touch the
+ * drawing buffer's alpha. (three's AdditiveBlending also adds alpha, which turns dim
+ * glow into opaque near-black over the page behind the canvas.)
+ */
+export function lightAdditive<T extends Material>(m: T): T {
+  m.blending = CustomBlending;
+  m.blendEquation = AddEquation;
+  m.blendSrc = SrcAlphaFactor; // material opacity still fades it; textures are premultiplied on black
+  m.blendDst = OneFactor;
+  m.blendSrcAlpha = ZeroFactor;
+  m.blendDstAlpha = OneFactor;
+  m.transparent = true;
+  m.depthWrite = false;
+  return m;
+}
+
+/**
+ * Lightformer environment: bright emissive panels (white key top-left, emerald
+ * rim right, teal strip behind, dim fill below) rendered once into a PMREM
+ * cube map. Equivalent to drei <Environment><Lightformer/></Environment> with
+ * frames={1}, without an extra React portal. Returns the env texture + dispose.
+ */
+export function buildLightformerEnv(gl: WebGLRenderer) {
+  const s = new Scene();
+  s.background = new Color('#020806');
+  const geos: PlaneGeometry[] = [];
+  const mats: MeshBasicMaterial[] = [];
+  for (const lf of HERO.lightformers) {
+    const g = new PlaneGeometry(lf.scale[0], lf.scale[1]);
+    const m = new MeshBasicMaterial({ color: new Color(lf.color).multiplyScalar(lf.intensity), side: DoubleSide, toneMapped: false });
+    const mesh = new Mesh(g, m);
+    mesh.position.set(...lf.position);
+    mesh.lookAt(0, 0, 0);
+    s.add(mesh);
+    geos.push(g); mats.push(m);
+  }
+  const pmrem = new PMREMGenerator(gl);
+  const rt = pmrem.fromScene(s, 0.02);
+  pmrem.dispose();
+  geos.forEach((g) => g.dispose());
+  mats.forEach((m) => m.dispose());
+  return { texture: rt.texture, dispose: () => rt.dispose() };
+}
+
+/**
+ * Facet edges as thin instanced cylinders (real thickness, MSAA-smooth — WebGL
+ * line width is always 1px). A light sweep travels across them periodically.
+ */
+export function buildEdges(geo: BufferGeometry) {
+  const edges = new EdgesGeometry(geo, 1);
+  const p = edges.attributes.position.array as ArrayLike<number>;
+  const count = p.length / 6;
+  const cyl = new CylinderGeometry(1, 1, 1, 6, 1, true);
+  const mat = lightAdditive(new ShaderMaterial({
+    toneMapped: false,
+    uniforms: {
+      uTime: { value: 0 },
+      uColor: { value: new Color(COLORS.accent) },
+      uHot: { value: new Color(COLORS.ice) },
+      uBase: { value: HERO.crystal.edges.base },
+      uPeriod: { value: HERO.crystal.edges.sweepPeriod },
+      uWidth: { value: HERO.crystal.edges.sweepWidth },
+      uRadius: { value: HERO.crystal.radius },
+      uFade: { value: 1 },
+    },
+    vertexShader: /* glsl */ `
+      varying vec3 vLocal;
+      void main() {
+        vec4 lp = instanceMatrix * vec4(position, 1.0);
+        vLocal = lp.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * lp;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uTime, uBase, uPeriod, uWidth, uRadius, uFade;
+      uniform vec3 uColor, uHot;
+      varying vec3 vLocal;
+      void main() {
+        // Sweep plane travels diagonally across the crystal once per period.
+        float k = fract(uTime / uPeriod) * 2.0 - 0.5;           // -0.5 .. 1.5
+        float along = dot(normalize(vec3(0.6, 0.75, 0.3)), vLocal) / (uRadius * 2.0) + 0.5;
+        float sweep = exp(-pow((along - k) / uWidth, 2.0) * 4.0);
+        vec3 col = uColor * (uBase + sweep * 2.2) + uHot * sweep * 0.9;
+        gl_FragColor = vec4(col * uFade, 1.0);
+      }`,
+  }));
+  const mesh = new InstancedMesh(cyl, mat, count);
+  const a = new Vector3(), b = new Vector3(), mid = new Vector3(), dir = new Vector3();
+  const q = new Quaternion(), up = new Vector3(0, 1, 0), m = new Matrix4(), sc = new Vector3();
+  const r = HERO.crystal.edges.radius;
+  for (let i = 0; i < count; i++) {
+    a.set(p[i * 6], p[i * 6 + 1], p[i * 6 + 2]);
+    b.set(p[i * 6 + 3], p[i * 6 + 4], p[i * 6 + 5]);
+    mid.copy(a).add(b).multiplyScalar(0.5);
+    dir.copy(b).sub(a);
+    const len = dir.length();
+    q.setFromUnitVectors(up, dir.normalize());
+    m.compose(mid, q, sc.set(r, len, r));
+    mesh.setMatrixAt(i, m);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.frustumCulled = false;
+  edges.dispose();
+  return { mesh, mat, dispose: () => { cyl.dispose(); mat.dispose(); mesh.dispose(); } };
+}
+
+/**
+ * Ring = light trail on a tube. uv.x runs along the ring: bright head at uHead,
+ * fading tail of length uTrail behind it, faint base everywhere else. uDraw
+ * (0→1) reveals the ring on load like a pen stroke.
+ */
+export function createRingMaterial() {
+  return lightAdditive(new ShaderMaterial({
+    toneMapped: false,
+    uniforms: {
+      uHead: { value: 0 },
+      uTrail: { value: HERO.ringTrail },
+      uBase: { value: HERO.ringBase },
+      uDraw: { value: 0 },
+      uFade: { value: 1 },
+      uColor: { value: new Color(COLORS.accent) },
+      uHot: { value: new Color(COLORS.ice) },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv; varying float vFres;
+      void main() {
+        vUv = uv;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vFres = abs(dot(normalize(normalMatrix * normal), normalize(-mv.xyz)));
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uHead, uTrail, uDraw, uFade, uBase;
+      uniform vec3 uColor, uHot;
+      varying vec2 vUv; varying float vFres;
+      void main() {
+        if (vUv.x > uDraw) discard;
+        float d = fract(uHead - vUv.x);                 // distance behind the head
+        float tail = pow(clamp(1.0 - d / uTrail, 0.0, 1.0), 2.2);
+        float head = exp(-d * 60.0) + exp(-(1.0 - d) * 200.0);
+        float core = pow(vFres, 0.6);                   // brighter in the middle of the tube
+        float i = (uBase + tail * 1.35 + head * 1.8) * core;
+        vec3 col = mix(uColor, uHot, clamp(head + tail * 0.25, 0.0, 1.0)) * i;
+        // pen tip glow while drawing in
+        col += uHot * exp(-abs(vUv.x - uDraw) * 120.0) * step(uDraw, 0.999) * 1.5;
+        gl_FragColor = vec4(col * uFade, 1.0);
+      }`,
+  }));
+}
+
+/**
+ * Perspective grid floor: anti-aliased lines (fwidth), brighter near the
+ * centre, fading out radially and with distance so it melts into the page.
+ */
+export function createGridMaterial() {
+  return new ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    toneMapped: false,
+    fog: false,
+    uniforms: {
+      uCell: { value: HERO.floor.cell },
+      uFadeR: { value: HERO.floor.fadeRadius },
+      uOpacity: { value: HERO.floor.lineOpacity },
+      uColor: { value: new Color(COLORS.accent) },
+      uTime: { value: 0 },
+      uFade: { value: 1 },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vXZ;
+      void main() {
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vXZ = position.xy;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uCell, uFadeR, uOpacity, uTime, uFade;
+      uniform vec3 uColor;
+      varying vec2 vXZ;
+      void main() {
+        vec2 g = vXZ / uCell;
+        vec2 w = fwidth(g);
+        vec2 l = abs(fract(g - 0.5) - 0.5) / w;
+        float line = 1.0 - min(min(l.x, l.y), 1.0);
+        vec2 g4 = vXZ / (uCell * 4.0);
+        vec2 w4 = fwidth(g4);
+        vec2 l4 = abs(fract(g4 - 0.5) - 0.5) / w4;
+        float major = 1.0 - min(min(l4.x, l4.y), 1.0);
+        float r = length(vXZ);
+        float fade = smoothstep(uFadeR, uFadeR * 0.15, r);
+        // a slow pulse ring travelling outward from under the crystal
+        float pulse = exp(-pow(r - mod(uTime * 1.2, uFadeR * 1.2), 2.0) * 1.5) * 0.6;
+        float a = (line * 0.55 + major * 0.45) * fade * uOpacity * (1.0 + pulse);
+        gl_FragColor = vec4(uColor * (0.7 + pulse), a * uFade);
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
+/** White-centre → transparent-edge radial mask (alphaMap for the reflector disc). */
+export function radialAlphaTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d')!;
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grd.addColorStop(0, '#fff');
+  grd.addColorStop(0.45, '#888');
+  grd.addColorStop(1, '#000');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  return new CanvasTexture(c);
+}
+
+/**
+ * Radial glow drawn on black (premultiplied): for lightAdditive materials only
+ * the RGB counts, so the falloff must live in the colour, not the alpha.
+ * `hard` makes a small bright core (data packets, particles).
+ */
+export function additiveGlowTexture(color: string, hard = false) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, 128, 128);
+  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  if (hard) {
+    grd.addColorStop(0, '#ffffff');
+    grd.addColorStop(0.12, color);
+    grd.addColorStop(0.35, 'rgba(0,0,0,0)');
+  } else {
+    grd.addColorStop(0, color);
+    grd.addColorStop(0.45, 'rgba(0,0,0,0)');
+  }
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128);
+  const t = new CanvasTexture(c);
+  t.colorSpace = SRGBColorSpace;
+  return t;
+}
+
+/**
+ * Backdrop seen only by glass. three's transmission pass clears its buffer to
+ * half-transparent white when the canvas is transparent, so glass would refract
+ * a milky grey void. This far plane is opaque dark green inside that pass and
+ * writes nothing (rgba 0) in the normal pass, leaving the page visible.
+ */
+export function createGlassBackdrop(color: string) {
+  const mat = new ShaderMaterial({
+    depthWrite: false,
+    toneMapped: false,
+    uniforms: { uColor: { value: new Color(color) }, uOn: { value: 0 } },
+    vertexShader: /* glsl */ `void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uColor; uniform float uOn;
+      void main() { gl_FragColor = vec4(uColor * uOn, uOn); }`,
+  });
+  const geo = new PlaneGeometry(1, 1);
+  const mesh = new Mesh(geo, mat);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = -100;
+  mesh.onBeforeRender = (renderer) => { mat.uniforms.uOn.value = renderer.getRenderTarget() ? 1 : 0; mat.uniformsNeedUpdate = true; };
+  return { mesh, dispose: () => { geo.dispose(); mat.dispose(); } };
+}
