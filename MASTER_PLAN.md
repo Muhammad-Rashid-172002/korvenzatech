@@ -20,10 +20,10 @@ Legend: `[x]` done · `[~]` done earlier, upgrade pending in this plan · `[ ]` 
 - [x] 1.3 Footer lists all 9 services.
 
 ## Phase 2 — Brand system: new K logo everywhere
-- [ ] 2.1 Vector master (`brand-source/k-logo.svg`, `k-mark.svg`) + original raster kept
-- [ ] 2.2 `scripts/build-brand.mjs` (sharp): favicon.ico/svg, apple-touch 180, manifest 192/512 + maskable, og-cover 1200×630, header/footer assets
-- [ ] 2.3 Inline SVG logo in navbar, footer, mobile menu (fixed size, no CLS)
-- [ ] 2.4 Replace everywhere (poster/loading, AI widget avatar, JSON-LD, manifest, 404, 3D scenes, CTA particles), delete unused old logo files
+- [x] 2.1 Vector master (`brand-source/k-logo.svg`, `k-mark.svg`) + original raster kept (`brand-source/`, not deployed)
+- [x] 2.2 `scripts/build-brand.mjs` (sharp): favicon.ico/svg, apple-touch 180, manifest 192/512 + maskable, og-cover 1200×630, logo rasters
+- [x] 2.3 Inline SVG logo in navbar, footer, mobile menu (fixed size, no CLS)
+- [x] 2.4 Replaced everywhere; old logo files deleted (hero/3D scenes get the new K in Phase 3; CTA particles already sample the regenerated raster)
 
 ## Phase 3 — Hero: glass K + living device interfaces  ← **stop for review after this**
 - [~] Hero V2 surroundings (rings, floor, fog, devices) — done in 3D_PROGRESS "Hero V2"
@@ -68,6 +68,7 @@ Legend: `[x]` done · `[~]` done earlier, upgrade pending in this plan · `[ ]` 
 - App-screen recreations review (`tools/screens/contact-sheet.png`).
 - "Rony Sultana" testimonial (two different roles).
 - Optional: designer-made SVG of the K.
+- After deploy: re-share korvenzatech.com on LinkedIn/WhatsApp once so their link-preview caches pick up the new og-cover.
 
 ---
 
@@ -85,3 +86,12 @@ Legend: `[x]` done · `[~]` done earlier, upgrade pending in this plan · `[ ]` 
 - Files: `vercel.json`, `src/data/seo.ts`, `scripts/generate-seo-pages.mjs`, `src/components/SeoManager.tsx`, `src/components/Footer.tsx`, `MASTER_PLAN.md`.
 - Bundle: ±0.
 - Test: open `/` after deploy → view source has no `<meta name="keywords">`; footer "Services" column shows 9 links on desktop and mobile.
+
+### Phase 2 — Brand system ✅
+**2.1 Vector master.** The K is a shaded raster (4096², transparent). Its silhouette is taken from the solid alpha and simplified to straight edges (the logo is all straight edges), facets re-drawn as flat gradients with the circuit traces: `brand-source/k-logo.svg` (colour) and `k-mark.svg` (one colour, for favicons/masks/3D). Compared at 600 px against the original: same proportions and silhouette; the soft shading of the render is replaced by gradients. The original PNG stays the source for places where shading matters (app icons, OG, AI avatar).
+**2.2 `node scripts/build-brand.mjs`** (rerunnable, `sharp@0.35.4` dev dependency; `--og-hero render.png` swaps the OG artwork) writes: `favicon.svg` (emerald mark on dark tile), `favicon.ico` (16/32/48), `favicon-48.png`, `media/brand/apple-touch-icon.png` (180, opaque), `icon-192/512.png`, `icon-maskable-512.png` (logo inside the safe zone), `logo-{64,128,256,512}.webp`, `logo-512.png` (Organization logo), `k-logo.svg`, `k-mark.svg`, `og-cover.png` (1200×630: K + wordmark + tagline on brand background).
+**2.3** `src/components/BrandMark.tsx` — inline SVG generated from the master (unique gradient ids per instance, explicit width/height → no CLS). Used in the navbar, footer, mobile menu header and the 404 page.
+**2.4 Replaced:** navbar, footer, mobile menu, 404, favicon links (`index.html`), web manifest (+ maskable icon, theme colours), Organization JSON-LD logo (`/media/brand/logo-512.png`), AI widget avatar + route-curtain mark + CTA particle K (all use the regenerated `logo-*.webp`). **Deleted:** `public/korvenza-logo.png`, `public/favicon.png` (622 KB each), `public/media/brand/logo-128.png`, unused legacy `HeroVisual.tsx`, `Navbar.tsx`. Email templates: the API sends plain-text email (no logo) — nothing to replace. Hero 3D logo: Phase 3.
+- Files: `brand-source/*`, `scripts/build-brand.mjs`, `src/components/BrandMark.tsx`, `SiteNavbar.tsx`, `Footer.tsx`, `home/HomeSections.tsx`, `src/data/seo.ts`, `index.html`, `public/site.webmanifest`, `public/favicon.*`, `public/og-cover.png`, `public/media/brand/*`, `package.json`.
+- Bundle (gzip): main +1.1 KB (inline logo) → 120.6 KB; CSS −0.6 KB (legacy components removed).
+- Test (laptop + Android): browser tab shows the green K on a dark tile; navbar/footer logos crisp at any zoom, no layout jump on load; open the mobile menu → small K row at the top; add to home screen on Android → K icon on dark background; paste the site link into WhatsApp after deploy → new preview card.

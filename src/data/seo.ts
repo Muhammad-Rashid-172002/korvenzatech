@@ -106,7 +106,7 @@ const organization = {
   '@id': ORG_ID,
   name: 'KorvenzaTech',
   url: `${SITE}/`,
-  logo: `${SITE}/korvenza-logo.png`,
+  logo: `${SITE}/media/brand/logo-512.png`,
   image: OG_IMAGE,
   description: 'Software development company building custom software, SaaS platforms, mobile apps, AI solutions, websites, APIs and cloud-ready systems.',
   email: 'info@korvenzatech.com',

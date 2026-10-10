@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronDown, Menu, Moon, Sun, X } from 'lucide-react';
 import { SERVICES_DATA } from '../data/companyData';
 import { ServiceItem } from '../types';
+import { BrandMark } from './BrandMark';
 import { Link } from '../lib/router';
 
 type Props = {
@@ -72,7 +73,7 @@ export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
       <div className="kz-container flex h-[72px] items-center justify-between gap-4 xl:h-[76px]">
         <Link to="/" className="group flex shrink-0 items-center gap-3" aria-label="KorvenzaTech home">
           <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl border border-[var(--kz-border-strong)] bg-[#0A1612] shadow-[0_8px_24px_-12px_rgba(25,199,132,.6)]">
-            <img src="/media/brand/logo-64.webp" width={32} height={32} alt="" className="h-8 w-8 object-contain transition-transform duration-500 group-hover:scale-110" />
+            <BrandMark size={28} className="transition-transform duration-500 group-hover:scale-110" />
           </span>
           <span className="leading-none">
             <span className="block text-[17px] font-extrabold tracking-tight text-[var(--kz-text)]">Korvenza<span className="text-emerald-400">Tech</span></span>
@@ -155,6 +156,10 @@ export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
 
       {mobile && (
         <nav id="mobile-menu" data-lenis-prevent aria-label="Mobile" className="kz-mobile-menu mx-4 mb-4 max-h-[calc(100dvh-90px)] overflow-y-auto rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)] xl:hidden">
+          <div className="mb-2 flex items-center gap-2.5 border-b border-[var(--kz-border)] px-3 pb-3 pt-1" aria-hidden="true">
+            <BrandMark size={20} />
+            <span className="text-[10px] font-semibold uppercase tracking-[.28em] text-[var(--kz-muted)]">Build • Automate • Scale</span>
+          </div>
           <div className="grid gap-0.5">
             {nav.map(([to, label]) => {
               const active = isActive(path, to);
