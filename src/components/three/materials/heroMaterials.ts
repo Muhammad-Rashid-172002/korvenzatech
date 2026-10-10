@@ -153,21 +153,26 @@ export function createRingMaterial(pass: 'main' | 'rt' = 'main') {
       uDraw: { value: 0 },
       uFade: { value: 1 },
       uOn: { value: 1 },
+      /** World → glass-K local space; the ring dims where it passes in front of the K. */
+      uToK: { value: new Matrix4() },
+      uKFade: { value: pass === 'main' ? 1 : 0 },
       uColor: { value: new Color(COLORS.accent) },
       uHot: { value: new Color(COLORS.ice) },
     },
     vertexShader: /* glsl */ `
-      varying vec2 vUv; varying float vFres;
+      varying vec2 vUv; varying float vFres; varying vec3 vWorld;
       void main() {
         vUv = uv;
+        vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         vFres = abs(dot(normalize(normalMatrix * normal), normalize(-mv.xyz)));
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: /* glsl */ `
-      uniform float uHead, uTrail, uDraw, uFade, uBase, uOn;
+      uniform float uHead, uTrail, uDraw, uFade, uBase, uOn, uKFade;
       uniform vec3 uColor, uHot;
-      varying vec2 vUv; varying float vFres;
+      uniform mat4 uToK;
+      varying vec2 vUv; varying float vFres; varying vec3 vWorld;
       void main() {
         if (vUv.x > uDraw) discard;
         float d = fract(uHead - vUv.x);                 // distance behind the head
@@ -178,6 +183,10 @@ export function createRingMaterial(pass: 'main' | 'rt' = 'main') {
         vec3 col = mix(uColor, uHot, clamp(head + tail * 0.25, 0.0, 1.0)) * i;
         // pen tip glow while drawing in
         col += uHot * exp(-abs(vUv.x - uDraw) * 120.0) * step(uDraw, 0.999) * 1.5;
+        // where the ring crosses in front of the K, let it fade so no streak cuts through the logo
+        vec3 k = (uToK * vec4(vWorld, 1.0)).xyz;
+        float over = (1.0 - smoothstep(0.9, 1.6, abs(k.x))) * (1.0 - smoothstep(1.2, 1.9, abs(k.y))) * smoothstep(-0.1, 0.35, k.z);
+        col *= 1.0 - 0.88 * over * uKFade;
         gl_FragColor = vec4(col * uFade * uOn, 1.0);
       }`,
   }));
@@ -243,7 +252,9 @@ export function createGridMaterial() {
         float line = gridLine(vXZ / uCell);
         float major = gridLine(vXZ / (uCell * 4.0));
         float r = length(vXZ);
-        float fade = smoothstep(uFadeR, uFadeR * 0.15, r);
+        float fade = smoothstep(uFadeR, uFadeR * 0.1, r);
+        fade *= fade;                                         // faster falloff toward the edges
+        fade *= smoothstep(-uFadeR * 0.75, -uFadeR * 0.15, vXZ.x); // and away from the text column (left)
         // a slow pulse ring travelling outward from under the crystal
         float pulse = exp(-pow(r - mod(uTime * 1.2, uFadeR * 1.2), 2.0) * 1.5) * 0.6;
         pulse += exp(-pow((r - uShockR) * 2.5, 2.0)) * uShockA * 2.0;
@@ -318,4 +329,30 @@ export function createGlassBackdrop(color: string) {
   mesh.renderOrder = -100;
   mesh.onBeforeRender = (renderer) => { mat.uniforms.uOn.value = renderer.getRenderTarget() ? 1 : 0; mat.uniformsNeedUpdate = true; };
   return { mesh, dispose: () => { geo.dispose(); mat.dispose(); } };
+}
+
+/**
+ * Glass body tint (additive, drawn over the clear glass K at rest): a faint emerald fill
+ * plus a fresnel rim, so a perfectly clear slab still reads as a solid emerald glass form
+ * on a dark background (a flat slab of real glass is otherwise nearly invisible).
+ */
+export function createGlassTintMaterial(color: string, fill: number, rim: number) {
+  return lightAdditive(new ShaderMaterial({
+    toneMapped: false,
+    uniforms: { uColor: { value: new Color(color) }, uFill: { value: fill }, uRim: { value: rim }, uFade: { value: 1 } },
+    vertexShader: /* glsl */ `
+      varying vec3 vN; varying vec3 vV;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uColor; uniform float uFill, uRim, uFade;
+      varying vec3 vN; varying vec3 vV;
+      void main() {
+        float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.5);
+        gl_FragColor = vec4(uColor * (uFill + uRim * f) * uFade, 1.0);
+      }`,
+  }));
 }

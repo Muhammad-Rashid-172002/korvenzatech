@@ -57,9 +57,15 @@ export const HERO = {
   /** Exposure under AgX tone mapping (hero view only; other views keep ACES). */
   agxExposure: 1.35,
   /** Size (world units) of the composition that maps onto the poster stage box. */
-  compositionSize: 6.6,
+  compositionSize: 6.0,
   /** Composition half-width incl. the outer devices (world units): the stage is shrunk so this always fits on screen. */
-  halfWidth: 3.85,
+  halfWidth: 4.4,
+  /** Composition centre offset as a fraction of the stage width (desktop only; negative = left). */
+  shiftX: -0.1,
+  /** Lift the whole composition (world units) to balance the headline. */
+  liftY: 0.3,
+  /** Offset of the K inside the composition (up-left, making room for the front AI browser). */
+  kOffset: [-0.4, 0.25] as [number, number],
   /** Mouse parallax: max camera offset (world units) and smoothing (higher = snappier). */
   parallax: 0.35,
   parallaxDamping: 2.2,
@@ -94,11 +100,16 @@ export const HERO = {
    *  emissive plane rendered once into a PMREM env map: what the glass reflects and refracts. */
   lightformers: [
     /** Large soft white key, top-left. */
-    { color: '#FFFFFF', intensity: 1.8, position: [-4.5, 4.5, 3.5] as [number, number, number], scale: [4, 2.6] as [number, number] },
+    { color: '#FFFFFF', intensity: 3.2, position: [-4.5, 4.5, 3.5] as [number, number, number], scale: [4.5, 2.2] as [number, number] },
+    /** Thin hard white strip, top-left: crisp specular line along the K's bevels. */
+    { color: '#FFFFFF', intensity: 9, position: [-3.2, 2.6, 4.2] as [number, number, number], scale: [0.35, 4] as [number, number] },
     /** Emerald rim strip on the right. */
-    { color: '#19C784', intensity: 7, position: [5.5, 0.2, 0.5] as [number, number, number], scale: [0.7, 7] as [number, number] },
+    { color: '#19C784', intensity: 11, position: [5.5, 0.2, 1.2] as [number, number, number], scale: [0.6, 7] as [number, number] },
     /** Cool teal strip behind. */
     { color: '#2DD4BF', intensity: 4, position: [0, 1.2, -6] as [number, number, number], scale: [9, 0.6] as [number, number] },
+    /** Soft panels behind the camera: as the K sways, its face picks up a moving reflection gradient. */
+    { color: '#E6FFF4', intensity: 1.1, position: [0, 3.5, 9] as [number, number, number], scale: [12, 4] as [number, number] },
+    { color: '#5FE3AE', intensity: 0.5, position: [0, -2.5, 9] as [number, number, number], scale: [12, 3] as [number, number] },
     /** Dim fill below. */
     { color: '#A6EBCD', intensity: 0.7, position: [0, -6, 0] as [number, number, number], scale: [10, 10] as [number, number] },
   ],
@@ -135,12 +146,16 @@ export const HERO = {
     /** Normals are smoothed across angles below this (rounded bevel, crisp caps). */
     creaseAngle: 0.6,
     /** Glass tints: emerald body, smoky charcoal for the bar / upper stem (logo colours). */
-    tint: '#6BF5B8',
-    charcoalTint: '#55625D',
+    tint: '#BFFFE2',
+    charcoalTint: '#8E9C96',
     /** Physical transmission (tier 2). thickness/ior/dispersion (= chromatic aberration). */
-    transmission: { thickness: 1.2, roughness: 0.1, ior: 1.5, dispersion: 0.9, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.03 },
-    attenuationColor: '#21D08A',
-    attenuationDistance: 0.9,
+    transmission: { thickness: 1.2, roughness: 0.015, ior: 1.5, dispersion: 0.35, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: 0.02 },
+    attenuationColor: '#1FD08A',
+    attenuationDistance: 1.1,
+    /** Reflection strength of the light panels on the glass (specular edges). */
+    envIntensity: 2.4,
+    /** Additive emerald body tint + fresnel rim over the clear glass (0 = invisible slab). */
+    bodyTint: { color: '#1FD08A', fill: 0.07, rim: 0.55 },
     /** Shards: total count, max triangle edge before subdividing, intro stagger (0..1 of the intro). */
     shards: 100,
     maxEdge: 0.24,
@@ -160,8 +175,9 @@ export const HERO = {
     hoverSpeed: 2.6,
     hoverCore: 1.6,
     /** Edge glow: tube radius, base intensity, sweep period (s). Circuit traces are brighter. */
-    edge: { radius: 0.0075, base: 0.32, period: 6, width: 0.3 },
-    trace: { radius: 0.007, base: 0.8 },
+    edge: { radius: 0.0075, base: 0.45, period: 6, width: 0.3 },
+    /** The logo's circuit traces as glowing lines on the stem. Off: at hero scale they read as slits in the glass. */
+    trace: { enabled: false, radius: 0.007, base: 0.8 },
     /** Shockwave ring: max radius (world), duration (s). Also ripples the network and floor. */
     shock: { radius: 6.5, duration: 1.5 },
   },
@@ -170,11 +186,14 @@ export const HERO = {
      *  pos/rot are in composition space; `blur` < 1 = far, defocused screen (cheap DOF);
      *  `target` = what clicking does (scroll to a case study or open the AI widget). */
     items: [
-      { screen: 'ielts', frame: 'phone', pos: [-2.42, -0.72, 1.05], rot: [0.04, 0.46, 0.05], blur: 1, target: 'case:ielts-ai-master' },
-      { screen: 'skilllink', frame: 'phone', pos: [2.55, -1.12, 0.75], rot: [0.02, -0.48, -0.05], blur: 1, target: 'case:skilllink' },
-      { screen: 'agent', frame: 'browser', pos: [2.2, 1.42, -0.55], rot: [0.06, -0.38, 0.02], blur: 1, target: 'ai' },
-      { screen: 'dashboard', frame: 'browser', pos: [-2.25, 1.62, -3.3], rot: [0.08, 0.34, -0.03], blur: 0.42, target: '' },
-    ] as { screen: 'ielts' | 'skilllink' | 'dashboard' | 'agent'; frame: 'phone' | 'browser'; pos: [number, number, number]; rot: [number, number, number]; blur: number; target: string }[],
+      // The readable "hero device": closest and largest, bottom-right in front of the K's leg tips.
+      { screen: 'agent', frame: 'browser', pos: [1.85, -1.55, 1.5], rot: [-0.04, -0.28, 0.0], scale: 1.45, blur: 1, target: 'ai' },
+      { screen: 'ielts', frame: 'phone', pos: [-2.45, -0.15, 0.9], rot: [0.03, 0.42, 0.04], scale: 1.05, blur: 1, target: 'case:ielts-ai-master' },
+      // Smaller and further back, defocused.
+      { screen: 'skilllink', frame: 'phone', pos: [2.55, 1.3, -1.9], rot: [0.06, -0.32, 0.03], scale: 0.85, blur: 0.6, target: 'case:skilllink' },
+      // Directly behind the K: seen refracted through the glass.
+      { screen: 'dashboard', frame: 'browser', pos: [0.35, 0.55, -3.8], rot: [0.05, -0.1, 0], scale: 1.05, blur: 0.42, target: '' },
+    ] as { screen: 'ielts' | 'skilllink' | 'dashboard' | 'agent'; frame: 'phone' | 'browser'; pos: [number, number, number]; rot: [number, number, number]; scale: number; blur: number; target: string }[],
     /** Phone body (w, h, depth, corner) and browser body (w, h, depth, corner), world units. */
     phone: { w: 0.9, h: 1.9, d: 0.085, r: 0.13, bezel: 0.032 },
     browser: { w: 2.3, h: 1.45, d: 0.055, r: 0.07, bezel: 0.028 },
@@ -185,6 +204,9 @@ export const HERO = {
     /** Hover: pull toward the camera (world) and loop speed multiplier. */
     hoverForward: 0.35,
     hoverSpeed: 1.8,
+    /** Screen brightness (emissive gain; not tone-mapped) for near and far (defocused) devices. */
+    screenGain: 1.15,
+    farScreenGain: 0.6,
     /** Body finish. */
     bodyColor: '#151A19',
     /** Bob amplitude/speed. */
@@ -202,9 +224,9 @@ export const HERO = {
     y: -2.35,
     size: 26,
     cell: 0.55,
-    lineOpacity: 0.55,
+    lineOpacity: 0.3,
     /** Radius (world units) over which the floor fades into the page — no hard edges. */
-    fadeRadius: 9,
+    fadeRadius: 6.5,
     /** Reflection (tier 2 only, not lite): blur, strength, resolution. Kept faint. */
     reflector: { resolution: 512, blur: [400, 120] as [number, number], mixBlur: 1, mixStrength: 0.9, mixContrast: 1, depthScale: 1.1, minDepthThreshold: 0.35, maxDepthThreshold: 1.4, opacity: 0.55 },
   },

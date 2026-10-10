@@ -103,7 +103,7 @@ function browserChrome(g: G, W: number, url: string, t: number, live: boolean) {
 }
 
 /* ======================================================================= IELTS */
-const IELTS = { bg0: '#0F1A3D', bg1: '#0A1028', brand: '#2F5BEA', brandL: '#8FA9FF', accent: '#E2384D', cycle: 10.5 };
+const IELTS = { bg0: '#21347A', bg1: '#141F52', brand: '#2F5BEA', brandL: '#8FA9FF', accent: '#E2384D', cycle: 10.5 };
 function drawIelts(g: G, W: number, H: number, t: number) {
   const C = IELTS;
   const grd = g.createLinearGradient(0, 0, 0, H); grd.addColorStop(0, C.bg0); grd.addColorStop(1, C.bg1);
@@ -183,7 +183,7 @@ function drawIelts(g: G, W: number, H: number, t: number) {
 }
 
 /* =================================================================== SKILLLINK */
-const SL = { bg: '#15132A', block: '#1D1A38', road: '#2A2652', main: '#3A3474', brand: '#6D5CF0', light: '#A99BFF', cycle: 12 };
+const SL = { bg: '#24204A', block: '#2E2A5C', road: '#3C3774', main: '#5047A8', brand: '#6D5CF0', light: '#A99BFF', cycle: 12 };
 const PINS: [number, number][] = [[78, 210], [222, 238], [196, 340], [96, 366], [246, 300]];
 function drawSkilllink(g: G, W: number, H: number, t: number) {
   const C = SL;
@@ -384,8 +384,12 @@ function drawDashboard(g: G, W: number, H: number, t: number) {
   });
 }
 
-/* ======================================================================= AGENT */
-const AG = { bg: '#07110E', card: '#0E1B17', line: 'rgba(166,235,205,0.1)', accent: '#19C784', mint: '#A6EBCD', scene: 12.5 };
+/* ======================================================================= AGENT
+ * Drawn at 460×288 logical px with large type: this is the hero's "readable" device
+ * (≈ 350 px wide on screen at 1440 → body text ≈ 10–12 px). */
+const AG = { bg: '#08130F', card: '#0F1E19', line: 'rgba(166,235,205,0.12)', accent: '#19C784', mint: '#A6EBCD', scene: 12.5 };
+const C_MINT = AG.mint;
+const C_CARD = AG.card;
 function orb(g: G, x: number, y: number, r: number, t: number, busy: boolean) {
   const sp = busy ? 3.2 : 1.1;
   const k = (Math.sin(t * sp * 2) + 1) / 2;
@@ -393,232 +397,205 @@ function orb(g: G, x: number, y: number, r: number, t: number, busy: boolean) {
   const gr = g.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r);
   gr.addColorStop(0, '#E8FFF5'); gr.addColorStop(0.45, '#2FE0A0'); gr.addColorStop(1, '#087F5B');
   g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fillStyle = gr; g.fill();
-  g.strokeStyle = 'rgba(232,255,245,0.85)'; g.lineWidth = 1.6;
+  g.strokeStyle = 'rgba(232,255,245,0.85)'; g.lineWidth = 1.4;
   g.beginPath(); g.arc(x, y, r * 0.62, t * sp * 3, t * sp * 3 + 1.6); g.stroke();
 }
-function bubble(g: G, x: number, y: number, maxW: number, s: string, user: boolean) {
-  const lines = wrap(g, s, maxW - 24, f(500, 11.5));
-  const h = lines.length * 16 + 16;
-  rr(g, x, y, maxW, h, 11, user ? 'rgba(25,199,132,0.14)' : AG.card, user ? 'rgba(25,199,132,0.3)' : AG.line);
-  lines.forEach((l, i) => text(g, l, x + 12, y + 22 + i * 16, f(500, 11.5), '#E6F6EF'));
-  return h;
+function agentChrome(g: G, W: number, t: number) {
+  g.fillStyle = '#0D1714'; g.fillRect(0, 0, W, 26);
+  g.fillStyle = 'rgba(255,255,255,0.07)'; g.fillRect(0, 25, W, 1);
+  ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, i) => { g.beginPath(); g.arc(14 + i * 13, 13, 4.2, 0, Math.PI * 2); g.fillStyle = c; g.fill(); });
+  rr(g, W / 2 - 85, 6, 170, 15, 7.5, 'rgba(255,255,255,0.06)', 'rgba(255,255,255,0.08)');
+  text(g, 'agents.workspace.demo', W / 2, 17, f(500, 9.5), 'rgba(220,235,228,0.8)', 'center');
+  void t;
 }
 function toolCard(g: G, x: number, y: number, w: number, name: string, done: boolean, ms: string, t: number, alpha: number) {
   g.globalAlpha = alpha;
-  rr(g, x, y, w, 44, 10, '#0F201A', done ? 'rgba(25,199,132,0.35)' : 'rgba(166,235,205,0.14)');
-  rr(g, x + 10, y + 11, 22, 22, 6, done ? 'rgba(25,199,132,0.2)' : 'rgba(255,255,255,0.06)');
-  if (done) check(g, x + 21, y + 22, 9, AG.accent, 2); else spinner(g, x + 21, y + 22, 6, t, AG.mint);
-  text(g, name, x + 42, y + 20, f(600, 10.5, true), '#E6F6EF');
-  text(g, done ? `done · ${ms}` : 'running…', x + 42, y + 35, f(500, 9.5), done ? AG.mint : 'rgba(200,225,214,0.55)');
+  rr(g, x, y, w, 40, 9, '#102119', done ? 'rgba(25,199,132,0.4)' : 'rgba(166,235,205,0.16)');
+  rr(g, x + 9, y + 10, 20, 20, 6, done ? 'rgba(25,199,132,0.22)' : 'rgba(255,255,255,0.06)');
+  if (done) check(g, x + 19, y + 20, 9, AG.accent, 2); else spinner(g, x + 19, y + 20, 5.5, t, AG.mint);
+  text(g, name, x + 37, y + 18, f(600, 11, true), '#EAF8F1');
+  text(g, done ? `done · ${ms}` : 'running…', x + 37, y + 32, f(600, 10), done ? AG.mint : 'rgba(200,225,214,0.6)');
   g.globalAlpha = 1;
 }
+const SCENES = ['Agentic workflow', 'Document intelligence', 'Voice → insight'];
 function drawAgent(g: G, W: number, H: number, t: number) {
   const C = AG;
   g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
-  browserChrome(g, W, 'agents.workspace.demo', t, false);
+  agentChrome(g, W, t);
   const scene = Math.floor(t / C.scene) % 3;
   const st = t % C.scene;
-  const busy = scene === 0 ? st > 1.4 && st < 8.8 : scene === 1 ? st > 0.5 && st < 8.2 : st > 0.3 && st < 9.6;
-  orb(g, 28, 54, 11, t, busy);
-  text(g, 'Korvenza AI Agent', 48, 58.5, f(800, 13), '#FFFFFF');
-  demoChip(g, 172, 46, '#A6EBCD', 'left');
-  const tabs = ['Onboarding', 'Documents', 'Voice → Insight'];
-  let tx = W - 14;
-  for (let i = tabs.length - 1; i >= 0; i--) {
-    g.font = f(700, 10); const w = g.measureText(tabs[i]).width + 20; tx -= w;
-    rr(g, tx, 44, w, 20, 10, i === scene ? 'rgba(25,199,132,0.18)' : 'rgba(255,255,255,0.04)', i === scene ? 'rgba(25,199,132,0.45)' : 'rgba(255,255,255,0.07)');
-    text(g, tabs[i], tx + w / 2, 57.5, f(700, 10), i === scene ? '#E8FFF5' : 'rgba(200,225,214,0.55)', 'center');
-    tx -= 6;
-  }
-  g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(0, 74, W, 1);
-  if (scene === 0) agentOnboarding(g, W, H, st);
+  const busy = scene === 0 ? st > 1.4 && st < 8.4 : scene === 1 ? st > 0.5 && st < 7.6 : st > 0.3 && st < 9.6;
+  orb(g, 20, 41, 9, t, busy);
+  text(g, 'Korvenza AI Agent', 36, 46, f(800, 13.5), '#FFFFFF');
+  g.font = f(800, 13.5);
+  demoChip(g, 36 + g.measureText('Korvenza AI Agent').width + 8, 34, '#A6EBCD', 'left');
+  const label = `${scene + 1}/3 · ${SCENES[scene]}`;
+  g.font = f(700, 10.5); const lw = g.measureText(label).width + 20;
+  rr(g, W - 12 - lw, 31, lw, 20, 10, 'rgba(25,199,132,0.16)', 'rgba(25,199,132,0.45)');
+  text(g, label, W - 12 - lw / 2, 45, f(700, 10.5), '#E8FFF5', 'center');
+  g.fillStyle = 'rgba(255,255,255,0.07)'; g.fillRect(0, 57, W, 1);
+  if (scene === 0) agentWorkflow(g, W, H, st);
   else if (scene === 1) agentDocs(g, W, H, st);
   else agentVoice(g, W, H, st);
-  // scene cross-fade
   const fade = Math.max(seg(st, C.scene - 0.45, C.scene), 1 - seg(st, 0, 0.3));
-  if (fade > 0) { g.fillStyle = rgba(C.bg, fade); g.fillRect(0, 75, W, H - 75); }
+  if (fade > 0) { g.fillStyle = rgba(C.bg, fade); g.fillRect(0, 58, W, H - 58); }
 }
-function agentOnboarding(g: G, W: number, H: number, t: number) {
-  const ask = 'Onboard Northwind Retail (demo client): create their CRM account, send the welcome pack and book a kickoff call.';
-  const h = bubble(g, 16, 88, 356, words(ask, seg(t, 0.2, 1.4)), true);
-  const plan = ['Create CRM account', 'Provision workspace', 'Send welcome email', 'Draft statement of work', 'Book kickoff call'];
-  const tools = ['crm.create_account', 'workspace.provision', 'email.send_template', 'docs.generate_sow', 'calendar.book_meeting'];
-  const ms = ['0.9s', '1.4s', '0.6s', '2.1s', '1.2s'];
-  const y0 = 88 + h + 12;
+function agentWorkflow(g: G, W: number, H: number, t: number) {
+  // user request (streams word by word)
+  const ask = 'New client contract attached — set them up and send the first invoice.';
+  const lines = wrap(g, words(ask, seg(t, 0.2, 1.4)), 228, f(600, 12.5));
+  const bh = Math.max(1, lines.length) * 17 + 14;
+  rr(g, 14, 66, 250, bh, 10, 'rgba(25,199,132,0.15)', 'rgba(25,199,132,0.32)');
+  lines.forEach((l, i) => text(g, l, 26, 85 + i * 17, f(600, 12.5), '#EAF8F1'));
+  const plan = ['Read contract', 'Extract key fields', 'Create CRM record', 'Generate invoice', 'Draft welcome email'];
+  const tools = ['contract.read()', 'fields.extract()', 'crm.create()', 'invoice.create()', 'email.draft()'];
+  const ms = ['0.8s', '1.6s', '0.9s', '1.7s', '1.2s'];
+  const y0 = 66 + bh + 18;
   if (t > 1.5) {
-    text(g, t < 2.2 ? 'Planning' + '.'.repeat(1 + (Math.floor(t * 4) % 3)) : 'Plan', 16, y0 + 12, f(800, 11), C_MINT);
+    text(g, t < 2.2 ? 'Planning' + '.'.repeat(1 + (Math.floor(t * 4) % 3)) : 'Plan', 14, y0, f(800, 11), C_MINT);
     plan.forEach((p, i) => {
-      const a = seg(t, 2.0 + i * 0.12, 2.3 + i * 0.12);
+      const a = seg(t, 1.9 + i * 0.1, 2.2 + i * 0.1);
       if (a <= 0) return;
-      const y = y0 + 32 + i * 25;
-      const start = 2.6 + i * 1.2, done = t > start + 1.0, running = t > start && !done;
+      const y = y0 + 22 + i * 21;
+      const start = 2.4 + i * 1.15, done = t > start + 0.9, running = t > start && !done;
       g.globalAlpha = a;
-      rr(g, 16, y - 12, 16, 16, 5, done ? 'rgba(25,199,132,0.22)' : 'rgba(255,255,255,0.05)', done ? 'rgba(25,199,132,0.5)' : 'rgba(255,255,255,0.12)');
-      if (done) check(g, 24, y - 4, 7, AG.accent, 1.8); else if (running) spinner(g, 24, y - 4, 4.5, t, AG.mint);
-      text(g, p, 42, y, f(done ? 600 : 500, 11.5), done ? '#E6F6EF' : running ? '#FFFFFF' : 'rgba(200,225,214,0.6)');
+      rr(g, 14, y - 12, 15, 15, 4.5, done ? 'rgba(25,199,132,0.25)' : 'rgba(255,255,255,0.05)', done ? 'rgba(25,199,132,0.55)' : 'rgba(255,255,255,0.14)');
+      if (done) check(g, 21.5, y - 4.5, 7, AG.accent, 1.8); else if (running) spinner(g, 21.5, y - 4.5, 4.2, t, AG.mint);
+      text(g, p, 37, y, f(done || running ? 700 : 500, 13), done ? '#EAF8F1' : running ? '#FFFFFF' : 'rgba(200,225,214,0.55)');
       g.globalAlpha = 1;
     });
   }
-  // stacked tool cards (newest on top, older ones step down and dim)
-  const started = tools.map((_, i) => 2.6 + i * 1.2).filter((s) => t > s).length;
-  for (let j = 0; j < started; j++) {
-    const i = started - 1 - j; // newest first
-    const s = 2.6 + i * 1.2;
+  // stacked tool cards: newest on top, older ones step down and dim
+  const started = tools.map((_, i) => 2.4 + i * 1.15).filter((s) => t > s).length;
+  for (let j = Math.min(started, 3) - 1; j >= 0; j--) {
+    const i = started - 1 - j;
+    const s = 2.4 + i * 1.15;
     const enter = expo(seg(t, s, s + 0.45));
-    const depth = Math.min(j, 3);
-    const x = 388 + (1 - enter) * 60 + depth * 6;
-    const y = 88 + depth * 54;
-    if (j > 3) continue;
-    toolCard(g, x, y, W - 16 - 388 - depth * 12, tools[i], t > s + 1.0, ms[i], t, enter * (1 - depth * 0.22));
+    toolCard(g, 278 + (1 - enter) * 50 + j * 5, 66 + j * 46, W - 292 - j * 10, tools[i], t > s + 0.9, ms[i], t, enter * (1 - j * 0.25));
   }
-  const res = expo(seg(t, 8.8, 9.4));
+  const res = expo(seg(t, 8.4, 9.0));
   if (res > 0) {
     g.globalAlpha = res;
-    rr(g, 388, H - 62, W - 404, 40, 20, 'rgba(25,199,132,0.16)', 'rgba(25,199,132,0.55)');
-    check(g, 410, H - 42, 10, AG.accent, 2.2);
-    text(g, '5 tasks completed · 6.2s', 426, H - 38, f(800, 12), '#E8FFF5');
+    rr(g, 262, H - 46, W - 274, 32, 16, 'rgba(25,199,132,0.18)', 'rgba(25,199,132,0.6)');
+    check(g, 280, H - 30, 9, AG.accent, 2.2);
+    text(g, '5 tasks completed · 6.2s', 293, H - 25.5, f(800, 11.5), '#E8FFF5');
     g.globalAlpha = 1;
   }
 }
-const C_MINT = '#A6EBCD';
 function agentDocs(g: G, W: number, H: number, t: number) {
-  // document page
-  const dx = 18, dy = 88, dw = 184, dh = 298;
-  rr(g, dx, dy, dw, dh, 8, '#EEF3F0');
-  text(g, 'INVOICE', dx + 14, dy + 28, f(800, 14), '#11201A');
-  text(g, 'Demo Supplies Co.', dx + 14, dy + 46, f(600, 9.5), '#41524B');
-  text(g, '14 Mar 2026', dx + dw - 14, dy + 28, f(600, 9.5), '#41524B', 'right');
-  for (let i = 0; i < 3; i++) { rr(g, dx + 14, dy + 64 + i * 9, 90 - i * 18, 4, 2, '#C9D3CE'); }
+  // invoice document
+  const dx = 14, dy = 66, dw = 150, dh = 210;
+  rr(g, dx, dy, dw, dh, 7, '#EEF3F0');
+  text(g, 'INVOICE', dx + 11, dy + 22, f(800, 12), '#11201A');
+  text(g, 'Demo Supplies Co.', dx + 11, dy + 37, f(600, 8.5), '#41524B');
+  text(g, '14 Mar 2026', dx + dw - 11, dy + 22, f(600, 8.5), '#41524B', 'right');
   const rows: [string, string][] = [['Cloud hosting', '480.00'], ['Support plan', '280.00'], ['Support plan', '280.00'], ['Setup fee', '200.00']];
   rows.forEach(([a, b], i) => {
-    const y = dy + 120 + i * 24;
-    text(g, a, dx + 14, y, f(500, 10), '#22332C');
-    text(g, b, dx + dw - 14, y, f(600, 10), '#22332C', 'right');
-    g.fillStyle = '#DCE3DF'; g.fillRect(dx + 14, y + 8, dw - 28, 1);
+    const y = dy + 66 + i * 21;
+    text(g, a, dx + 11, y, f(500, 9), '#22332C');
+    text(g, b, dx + dw - 11, y, f(600, 9), '#22332C', 'right');
+    g.fillStyle = '#DCE3DF'; g.fillRect(dx + 11, y + 7, dw - 22, 1);
   });
-  text(g, 'Total', dx + 14, dy + 236, f(800, 11), '#11201A');
-  text(g, '$1,240.00', dx + dw - 14, dy + 236, f(800, 11), '#11201A', 'right');
-  // scan line
-  const sc = seg(t, 0.5, 2.1);
+  text(g, 'Total', dx + 11, dy + 172, f(800, 10), '#11201A');
+  text(g, '$1,240.00', dx + dw - 11, dy + 172, f(800, 10), '#11201A', 'right');
+  const sc = seg(t, 0.4, 1.8);
   if (sc > 0 && sc < 1) {
     const y = dy + sc * dh;
-    const gr = g.createLinearGradient(0, y - 30, 0, y);
-    gr.addColorStop(0, 'rgba(25,199,132,0)'); gr.addColorStop(1, 'rgba(25,199,132,0.35)');
-    g.fillStyle = gr; g.fillRect(dx, y - 30, dw, 30);
-    g.fillStyle = '#19C784'; g.fillRect(dx, y, dw, 2);
+    const gr = g.createLinearGradient(0, y - 26, 0, y); gr.addColorStop(0, 'rgba(25,199,132,0)'); gr.addColorStop(1, 'rgba(25,199,132,0.35)');
+    g.fillStyle = gr; g.fillRect(dx, y - 26, dw, 26); g.fillStyle = '#19C784'; g.fillRect(dx, y, dw, 2);
   }
-  // bounding boxes
-  const boxes: [number, number, number, number, string][] = [
-    [dx + 8, dy + 34, 100, 18, 'vendor'], [dx + dw - 82, dy + 15, 74, 18, 'date'],
-    [dx + 8, dy + 106, dw - 16, 98, 'line_items'], [dx + 8, dy + 222, dw - 16, 22, 'total'],
+  // boxes lock onto the fields, then each value flies into the table
+  const fields: { box: [number, number, number, number]; label: string; value: string }[] = [
+    { box: [dx + 6, dy + 27, 92, 15], label: 'Vendor', value: 'Demo Supplies Co.' },
+    { box: [dx + dw - 68, dy + 10, 62, 16], label: 'Invoice date', value: '14 Mar 2026' },
+    { box: [dx + 6, dy + 52, dw - 12, 92], label: 'Line items', value: '4' },
+    { box: [dx + 6, dy + 158, dw - 12, 20], label: 'Total', value: '$1,240.00' },
   ];
-  boxes.forEach(([x, y, w, h, l], i) => {
-    const a = eo(seg(t, 2.2 + i * 0.45, 2.6 + i * 0.45));
-    if (a <= 0) return;
-    g.globalAlpha = a;
-    rr(g, x, y, w, h, 4, 'rgba(25,199,132,0.08)', '#19C784', 1.5);
-    g.font = f(700, 8.5); const lw = g.measureText(l).width + 8;
-    // tag: outside right for the small vendor box, top-right corner otherwise (never over the text)
-    const lx = i === 0 ? x + w + 3 : x + w - lw, ly = i === 0 ? y + 4 : y - 11;
-    rr(g, lx, ly, lw, 11, 3, '#19C784');
-    text(g, l, lx + 4, ly + 8, f(700, 8.5, true), '#04130D');
-    g.globalAlpha = 1;
+  const tx = 178, tw = W - tx - 14;
+  rr(g, tx, 66, tw, 150, 10, C_CARD, AG.line);
+  text(g, 'Extracted fields', tx + 12, 84, f(800, 11), C_MINT);
+  fields.forEach((fd, i) => {
+    const lock = seg(t, 2.0 + i * 0.55, 2.5 + i * 0.55);
+    const ry = 106 + i * 27;
+    g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(tx + 12, ry + 8, tw - 24, 1);
+    text(g, fd.label, tx + 12, ry, f(600, 11), 'rgba(200,225,214,0.7)');
+    if (lock > 0) {
+      const [bx, by, bw, bh] = fd.box;
+      const k = expo(lock), grow = 1 + (1 - k) * 0.35;
+      const cx = bx + bw / 2, cy = by + bh / 2;
+      g.globalAlpha = 0.35 + 0.65 * k;
+      rr(g, cx - (bw * grow) / 2, cy - (bh * grow) / 2, bw * grow, bh * grow, 4, 'rgba(25,199,132,0.08)', '#19C784', 1.6);
+      g.globalAlpha = 1;
+      const fly = eo(seg(t, 2.5 + i * 0.55, 3.1 + i * 0.55));
+      if (fly > 0) {
+        const fx = cx + (tx + tw - 12 - cx) * fly, fy = cy + (ry - cy) * fly;
+        text(g, fd.value, fx, fy, f(800, 11.5), fly < 1 ? '#7CF2C2' : '#FFFFFF', fly < 1 ? 'center' : 'right');
+      }
+    }
   });
-  // flagged duplicate row
-  const fl = seg(t, 8.0, 8.4);
+  const fl = seg(t, 7.6, 8.0);
   if (fl > 0) {
     const pulse = 0.5 + 0.5 * Math.sin(t * 6);
-    rr(g, dx + 6, dy + 133, dw - 12, 44, 5, `rgba(255,170,60,${0.12 + 0.1 * pulse})`, '#FFAA3C', 1.8);
-  }
-  // JSON stream
-  const jx = 218, jy = 88, jw = W - jx - 16;
-  rr(g, jx, jy, jw, 210, 10, C_CARD, AG.line);
-  text(g, 'extracted.json', jx + 12, jy + 20, f(700, 10, true), 'rgba(200,225,214,0.6)');
-  const json = ['{', '  "vendor": "Demo Supplies Co.",', '  "date": "2026-03-14",', '  "line_items": 4,', '  "total": 1240.00,', '  "currency": "USD",', '  "confidence": 0.97', '}'];
-  const jp = seg(t, 3.0, 7.4) * json.length;
-  json.forEach((l, i) => {
-    if (jp <= i) return;
-    const s = jp >= i + 1 ? l : chars(l, jp - i);
-    const m = s.match(/^(\s*)("[^"]+")(:\s*)?(.*)$/);
-    const y = jy + 44 + i * 19;
-    if (m) {
-      g.font = f(500, 11, true);
-      let x = jx + 14 + g.measureText(m[1]).width;
-      text(g, m[2], x, y, f(500, 11, true), '#7CF2C2'); x += g.measureText(m[2]).width;
-      if (m[3]) { text(g, m[3], x, y, f(500, 11, true), '#C9D9D2'); x += g.measureText(m[3]).width; }
-      text(g, m[4], x, y, f(500, 11, true), '#FFD38A');
-    } else text(g, s, jx + 14, y, f(500, 11, true), '#C9D9D2');
-  });
-  if (fl > 0) {
+    rr(g, dx + 5, dy + 72, dw - 10, 38, 5, `rgba(255,170,60,${0.14 + 0.12 * pulse})`, '#FFAA3C', 1.8);
     g.globalAlpha = eo(fl);
-    rr(g, jx, jy + 222, jw, 40, 20, 'rgba(255,170,60,0.14)', 'rgba(255,170,60,0.6)');
-    g.beginPath(); g.moveTo(jx + 22, jy + 233); g.lineTo(jx + 31, jy + 250); g.lineTo(jx + 13, jy + 250); g.closePath(); g.fillStyle = '#FFAA3C'; g.fill();
-    text(g, 'Flagged: duplicate charge', jx + 40, jy + 246.5, f(800, 12), '#FFE2BC');
-    text(g, 'Support plan ×2', jx + jw - 14, jy + 246.5, f(600, 10), 'rgba(255,226,188,0.7)', 'right');
+    rr(g, tx, 228, tw, 44, 12, 'rgba(255,170,60,0.15)', 'rgba(255,170,60,0.65)');
+    g.beginPath(); g.moveTo(tx + 22, 240); g.lineTo(tx + 31, 257); g.lineTo(tx + 13, 257); g.closePath(); g.fillStyle = '#FFAA3C'; g.fill();
+    text(g, 'Flagged: duplicate charge', tx + 40, 248, f(800, 12.5), '#FFE2BC');
+    text(g, 'Support plan ×2 · $280.00', tx + 40, 263, f(600, 10), 'rgba(255,226,188,0.75)');
     g.globalAlpha = 1;
   }
 }
-const C_CARD = '#0E1B17';
 function agentVoice(g: G, W: number, H: number, t: number) {
-  // voice input + transcript
-  rr(g, 16, 88, 356, 74, 12, C_CARD, AG.line);
+  rr(g, 14, 66, W - 28, 64, 12, C_CARD, AG.line);
   const live = t < 2.8;
-  g.beginPath(); g.arc(42, 116, 13, 0, Math.PI * 2); g.fillStyle = live ? '#E2384D' : 'rgba(25,199,132,0.25)'; g.fill();
-  rr(g, 39, 107, 6, 11, 3, '#FFFFFF');
-  for (let i = 0; i < 34; i++) {
+  g.beginPath(); g.arc(36, 89, 12, 0, Math.PI * 2); g.fillStyle = live ? '#E2384D' : 'rgba(25,199,132,0.3)'; g.fill();
+  rr(g, 33, 81, 6, 10, 3, '#FFFFFF');
+  for (let i = 0; i < 44; i++) {
     const a = live ? 0.2 + 0.8 * Math.abs(Math.sin(t * 8 + i * 0.6) * Math.sin(t * 2.7 + i * 0.25)) : 0.12;
-    const h = 4 + a * 22;
-    rr(g, 66 + i * 8.6, 116 - h / 2, 4, h, 2, rgba('#A6EBCD', live ? 0.85 : 0.35));
+    const h = 3 + a * 18;
+    rr(g, 58 + i * 8.6, 89 - h / 2, 4, h, 2, rgba('#A6EBCD', live ? 0.85 : 0.35));
   }
-  text(g, '“' + words('Which region grew fastest last quarter?', seg(t, 0.4, 2.6)) + '”', 30, 150, f(600, 12), '#E6F6EF');
-  // SQL
+  text(g, '“' + words('Which region grew fastest last quarter?', seg(t, 0.4, 2.6)) + '”', 26, 120, f(700, 13), '#EAF8F1');
   const sqlA = seg(t, 2.8, 3.1);
   if (sqlA > 0) {
     g.globalAlpha = sqlA;
-    rr(g, 16, 172, 356, 92, 12, '#0A1713', AG.line);
-    text(g, 'SQL', 28, 191, f(800, 9.5, true), 'rgba(200,225,214,0.55)');
-    const sql = ['SELECT region, SUM(revenue) AS rev', "FROM orders WHERE quarter = 'Q3'", 'GROUP BY region ORDER BY rev DESC;'];
-    const sp = seg(t, 3.0, 5.4) * sql.length;
-    sql.forEach((l, i) => {
-      if (sp <= i) return;
-      const s = sp >= i + 1 ? l : chars(l, sp - i);
-      text(g, s, 28, 213 + i * 18, f(500, 11, true), i === 0 ? '#7CF2C2' : '#C9D9D2');
-    });
+    rr(g, 14, 138, 238, 72, 10, '#0A1813', AG.line);
+    text(g, 'SQL', 24, 154, f(600, 9.5, true), 'rgba(200,225,214,0.6)');
+    const sql = ['SELECT region, SUM(revenue)', "FROM orders WHERE qtr = 'Q3'", 'GROUP BY region ORDER BY 2 DESC'];
+    const sp = seg(t, 3.0, 5.2) * sql.length;
+    sql.forEach((l, i) => { if (sp > i) text(g, sp >= i + 1 ? l : chars(l, sp - i), 24, 171 + i * 14, f(500, 10.5, true), i === 0 ? '#7CF2C2' : '#C9D9D2'); });
     g.globalAlpha = 1;
   }
-  // chart
-  const chA = seg(t, 5.2, 5.5);
+  const chA = seg(t, 5.0, 5.3);
   if (chA > 0) {
     g.globalAlpha = chA;
-    const x0 = 386, y0 = 88, w = W - x0 - 16, h = 176;
-    rr(g, x0, y0, w, h, 12, C_CARD, AG.line);
-    text(g, 'Revenue growth by region · QoQ', x0 + 12, y0 + 20, f(700, 10), '#E6F6EF');
+    const x0 = 262, w = W - x0 - 14, y0 = 138, h = 72;
+    rr(g, x0, y0, w, h, 10, C_CARD, AG.line);
     const data: [string, number][] = [['North', 18], ['East', 11], ['West', 7], ['South', 4]];
+    const slot = (w - 20) / 4;
     data.forEach(([n, v], i) => {
-      const p = backOut(seg(t, 5.4 + i * 0.15, 6.3 + i * 0.15));
-      const bh = (h - 70) * (v / 20) * p;
-      const bx = x0 + 18 + i * ((w - 30) / 4);
-      rr(g, bx, y0 + h - 30 - bh, (w - 30) / 4 - 14, Math.max(0, bh), 4, i === 0 ? '#19C784' : 'rgba(166,235,205,0.3)');
-      text(g, n, bx + ((w - 30) / 4 - 14) / 2, y0 + h - 14, f(600, 9.5), 'rgba(200,225,214,0.7)', 'center');
-      if (p > 0.6) text(g, `+${v}%`, bx + ((w - 30) / 4 - 14) / 2, y0 + h - 36 - bh, f(800, 9.5), i === 0 ? '#E8FFF5' : 'rgba(200,225,214,0.7)', 'center');
+      const p = backOut(seg(t, 5.2 + i * 0.15, 6.0 + i * 0.15));
+      const bh = 38 * (v / 18) * p;
+      const bx = x0 + 10 + i * slot + slot * 0.18;
+      rr(g, bx, y0 + h - 18 - bh, slot * 0.64, Math.max(0, bh), 3, i === 0 ? '#19C784' : 'rgba(166,235,205,0.32)');
+      text(g, n, bx + slot * 0.32, y0 + h - 6, f(600, 9), 'rgba(200,225,214,0.75)', 'center');
     });
     g.globalAlpha = 1;
   }
-  // insight (streams word by word)
-  const inA = seg(t, 7.0, 7.3);
+  const inA = seg(t, 6.8, 7.1);
   if (inA > 0) {
     g.globalAlpha = inA;
-    rr(g, 16, 276, W - 32, 74, 12, 'rgba(25,199,132,0.1)', 'rgba(25,199,132,0.35)');
-    orb(g, 36, 300, 8, t, t < 9.6);
-    text(g, 'Insight', 52, 304, f(800, 11), C_MINT);
-    text(g, words('North grew fastest: +18% quarter on quarter (demo data).', seg(t, 7.3, 8.6)), 30, 326, f(600, 12), '#FFFFFF');
-    text(g, words('Repeat orders from existing customers drove most of the lift.', seg(t, 8.6, 9.8)), 30, 343, f(500, 11.5), 'rgba(230,246,239,0.8)');
+    rr(g, 14, 218, W - 28, 60, 12, 'rgba(25,199,132,0.12)', 'rgba(25,199,132,0.4)');
+    orb(g, 32, 236, 7, t, t < 9.4);
+    text(g, 'Insight', 46, 240, f(800, 11), C_MINT);
+    text(g, words('North grew fastest: +18% QoQ (demo data).', seg(t, 7.1, 8.2)), 26, 258, f(700, 13), '#FFFFFF');
+    text(g, words('Repeat orders drove most of the lift.', seg(t, 8.2, 9.2)), 26, 273, f(500, 11.5), 'rgba(230,246,239,0.85)');
     g.globalAlpha = 1;
   }
 }
 
 /* ===================================================================== class */
-const SIZES: Record<ScreenKind, [number, number]> = { ielts: [300, 648], skilllink: [300, 648], dashboard: [640, 400], agent: [640, 400] };
+const SIZES: Record<ScreenKind, [number, number]> = { ielts: [300, 648], skilllink: [300, 648], dashboard: [640, 400], agent: [460, 288] };
 const CYCLE: Record<ScreenKind, number> = { ielts: IELTS.cycle, skilllink: SL.cycle, dashboard: DASH.cycle, agent: AG.scene * 3 };
 /** The frame shown when a screen is frozen (low tier / reduced motion): the "result" moment. */
 const STILL: Record<ScreenKind, number> = { ielts: 9.2, skilllink: 9.6, dashboard: 6, agent: 10.2 };

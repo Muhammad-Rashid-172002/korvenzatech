@@ -366,11 +366,14 @@ html[data-theme="light"] .kz-theme-icon-light, html[data-theme="dark"] .kz-theme
 @media (prefers-reduced-motion: reduce) { .kz-hero-grain { animation: none; } }
 .kz-hero-floor { background: radial-gradient(45% 38% at 50% 62%, rgba(25,199,132,.14), transparent 100%); }
 .kz-hero-stage { position: relative; aspect-ratio: 1 / 1; width: 100%; }
-.kz-hero-fallback { position: absolute; inset: 0; display: grid; place-items: center; perspective: 1200px; transition: opacity var(--kz-dur-slow) var(--kz-ease-out); }
+.kz-hero-fallback { position: absolute; inset: 0; z-index: -1; /* the 160% poster must paint under the hero copy */ display: grid; place-items: center; perspective: 1200px; transition: opacity var(--kz-dur-slow) var(--kz-ease-out); }
 .kz-hero-stage[data-ready="true"] .kz-hero-fallback { opacity: 0; }
-.kz-hero-poster { width: 100%; height: 100%; object-fit: contain; animation: kzFloat 9s var(--kz-ease-in-out) infinite; }
+/* The poster is rendered 1.6× the stage (the live composition reaches beyond the stage box) so the
+   cross-fade to WebGL lines up; on stacked layouts the composition is centred (no desktop shift). */
+.kz-hero-poster { position: absolute; left: -30%; top: -30%; width: 160%; height: 160%; max-width: none; object-fit: contain; animation: kzFloat 9s var(--kz-ease-in-out) infinite; }
 .kz-hero-stage[data-ready="true"] .kz-hero-poster { animation: none; }
 .kz-hero-enter { animation: kzHeroIn 900ms var(--kz-ease-out) both; animation-delay: calc(var(--i, 0) * 90ms); }
+@media (max-width: 1023px) { .kz-hero-poster { translate: 6.25% 0; } }
 @keyframes kzHeroIn { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
 /* Hero headline is the LCP element: static at first paint; lib/scroll.ts splits it after paint (movement only). */
 #hero .kz-gradient-word {
@@ -382,6 +385,7 @@ html[data-theme="light"] .kz-theme-icon-light, html[data-theme="dark"] .kz-theme
 .kz-hero-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border-radius: 999px; border: 1px solid rgba(110,221,176,.18); background: rgba(16,35,28,.6); color: #C3D1CA; font-size: 12px; font-weight: 600; backdrop-filter: blur(8px); }
 .kz-hero-chip b { padding: 3px 8px; border-radius: 999px; background: rgba(25,199,132,.16); color: #A6EBCD; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
 .kz-hero-caption { position: absolute; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 10px; border: 1px solid rgba(110,221,176,.14); background: rgba(7,17,14,.62); backdrop-filter: blur(10px); color: #C3D1CA; font: 600 10px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+.kz-hero-caption.kz-calm { background: rgba(5,13,10,.82); box-shadow: 0 0 0 1px rgba(110,221,176,.08), 0 10px 40px 18px rgba(5,13,10,.55); }
 .kz-hero-caption i { width: 6px; height: 6px; border-radius: 99px; background: #19C784; }
 .kz-scroll-cue { width: 22px; height: 34px; border-radius: 99px; border: 1.5px solid rgba(195,209,202,.35); display: grid; justify-items: center; padding-top: 6px; }
 .kz-scroll-cue span { width: 3px; height: 7px; border-radius: 99px; background: #19C784; animation: kzCue 2.2s var(--kz-ease-in-out) infinite; }

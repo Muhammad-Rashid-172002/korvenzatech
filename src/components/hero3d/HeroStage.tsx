@@ -1,7 +1,8 @@
 import React from 'react';
 
-export const HERO_POSTER_SRCSET = '/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w';
-export const HERO_POSTER_SIZES = '(min-width: 1024px) 620px, (min-width: 640px) 520px, 380px';
+export const HERO_POSTER_SRCSET = '/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w, /media/hero/sculpture-1600.webp 1600w';
+/** The poster is drawn at 160% of the stage (see .kz-hero-poster). */
+export const HERO_POSTER_SIZES = '(min-width: 1024px) 990px, (min-width: 640px) 830px, 610px';
 
 /**
  * The hero "stage": a server-rendered poster frame of the 3D composition.

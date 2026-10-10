@@ -14,6 +14,8 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 5. **Frameloop**: renders only while a 3D view is on screen and the tab is visible (= `demand` for idle cost).
 6. **Logo vector**: traced from your raster; a designer SVG is still the gold standard — TODO(Rashid, optional).
 7. **Build stamp**: every page has `<meta name="kz-build" content="<commit> <time>">` and `/build.json` exists — compare them to see instantly whether a route is served from an old cache.
+9. **Low-tier screens are drawn once on a canvas, not shipped as WebP frames**: same pixels, no 4 extra image downloads (~100 KB), and the text stays sharp at any DPR.
+10. **The K's circuit traces are off in 3D** (`HERO.k.trace.enabled`): at hero scale the glowing lines on the stem read as slits in the glass.
 8. **verify-build** runs at the end of `npm run build` (26 routes) — a broken route fails the build.
 
 ## Phase 1 — Deploy consistency
@@ -35,14 +37,14 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 
 ## Phase 3 — Hero polish  ← **stop for review after this**
 - [x] (v2) Glass K, shard intro + shockwave, hover/click, shatter, low-tier version; 4 devices with live demo screens; rings/floor/particles; AgX
-- [ ] 3.1 Clear glass (not frosted), stronger key/rim lightformers, device + particles refracted behind the K
-- [ ] 3.2 Remove stem slit artifacts; ring streak no longer cuts through the K
+- [x] 3.1 Clear glass (not frosted), stronger key/rim lightformers, device + particles refracted behind the K
+- [x] 3.2 Remove stem slit artifacts; ring streak no longer cuts through the K
 - [x] 3.3 Shard intro / hover / click / shatter / low tier (v2)
-- [ ] 3.4 IELTS phone + AI browser closer/larger (readable at 1440), others back + blurred, brighter screens, lighter phone UIs
-- [~] 3.5 Screen content — done in v2; agent scenario 1 to match the new tool list (read contract → … → "5 tasks completed · 6.2s"), values flying into a table in scenario 2, pause offscreen, static WebP frames on low tier
-- [ ] 3.6 Floor −40–50 %, faster fade, calm backdrop for "Connected systems"
-- [ ] 3.7 Composition up + ~10 % larger; nothing touches labels/edges at 1280/1440/1920; clean mobile
-- [~] 3.8 Post look (see push-back 1): AgX ✓, glow ✓, grain ✓, vignette ✓; DOF/CA refinement + MSAA check
+- [x] 3.4 IELTS phone + AI browser closer/larger (readable at 1440), others back + blurred, brighter screens, lighter phone UIs
+- [x] 3.5 Screen content: agent rebuilt at readable scale with the new workflow, values flying into a table, voice → SQL → chart; paused offscreen; static frames on low tier (canvas, see decision 9)
+- [x] 3.6 Floor −40–50 %, faster fade, calm backdrop for "Connected systems"
+- [x] 3.7 Composition up + ~10 % larger; nothing touches labels/edges at 1280/1440/1920; clean mobile
+- [x] 3.8 Post look within push-back 1: AgX, additive glow, glass dispersion (CA), defocused far screens (DOF), grain, vignette, MSAA on tier 2
 
 ## Phase 6.1 — AI security
 - [ ] Bundle secret scan; serverless proxy with rate limit, input/token caps, daily cost cap, scoped prompt, fallback; env var list
@@ -163,3 +165,18 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - Files: `src/data/people.ts`, `LeadershipTestimonialsSection.tsx`, `src/data/companyData.ts`, `src/types.ts`, `IndustriesSection.tsx`, `AIFeatureSection.tsx`, `TechStackSection.tsx`, `three/scenes/Orbit.tsx`, `FAQSection.tsx`, `home/HomeSections.tsx`, `App.tsx`, `src/data/seo.ts`, `lib/assistantKnowledge.ts`, `lib/handlers.ts`, `src/index.css`; removed 6 unused components.
 - Bundle (gzip): main 121.3 KB (+1.7 vs 2.2: 9-service grid, careers copy, people model), CSS 21.5 KB (+0.4).
 - Test (laptop + Android): Home → services grid has 9 cards; FAQ shows 3 questions and "See all 12 questions" jumps to About's FAQ; About → Suliman's card shows one title; testimonials show only the Rony Sultana cards without stars; /industries → two "Where we've delivered" cards open the case studies; /careers → three different descriptions; any wrong URL (e.g. /abc) → floating K 404 with links.
+
+### Phase 3 — Hero polish ✅ (awaiting your review)
+**3.1 Clear glass.** Roughness 0.015, thickness 1.2, ior 1.5, dispersion 0.35 (subtle CA), near-white tint with emerald attenuation, env reflections ×2.4; light panels: stronger top-left key + a thin hard white strip (crisp bevel highlights), stronger emerald rim on the right, two soft panels behind the camera so the face carries a moving reflection gradient as the K sways. A faint additive emerald body + fresnel rim keeps the clear slab readable on the dark background (a perfectly flat slab of real glass is otherwise invisible). The analytics dashboard now sits directly **behind** the K and network nodes/stars were moved into the opaque pass, so both are visibly refracted through the glass.
+**3.2 Artifacts.** The vertical "slits" were (a) hairline T-junction cracks from the shard subdivision and (b) the logo's glowing circuit traces. The K now swaps to the crack-free extrusion as soon as the shards lock (shards return only for the scroll shatter), and the traces are off in 3D. Rings fade where they pass in front of the K (no more streak across the logo). Also fixed: if the GPU monitor downgraded to lite mid-session, the K disappeared.
+**3.4 Devices.** AI-agent browser is the hero device: closest, 1.45× scale, bottom-right in front of the K's leg tips; its screen was redrawn at 460×288 with large type (title, plan, tool cards and the result are legible at 1440). IELTS phone front-left; SkillLink small, back and defocused; dashboard far behind the K, defocused. Screens are emissive ×1.15 (far ones ×0.6); IELTS/SkillLink UIs lightened.
+**3.5 Agent scenarios.** (1) contract.read → fields.extract → crm.create → invoice.create → email.draft, live plan checklist + stacked tool cards → "5 tasks completed · 6.2s"; (2) invoice scan, boxes lock onto the fields and each value flies into the extracted-fields table → "Flagged: duplicate charge"; (3) voice question → SQL typing → bar chart → 2-line insight streamed word by word. All labelled DEMO.
+**3.6 Floor** line opacity −45 %, smaller radius with a squared falloff and a fade toward the text column; "Connected systems" moved to the calm bottom-left with a dark backdrop halo.
+**3.7 Composition** ~10 % larger (compositionSize 6.6 → 6.0), lifted, centre shifted 10 % left on desktop to make room for the front browser; the K sits up-left inside the rings; checked at 1280/1440/1920 (labels clear of devices and of the AI launcher) and 390 (lite).
+**Poster/OG.** New first-paint poster rendered from the live scene at 160 % of the stage (the composition now reaches beyond the stage box, so the cross-fade lines up); 640/1100/1600 WebP; og-cover regenerated from it. The copy column now always paints above the poster.
+- Files: `three/scenes/Hero.tsx`, `three/materials/{glassK,heroMaterials,heroScreens}.ts`, `three/config.ts`, `components/Hero.tsx`, `hero3d/HeroStage.tsx`, `src/index.css`, `scripts/generate-seo-pages.mjs`, `public/media/hero/sculpture-{640,1100,1600}.webp`, `public/og-cover.png`.
+- Bundle (gzip): main 121.4 KB (±0), CSS 21.5 KB, lazy 3D chunk 108.9 KB (−0.5).
+- Lighthouse (no GPU → poster path): Home mobile **89** / a11y 100 / BP 96 / SEO 100 (LCP 2.1 s, TBT 340 ms, CLS 0) — down from 98: the larger poster and the 9-card services grid; still ≥ 85, to be tuned in Phase 9. Desktop 100. Article page mobile 99.
+- Known issues: screenshots come from a software GPU (SwiftShader), which drops to the lite tier part-way; judge glass brightness and FPS on your laptop. QA hooks: `?kz3d=force&kzqa` exposes `window.__kzHero`; `&kzt=9.6` starts the screen loops at a given second; `window.dispatchEvent(new Event('kz:hero-replay'))` replays the intro.
+- Test (laptop): reload `/` → poster, then shards assemble into a clear glass K with a ring pulse; the dashboard behind the K is visibly bent by the glass; no vertical lines on the stem; rings never streak across the K; the AI-agent browser's text is readable; hover the K / devices, click the browser (AI chat opens), click the phones (case studies); scroll → shatter. 60 fps in DevTools Performance.
+- Test (Android): hero visual below the copy shows the lite K + 4 devices with still frames, capability pills fully visible above it, smooth scroll.

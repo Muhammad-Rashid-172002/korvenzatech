@@ -38,7 +38,7 @@ import { useThemeBlend } from '../hooks/useThemeBlend';
 import { sectionProgress, scrollToElement } from '../../../lib/scrollStore';
 import {
   additiveGlowTexture, buildLightformerEnv, buildSegmentGlow, createGlassBackdrop, createGridMaterial, createRingMaterial,
-  createShockwaveMaterial, gateToPass, lightAdditive, radialAlphaTexture,
+  createGlassTintMaterial, createShockwaveMaterial, gateToPass, lightAdditive, radialAlphaTexture,
 } from '../materials/heroMaterials';
 import { buildGlassK, createShardUniforms, patchShardMaterial } from '../materials/glassK';
 import { DeviceScreen } from '../materials/heroScreens';
@@ -135,13 +135,17 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     if (!tr.height) return;
     const visH = 2 * HERO.cameraZ * Math.tan(MathUtils.degToRad(HERO.fov / 2));
     const wpp = visH / tr.height;
+    // Side-by-side layout: the composition centre sits a little left of the stage centre, so the
+    // front AI browser on the right has room to be large enough to read.
+    const sideBySide = window.innerWidth >= 1024;
+    const cx = sr.left + sr.width / 2 + (sideBySide ? sr.width * HERO.shiftX : 0);
     layout.current = {
-      x: (sr.left + sr.width / 2 - tr.left - tr.width / 2) * wpp,
+      x: (cx - tr.left - tr.width / 2) * wpp,
       y: -(sr.top + sr.height / 2 - tr.top - tr.height / 2) * wpp,
       s: Math.min(
         (Math.min(sr.width, sr.height) * wpp) / HERO.compositionSize,
         // keep the outer devices on screen when the stage hugs the viewport edge (≈1280 px)
-        ((tr.right - (sr.left + sr.width / 2)) * wpp) / HERO.halfWidth,
+        ((tr.right - cx) * wpp) / HERO.halfWidth,
       ),
     };
   };
@@ -192,18 +196,23 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
   useEffect(() => () => { const { halo, ...rest } = textures; Object.values(rest).forEach((t) => t.dispose()); Object.values(halo).forEach((t) => t.dispose()); }, [textures]);
 
   // ---------------------------------------------------------------- glass K
+  // Two versions of the K: shard geometry (subdivided, only for the intro / shatter) and the
+  // clean extrusion shown at rest. Subdivision leaves hairline T-junction cracks that glass
+  // makes visible, so the solid one takes over as soon as the shards have locked.
   const K = useMemo(() => buildGlassK(high), [high]);
+  const Ksolid = useMemo(() => (high ? buildGlassK(false) : K), [high, K]);
+  const shardGroup = useRef<Group>(null);
+  const solidGroup = useRef<Group>(null);
   const shardU = useMemo(() => createShardUniforms(), []);
   const kMat = useMemo(() => {
     const k = HERO.k;
     const m = high
       ? new MeshPhysicalMaterial({
         ...k.transmission, color: '#FFFFFF', vertexColors: true, transmission: 1, metalness: 0,
-        attenuationColor: new Color(k.attenuationColor), attenuationDistance: k.attenuationDistance, envMapIntensity: HERO.envIntensity,
-        emissive: k.attenuationColor, emissiveIntensity: 0.06, // a breath of inner light so the body reads on dark
+        attenuationColor: new Color(k.attenuationColor), attenuationDistance: k.attenuationDistance, envMapIntensity: k.envIntensity,
       })
       : new MeshPhysicalMaterial({
-        color: '#FFFFFF', vertexColors: true, metalness: 0.15, roughness: 0.12, transmission: 0, transparent: true, opacity: 0.78,
+        color: '#7FE6B9', vertexColors: true, metalness: 0.15, roughness: 0.12, transmission: 0, transparent: true, opacity: 0.78,
         clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.9, ior: 1.5,
         emissive: '#0E6B47', emissiveIntensity: 0.35,
       });
@@ -224,11 +233,13 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
   }), []);
   const glowMat = useMemo(() => lightAdditive(new SpriteMaterial({ map: textures.glow, toneMapped: false })), [textures.glow]);
   const shockMat = useMemo(() => createShockwaveMaterial(), []);
+  const tintMat = useMemo(() => createGlassTintMaterial(HERO.k.bodyTint.color, HERO.k.bodyTint.fill, HERO.k.bodyTint.rim), []);
+  useEffect(() => () => tintMat.dispose(), [tintMat]);
   const kHit = useMemo(() => new Mesh(new BoxGeometry(2.4, HERO.k.height, 0.5), new MeshBasicMaterial()), []);
   useEffect(() => () => {
-    K.dispose(); kMat.dispose(); edges.dispose(); traces.dispose(); traceDots.g.dispose(); traceDots.m.dispose();
+    K.dispose(); if (Ksolid !== K) Ksolid.dispose(); kMat.dispose(); edges.dispose(); traces.dispose(); traceDots.g.dispose(); traceDots.m.dispose();
     coreGeo.dispose(); coreMat.dispose(); glowMat.dispose(); shockMat.dispose(); kHit.geometry.dispose(); (kHit.material as MeshBasicMaterial).dispose();
-  }, [K, kMat, edges, traces, traceDots, coreGeo, coreMat, glowMat, shockMat, kHit]);
+  }, [K, Ksolid, kMat, edges, traces, traceDots, coreGeo, coreMat, glowMat, shockMat, kHit]);
 
   const backdrop = useMemo(() => createGlassBackdrop(HERO.glassBackdrop), []);
   useEffect(() => {
@@ -267,6 +278,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     const pGeo = new BufferGeometry();
     pGeo.setAttribute('position', new BufferAttribute(pos, 3));
     const pMat = lightAdditive(new PointsMaterial({ map: textures.dot, color: COLORS.mint, size: HERO.network.pointSize, sizeAttenuation: true, fog: true }));
+    pMat.transparent = false; // opaque list → also drawn into the transmission buffer: nodes behind the K are seen refracted
     const points = new Points(pGeo, pMat);
     const lPos = new Float32Array(HERO.network.maxLinks * 6);
     const lGeo = new BufferGeometry();
@@ -303,6 +315,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     }
     const g = new BufferGeometry(); g.setAttribute('position', new BufferAttribute(pos, 3));
     const m = lightAdditive(new PointsMaterial({ map: textures.dot, color: COLORS.ice, size: HERO.stars.size, sizeAttenuation: true, fog: false, opacity: 0.55 }));
+    m.transparent = false; // refracted through the K too
     const points = new Points(g, m); points.frustumCulled = false;
     return { g, m, points };
   }, [tierKey, textures.dot]);
@@ -336,7 +349,9 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
   const D = HERO.devices;
   const dev = useMemo(() => {
     const scale = D.screenScale[tierKey];
-    const screens = D.items.map((it, i) => new DeviceScreen(it.screen, scale, it.blur, i * 1.7));
+    // QA: ?kzqa&kzt=<s> starts every screen loop at that time (poster renders on slow GPUs).
+    const t0 = typeof location !== 'undefined' && location.search.includes('kzqa') ? Number(new URLSearchParams(location.search).get('kzt') ?? 0) : 0;
+    const screens = D.items.map((it, i) => new DeviceScreen(it.screen, scale, it.blur, t0 + i * 1.7));
     const geo = {
       phone: roundedRect(D.phone.w - D.phone.bezel * 2, D.phone.h - D.phone.bezel * 2, D.phone.r - D.phone.bezel),
       browser: roundedRect(D.browser.w - D.browser.bezel * 2, D.browser.h - D.browser.bezel * 2, D.browser.r - D.browser.bezel),
@@ -345,7 +360,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
       hit: new BoxGeometry(1, 1, 0.2),
     };
     // Screens are emissive: no fog (the far one is dimmed instead so it still sits back).
-    const screenMats = screens.map((s, i) => new MeshBasicMaterial({ map: s.texture, toneMapped: false, fog: false, color: D.items[i].blur < 1 ? '#9aa9a3' : '#ffffff' }));
+    const screenMats = screens.map((s, i) => new MeshBasicMaterial({ map: s.texture, toneMapped: false, fog: false, color: new Color().setScalar(D.items[i].blur < 1 ? D.farScreenGain : D.screenGain) }));
     const sheenMat = lightAdditive(new MeshBasicMaterial({ map: textures.sheen, opacity: 0.16, toneMapped: false }));
     const haloMats = D.items.map((it) => lightAdditive(new MeshBasicMaterial({ map: textures.halo[it.screen], opacity: 0.32, toneMapped: false })));
     const bodyMat = new MeshStandardMaterial({ color: D.bodyColor, metalness: 0.75, roughness: 0.32, envMapIntensity: 1.2 });
@@ -405,6 +420,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
   const eased = useRef({ p: 0, px: 0, py: 0, tx: 0, ty: 0, lx: 0, ly: 0, sway: 0, speed: 1, coreBoost: 1, flash: 0, rr: 0 });
   const devState = useRef(D.items.map(() => ({ fwd: 0, speed: 1 })));
   const frame = useRef(0);
+  const qa = useMemo(() => typeof location !== 'undefined' && location.search.includes('kzqa'), []);
   useFrame((state, delta) => {
     // Never render into a zero-sized view (route transitions): the transmission pass would
     // allocate a 0×0 render target ("framebuffer incomplete").
@@ -441,7 +457,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     c.lookAt(L.x * pe * 0.9, L.y * pe * 0.9 - 0.15, 0);
 
     const g = root.current;
-    g.position.set(L.x, L.y, 0);
+    g.position.set(L.x, L.y + HERO.liftY * L.s, 0);
     g.scale.setScalar(L.s);
     g.rotation.y = e.px * 0.08;
     g.rotation.x = -e.py * 0.04;
@@ -470,6 +486,10 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     if (intro >= 1 && !ui.current.locked) { ui.current.locked = true; if (high) ui.current.shockAt = t; }
     if (ui.current.shockAt === -1) ui.current.shockAt = t;
     shardU.uShatter.value = high ? smooth(0.04, 0.8, p) : 0;
+    // at rest (locked, not shattering) the crack-free solid K is shown instead of the shards
+    const atRest = intro >= 1 && shardU.uShatter.value <= 0.0001;
+    if (shardGroup.current && solidGroup.current) { shardGroup.current.visible = !atRest; solidGroup.current.visible = atRest; }
+    else if (shardGroup.current) shardGroup.current.visible = true; // lite (incl. a runtime downgrade): one geometry only
 
     const hoverK = hover === -1;
     e.speed = MathUtils.damp(e.speed, hoverK ? k.hoverSpeed : 1, 3, dt);
@@ -478,7 +498,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     e.tx = MathUtils.damp(e.tx, -e.py * k.tilt, 3, dt);
     e.ty = MathUtils.damp(e.ty, e.px * k.tilt, 3, dt);
     if (kFloat.current) {
-      kFloat.current.position.y = Math.sin(t * 0.7) * k.float * (1 - pe);
+      kFloat.current.position.set(HERO.kOffset[0], HERO.kOffset[1] + Math.sin(t * 0.7) * k.float * (1 - pe), 0);
       const sIn = high ? 1 : eo3((age - 0.1) / 1.0) * 0.12 + 0.88;
       const sOut = high ? 1 : Math.max(0.001, 1 - pe * 0.9);
       kFloat.current.scale.setScalar(sIn * sOut);
@@ -523,6 +543,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
       const grp = ringGroups.current[i];
       const draw = MathUtils.clamp((age - 0.5 - i * HERO.ringStagger) / HERO.ringDrawIn, 0, 1);
       const dv = 1 - Math.pow(1 - draw, 3);
+      if (kGroup.current) ringMats[i].uniforms.uToK.value.copy(kGroup.current.matrixWorld).invert();
       for (const m of [ringMats[i], ringRtMats[i]]) {
         m.uniforms.uDraw.value = dv;
         m.uniforms.uHead.value = ((t * r.speed) % 1 + 1) % 1;
@@ -559,14 +580,14 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
         it.pos[2] * (1 + pe * 0.3) + tmpDir.z * st.fwd,
       );
       grp.rotation.set(it.rot[0] + Math.sin(t * bs * 0.7 + i) * 0.035, it.rot[1] + Math.sin(t * bs * 0.5 + i * 2) * 0.05, it.rot[2]);
-      grp.scale.setScalar(Math.max(0.001, din) * (1 - pe * 0.15));
+      grp.scale.setScalar(it.scale * Math.max(0.001, din) * (1 - pe * 0.15));
       grp.visible = din > 0.01 && pe < 0.98;
       dev.haloMats[i].opacity = 0.3 * din * (1 - pe) * (hv ? 1.6 : 1);
       // the hit proxy follows the device
       dev.hits[i].position.copy(grp.position);
       dev.hits[i].rotation.copy(grp.rotation);
       const sz = it.frame === 'phone' ? D.phone : D.browser;
-      dev.hits[i].scale.set(sz.w, sz.h, 1);
+      dev.hits[i].scale.set(sz.w * it.scale, sz.h * it.scale, 1);
     });
     if (high) {
       const n = dev.screens.length;
@@ -621,7 +642,8 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
     // ---- pulses: node → heart (in the network group's rotated frame)
     if (ng) {
       const ry = ng.rotation.y, cs = Math.cos(-ry), sn = Math.sin(-ry);
-      const hx = K.heart.x * cs, hz = -K.heart.x * sn, hy = K.heart.y;
+      const kx = K.heart.x + HERO.kOffset[0];
+      const hx = kx * cs, hz = -kx * sn, hy = K.heart.y + HERO.kOffset[1];
       const P = pulses;
       P.st.forEach((s, i) => {
         s.p += dt * s.speed * (intro >= 1 ? 1 : 0);
@@ -662,6 +684,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
       lt.intensity = mouse.active ? HERO.crystal.cursorLight.intensity * (1 - pe) : MathUtils.damp(lt.intensity, 0, 2, dt);
     }
 
+    if (qa) (window as unknown as { __kzHero: unknown }).__kzHero = { p, intro, L: { ...L }, shatter: shardU.uShatter.value, kVis: kFloat.current?.visible, solid: solidGroup.current?.visible, shard: shardGroup.current?.visible };
     if (first.current) {
       first.current = false;
       // Cross-fade: poster out, live canvas in (see .kz-hero-stage[data-ready]); the flat CSS grid
@@ -696,10 +719,16 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
           <sprite ref={glow} material={glowMat} position={[K.heart.x, K.heart.y, -0.6]} renderOrder={-1} />
           <group ref={kGroup}>
             <mesh ref={core} geometry={coreGeo} material={coreMat} position={[K.heart.x, K.heart.y, 0]} />
-            {K.geos.map((geo, i) => <mesh key={i} geometry={geo} material={kMat} renderOrder={1} />)}
+            <group ref={shardGroup}>{K.geos.map((geo, i) => <mesh key={i} geometry={geo} material={kMat} renderOrder={1} />)}</group>
+            {Ksolid !== K && (
+              <group ref={solidGroup} visible={false}>
+                {Ksolid.geos.map((geo, i) => <mesh key={i} geometry={geo} material={kMat} renderOrder={1} />)}
+                {Ksolid.geos.map((geo, i) => <mesh key={`t${i}`} geometry={geo} material={tintMat} renderOrder={2} />)}
+              </group>
+            )}
             <primitive object={edges.mesh} renderOrder={2} />
-            <primitive object={traces.mesh} renderOrder={2} />
-            <primitive object={traceDots.points} renderOrder={2} frustumCulled={false} />
+            {HERO.k.trace.enabled && <primitive object={traces.mesh} renderOrder={2} />}
+            {HERO.k.trace.enabled && <primitive object={traceDots.points} renderOrder={2} frustumCulled={false} />}
             <primitive object={kHit} visible={false} />
           </group>
           <mesh ref={shockMesh} material={shockMat} renderOrder={3} visible={false}>
@@ -708,7 +737,7 @@ export function HeroScene({ track, quality }: { track: HTMLElement; quality: Qua
         </group>
 
         {HERO.rings.map((r, i) => (
-          <group key={i} ref={(el) => { ringGroups.current[i] = el; }} rotation={[r.rx, r.ry, 0]}>
+          <group key={i} ref={(el) => { ringGroups.current[i] = el; }} position={[HERO.kOffset[0], HERO.kOffset[1], 0]} rotation={[r.rx, r.ry, 0]}>
             <mesh ref={gateRing('main', i)} geometry={ringGeos[i]} material={ringMats[i]} renderOrder={3} />
             <mesh ref={gateRing('rt', i)} geometry={ringGeos[i]} material={ringRtMats[i]} renderOrder={-5} />
             {r.packets.map((_, kk) => (

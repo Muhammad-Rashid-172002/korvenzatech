@@ -63,7 +63,7 @@ async function buildPage(route) {
   html = setTag(html, /<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${meta.image}" />`);
   const extraHead = [
     // Desktop only: there the hero poster is above the fold; on phones it sits below the headline.
-    route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w" imagesizes="620px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
+    route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w, /media/hero/sculpture-1600.webp 1600w" imagesizes="990px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
     `<script type="application/ld+json" id="kz-schema">${jsonLd(buildStructuredData(route))}</script>`,
   ].join('');
   html = html.replace('</head>', `${extraHead}<meta name="kz-build" content="${STAMP}" /></head>`);
