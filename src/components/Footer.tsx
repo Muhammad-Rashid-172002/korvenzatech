@@ -9,13 +9,12 @@ interface FooterProps {
   onNavigateSection: (sectionId: string) => void;
   onOpenCareers: () => void;
   onOpenContact: () => void;
-  onOpenLegal: (type: 'privacy' | 'terms' | 'cookies') => void;
   onSelectService: (service: ServiceItem) => void;
 }
 
 const linkCls = 'inline-block py-1 text-[13.5px] text-[#8EA098] hover:text-white';
 
-export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
+export const Footer: React.FC<FooterProps> = () => {
   return (
     <footer className="kz-footer kz-cinematic relative z-10 text-[#8EA098]">
       <div className="kz-container pt-20 pb-10">
@@ -60,9 +59,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal }) => {
               <ul className="mt-4 space-y-1.5">
                 <li><Link to="/insights" className={linkCls}>Insights</Link></li>
                 <li><Link to="/about#faq" className={linkCls}>FAQs</Link></li>
-                <li><button type="button" onClick={() => onOpenLegal('privacy')} className={linkCls}>Privacy policy</button></li>
-                <li><button type="button" onClick={() => onOpenLegal('terms')} className={linkCls}>Terms of service</button></li>
-                <li><button type="button" onClick={() => onOpenLegal('cookies')} className={linkCls}>Cookie preferences</button></li>
+                <li><Link to="/privacy" className={linkCls}>Privacy policy</Link></li>
+                <li><Link to="/terms" className={linkCls}>Terms of service</Link></li>
+                {/* No non-essential cookies exist, so there is nothing to consent to: this links to the policy. */}
+                <li><Link to="/cookies" className={linkCls}>Cookie policy</Link></li>
               </ul>
             </div>
           </div>

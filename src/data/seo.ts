@@ -5,6 +5,8 @@
  * Only verified company information is used here.
  */
 import { CASE_STUDIES, SERVICES_DATA } from './companyData';
+import { ARTICLES } from './articles';
+import { LEGAL } from './legal';
 
 export const SITE = 'https://korvenzatech.com';
 export const OG_IMAGE = `${SITE}/og-cover.png`;
@@ -64,9 +66,12 @@ const STATIC: Record<string, { title: string; description: string; name: string;
   '/start-project': { title: 'Start a Software, AI, SaaS or App Project | KorvenzaTech', description: 'Share your product idea or business goal with KorvenzaTech and get a clear path for custom software, SaaS, AI, mobile, web, API or cloud development.', name: 'Start a Project', changefreq: 'monthly', priority: 0.8 },
 };
 
+for (const d of LEGAL) STATIC[`/${d.slug}`] = { title: `${d.title} | KorvenzaTech`, description: d.description, name: d.title, changefreq: 'monthly', priority: 0.3 };
+
 /** Every indexable route, in sitemap order. */
 export const ROUTES: string[] = [
   ...Object.keys(STATIC),
+  ...ARTICLES.map((a) => `/insights/${a.slug}`),
   ...CASE_STUDIES.map((c) => `/work/${c.id}`),
   ...SERVICES_DATA.map((s) => `/services/${s.id}`),
 ];
@@ -82,6 +87,9 @@ export function getRouteMeta(path: string): RouteMeta {
     const [title, description] = SERVICE_META[service.id] ?? [`${service.title} Services | KorvenzaTech`, service.shortDesc];
     return { ...base, path, title, description, name: service.title, changefreq: 'monthly', priority: 0.9 };
   }
+
+  const article = path.startsWith('/insights/') ? ARTICLES.find((a) => `/insights/${a.slug}` === path) : undefined;
+  if (article) return { ...base, path, title: `${article.title} | KorvenzaTech`, description: article.description, name: article.title, ogType: 'article', changefreq: 'monthly', priority: 0.6 };
 
   const study = path.startsWith('/work/') ? CASE_STUDIES.find((x) => `/work/${x.id}` === path) : undefined;
   if (study) {
@@ -129,6 +137,7 @@ function breadcrumbs(path: string, meta: RouteMeta) {
   const items: { name: string; url: string }[] = [{ name: 'Home', url: `${SITE}/` }];
   if (path.startsWith('/services/')) items.push({ name: 'Services', url: `${SITE}/services` });
   if (path.startsWith('/work/')) items.push({ name: 'Work', url: `${SITE}/work` });
+  if (path.startsWith('/insights/')) items.push({ name: 'Insights', url: `${SITE}/insights` });
   if (path !== '/') items.push({ name: meta.name, url: canonicalFor(path) });
   return {
     '@type': 'BreadcrumbList',
@@ -167,6 +176,17 @@ export function buildStructuredData(path: string) {
     if (service.faqs.length) {
       graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: service.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
     }
+  }
+
+  const article = ARTICLES.find((a) => `/insights/${a.slug}` === path);
+  if (article) {
+    graph.push({
+      '@type': 'Article', '@id': `${url}#article`, headline: article.title, description: article.description, url,
+      mainEntityOfPage: { '@id': `${url}#webpage` }, datePublished: article.published, dateModified: article.published,
+      articleSection: article.category, inLanguage: 'en', image: meta.image,
+      author: { '@type': 'Person', name: article.author.name, jobTitle: 'Founder & CEO', worksFor: { '@id': ORG_ID } },
+      publisher: { '@id': ORG_ID },
+    });
   }
 
   const study = CASE_STUDIES.find((s) => `/work/${s.id}` === path);

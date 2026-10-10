@@ -1,4 +1,4 @@
-import { ServiceItem, CaseStudy, IndustryItem, TechStackCategory, ProcessStep, InsightArticle, FAQItem, OpenRole } from '../types';
+import { ServiceItem, CaseStudy, IndustryItem, TechStackCategory, ProcessStep, FAQItem, OpenRole } from '../types';
 
 export const SERVICES_DATA: ServiceItem[] = [
   {
@@ -552,46 +552,6 @@ export const TECH_STACK: TechStackCategory[] = [
   }
 ];
 
-export const INSIGHTS_ARTICLES: InsightArticle[] = [
-  {
-    id: 'ai-integration-guide-2026',
-    title: 'How Businesses Can Integrate AI Without Sacrificing Data Security',
-    category: 'AI & Automation',
-    readTime: '5 min read',
-    date: 'August 2, 2026',
-    excerpt: 'AI is no longer just for tech giants. Learn how growing organizations can leverage LLMs and RAG architectures safely without exposing proprietary company data.',
-    author: { name: 'Engineering Team', role: 'KorvenzaTech Systems Lab' },
-    content: `Many executives want to harness artificial intelligence to automate customer service or analyze complex business reports, but worry about data leaks. 
-
-The key lies in private API endpoints, controlled access, and Retrieval-Augmented Generation (RAG). Sensitive business content can remain inside isolated data stores while the application retrieves only the information needed for each approved request.
-
-At KorvenzaTech, we design AI architectures that keep your data strictly private while delivering instant 24/7 intelligence to your customers and team.`
-  },
-  {
-    id: 'native-vs-flutter-apps',
-    title: 'Flutter vs Native Apps in 2026: Choosing the Right Strategy for Your Business',
-    category: 'App Development',
-    readTime: '6 min read',
-    date: 'July 18, 2026',
-    excerpt: 'Building separate iOS and Android apps doubles development cost and time. Here is why modern cross-platform engineering with Flutter is powering the top business products.',
-    author: { name: 'Mobile Product Lead', role: 'KorvenzaTech Engineering' },
-    content: `For years, non-technical founders believed they had to write native Swift for iOS and native Kotlin for Android to achieve smooth performance. Modern cross-platform frameworks like Flutter have completely changed the equation.
-
-A shared cross-platform codebase can reduce duplicated engineering effort while supporting both iOS and Android. Flutter is a strong option when a product needs consistent UI, fast iteration, native integrations, and maintainable feature delivery across platforms.`
-  },
-  {
-    id: 'api-first-architecture',
-    title: 'Why an API-First Approach Prevents Costly Software Rebuilds',
-    category: 'Software Architecture',
-    readTime: '4 min read',
-    date: 'June 29, 2026',
-    excerpt: 'When building software, coupling your database directly to your front-end creates rigid systems. Discover how API-first design keeps your product ready for future apps and tools.',
-    author: { name: 'Architectural Director', role: 'KorvenzaTech Cloud Services' },
-    content: `When a business builds a website first and later decides to add a mobile app, poorly structured codeforces them to rebuild their backend from scratch.
-
-An API-First architecture solves this by building a clean, secure data layer first. Your website, mobile apps, third-party payment gateways, and AI agents all connect to this central hub. This means adding a new iOS app or web portal in the future takes weeks instead of months.`
-  }
-];
 
 export const FAQ_ITEMS: FAQItem[] = [
   {

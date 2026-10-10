@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { ArrowRight, Mail, MapPin, MessageCircle, MessageSquare, Video } from 'lucide-react';
 import { SiteNavbar } from './components/SiteNavbar';
 import { PageHero } from './components/PageHero';
@@ -19,12 +19,13 @@ import { InsightsSection } from './components/InsightsSection';
 import { FAQSection } from './components/FAQSection';
 import { StartProjectSection } from './components/StartProjectSection';
 import { Footer } from './components/Footer';
-import { LegalModal } from './components/LegalModal';
 import { KorvenzaAIChat } from './components/KorvenzaAIChat';
 import { ServiceLandingPage } from './components/ServiceLandingPage';
 import { CaseStudyLandingPage } from './components/CaseStudyLandingPage';
 import { SolutionBlueprints } from './components/SolutionBlueprints';
 import { SeoManager } from './components/SeoManager';
+import { ARTICLES } from './data/articles';
+import { LEGAL } from './data/legal';
 import { ClosingCTA, HomeProjects, HomeServices, NotFound } from './components/home/HomeSections';
 import { SERVICES_DATA, CASE_STUDIES } from './data/companyData';
 import { RouterProvider } from './lib/router';
@@ -33,19 +34,24 @@ import { SectionHeader } from './components/ui';
 import { ExperienceGate } from './components/three/ExperienceGate';
 import { scrollToElement, scrollToTop } from './lib/scrollStore';
 
-const STATIC_ROUTES = ['/', '/services', '/work', '/industries', '/about', '/insights', '/careers', '/contact', '/start-project'];
+// Long-form pages load as their own chunks (their text would otherwise weigh on every page).
+const ArticlePage = lazy(() => import('./components/content/ArticlePage'));
+const LegalPage = lazy(() => import('./components/content/LegalPage'));
+const PageFallback = () => <div className="min-h-[100svh]" aria-hidden="true" />;
+
+const STATIC_ROUTES = ['/', '/services', '/work', '/industries', '/about', '/insights', '/careers', '/contact', '/start-project', ...LEGAL.map((d) => `/${d.slug}`)];
 
 export const normalizePath = (p: string) => (p.length > 1 ? p.replace(/\/+$/, '') : p) || '/';
 
 export function isKnownRoute(path: string) {
   return STATIC_ROUTES.includes(path)
     || SERVICES_DATA.some((s) => `/services/${s.id}` === path)
-    || CASE_STUDIES.some((s) => `/work/${s.id}` === path);
+    || CASE_STUDIES.some((s) => `/work/${s.id}` === path)
+    || ARTICLES.some((a) => `/insights/${a.slug}` === path);
 }
 
 function App({ initialPath }: { initialPath?: string }) {
   const [path, setPath] = useState(() => normalizePath(initialPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/')));
-  const [legal, setLegal] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   // Theme is applied to <html> by an inline script before paint; markup never depends on it,
   // so server and client render identically.
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
@@ -97,9 +103,13 @@ function App({ initialPath }: { initialPath?: string }) {
   let content: React.ReactNode;
   const serviceRoute = path.startsWith('/services/') ? SERVICES_DATA.find((s) => `/services/${s.id}` === path) : undefined;
   const studyRoute = path.startsWith('/work/') ? CASE_STUDIES.find((s) => `/work/${s.id}` === path) : undefined;
+  const articleRoute = path.startsWith('/insights/') ? ARTICLES.find((a) => `/insights/${a.slug}` === path) : undefined;
+  const legalRoute = LEGAL.find((d) => `/${d.slug}` === path);
 
   if (serviceRoute) content = <ServiceLandingPage service={serviceRoute} onStartProject={startProject} onNavigateServices={() => navigate('/services')} />;
   else if (studyRoute) content = <CaseStudyLandingPage study={studyRoute} onBack={() => navigate('/work')} onStartProject={startProject} />;
+  else if (articleRoute) content = <Suspense fallback={<PageFallback />}><ArticlePage article={articleRoute} /></Suspense>;
+  else if (legalRoute) content = <Suspense fallback={<PageFallback />}><LegalPage doc={legalRoute} /></Suspense>;
   else if (path === '/services') content = <>
     <PageHero eyebrow="Capabilities" title={<>Technology services built to <span className="gradient-text-cyan">solve real business problems.</span></>} description="From AI systems and APIs to mobile apps, websites, custom software and cloud delivery — choose one service or let us design the complete solution." primary="Discuss your project" onPrimary={startProject} secondary="See our work" onSecondary={openWork} />
     <ServicesOverview onNavigateService={(id) => navigate(`/services/${id}`)} onStartProject={startProject} />
@@ -197,8 +207,7 @@ function App({ initialPath }: { initialPath?: string }) {
         <SeoManager path={path} />
         <SiteNavbar path={path} navigate={navigate} onSelectService={navigateService} theme={theme} onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
         <main id="main" tabIndex={-1} className="outline-none">{content}</main>
-        <Footer onNavigateSection={() => {}} onOpenCareers={() => navigate('/careers')} onOpenContact={() => navigate('/contact')} onOpenLegal={setLegal} onSelectService={navigateService} />
-        <LegalModal type={legal} onClose={() => setLegal(null)} />
+        <Footer onNavigateSection={() => {}} onOpenCareers={() => navigate('/careers')} onOpenContact={() => navigate('/contact')} onSelectService={navigateService} />
         <KorvenzaAIChat />
         <ExperienceGate path={path} />
       </div>

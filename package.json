@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/generate-seo-pages.mjs",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/generate-seo-pages.mjs && tsx scripts/verify-build.ts",
     "start": "tsx server.ts",
     "verify": "tsx scripts/verify-build.ts",
     "preview": "vite preview",

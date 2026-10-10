@@ -52,17 +52,6 @@ export interface ProcessStep {
   deliverable: string;
 }
 
-export interface InsightArticle {
-  id: string;
-  title: string;
-  category: string;
-  readTime: string;
-  date: string;
-  excerpt: string;
-  content: string;
-  author: { name: string; role: string };
-}
-
 export interface FAQItem {
   question: string;
   answer: string;

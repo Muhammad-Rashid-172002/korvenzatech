@@ -724,3 +724,17 @@ html.kz-cursor-on .kz-cursor { opacity: 1; }
 #hero[data-kz3d="ready"] .kz-fine-grid { opacity: 0 !important; }
 /* Hero V2 poster is a render of the live scene (with its own backdrop): feather its square edges. */
 .kz-hero-poster { -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); mask-image: radial-gradient(closest-side, #000 70%, transparent 100%); }
+
+/* ---------- Long-form content (articles, legal) ------------------------- */
+.kz-prose { color: var(--kz-text-2); font-size: 17px; line-height: 1.8; }
+.kz-prose > * + * { margin-top: 1.15em; }
+.kz-prose h2 { margin-top: 2.2em; color: var(--kz-text); font-size: clamp(22px, 2.4vw, 27px); line-height: 1.25; font-weight: 800; letter-spacing: -0.02em; scroll-margin-top: 110px; }
+.kz-prose ul { padding-left: 1.2em; list-style: disc; }
+.kz-prose li { padding-left: .25em; }
+.kz-prose li + li { margin-top: .45em; }
+.kz-prose li::marker { color: var(--kz-accent-text); }
+.kz-prose strong { color: var(--kz-text); font-weight: 700; }
+.kz-prose code { font-family: var(--font-mono); font-size: .86em; padding: .12em .4em; border-radius: 6px; background: var(--kz-surface); border: 1px solid var(--kz-border); }
+.kz-read-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: calc(var(--kz-z-sticky) + 2); pointer-events: none; }
+.kz-read-progress > div { height: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, #087F5B, #19C784 60%, #A6EBCD); }
+body:has(.kz-read-progress) .kz-progress { display: none; }

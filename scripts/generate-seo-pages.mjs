@@ -42,7 +42,7 @@ function setTag(html, re, replacement) {
   return html.replace(re, replacement);
 }
 
-function buildPage(route) {
+async function buildPage(route) {
   const meta = getRouteMeta(route);
   const canonical = canonicalFor(route);
   const robots = meta.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
@@ -68,14 +68,14 @@ function buildPage(route) {
   ].join('');
   html = html.replace('</head>', `${extraHead}<meta name="kz-build" content="${STAMP}" /></head>`);
 
-  const appHtml = render(route);
+  const appHtml = await render(route);
   html = setTag(html, /<div id="root"><\/div>/, `<div id="root">${appHtml}</div>`);
   return html;
 }
 
 const routes = [...ROUTES];
 for (const route of routes) {
-  const html = buildPage(route);
+  const html = await buildPage(route);
   if (route === '/') { fs.writeFileSync(baseFile, html); continue; }
   const dir = path.join(dist, ...route.split('/').filter(Boolean));
   fs.mkdirSync(dir, { recursive: true });
@@ -83,7 +83,7 @@ for (const route of routes) {
 }
 
 // Branded 404 (served by Vercel for unknown paths with a 404 status).
-fs.writeFileSync(path.join(dist, '404.html'), buildPage('/__not-found__'));
+fs.writeFileSync(path.join(dist, "404.html"), await buildPage('/__not-found__'));
 
 // Sitemap from the same route list — only canonical, indexable URLs.
 const lastmod = new Date().toISOString().slice(0, 10);

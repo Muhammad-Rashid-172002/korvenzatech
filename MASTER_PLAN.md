@@ -14,7 +14,7 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 5. **Frameloop**: renders only while a 3D view is on screen and the tab is visible (= `demand` for idle cost).
 6. **Logo vector**: traced from your raster; a designer SVG is still the gold standard — TODO(Rashid, optional).
 7. **Build stamp**: every page has `<meta name="kz-build" content="<commit> <time>">` and `/build.json` exists — compare them to see instantly whether a route is served from an old cache.
-8. **verify-build** (`npm run verify`) is wired into `npm run build` once Phase 2.1/2.2 make it green (it currently fails, correctly, on the plain-text legal items and the unlinked "Read full article").
+8. **verify-build** runs at the end of `npm run build` (26 routes) — a broken route fails the build.
 
 ## Phase 1 — Deploy consistency
 - [x] 1.1 All 20 routes rebuilt and audited: every `dist/**/index.html` has the 9-service footer, the inline K, full content. (Legal links + article links → 2.1/2.2, enforced by 1.3.)
@@ -23,8 +23,8 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - [x] 1.4 Hosting = Vercel (`vercel.json`; `server.ts` is the local/Node fallback). Cache headers fixed in both. Redeploy + purge steps in the log.
 
 ## Phase 2 — Trust, legal & content
-- [ ] 2.1 /privacy, /terms, /cookies + footer links (lawyer review TODO)
-- [ ] 2.2 Three full Insight articles + routes, JSON-LD, progress bar; links wired
+- [x] 2.1 /privacy, /terms, /cookies + footer links (lawyer review TODO)
+- [x] 2.2 Three full Insight articles + routes, JSON-LD, progress bar; links wired
 - [ ] 2.3 Testimonials data model; hide placeholder entries; TODO list
 - [ ] 2.4 Leadership: Suliman single title; LinkedIn icons (hidden until URLs)
 - [ ] 2.5 Copy corrections (FAQ, process deliverables, CTA label, latency, benchmarks, industries split, tech list confirmation)
@@ -83,6 +83,7 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - App-screen recreations review (`tools/screens/contact-sheet.png`); hero device demo wording.
 - "Rony Sultana" testimonial (two different roles).
 - Optional: designer-made SVG of the K.
+- Lawyer review of /privacy, /terms, /cookies (written for GDPR/UK-GDPR awareness; governing law set to Pakistan). Confirm which Gemini API plan is used (free-tier prompts may be used by Google to improve products — if so, switch to a paid plan or say so in the privacy policy).
 - After deploy: re-share korvenzatech.com on LinkedIn/WhatsApp so link previews refresh.
 
 ---
@@ -135,3 +136,11 @@ Legend: `[x]` done · `[~]` partly done earlier · `[ ]` to do · **TODO(Rashid)
 - Known issues: screenshots here are from a software GPU (SwiftShader) — glass looks a little flatter than on a real GPU; please judge colour/brightness on your laptop. QA hook: `window.dispatchEvent(new Event('kz:hero-replay'))` replays the intro.
 - Test (laptop): hard-reload `/` → poster, then shards fly in and lock with a ring pulse (~2 s); hover the K (cursor = pointer, sway speeds up, core brighter), click it (shockwave); hover each device (comes forward, loop faster); click the blue phone → IELTS case study, purple phone → SkillLink, top-right browser → AI chat opens; scroll down → K shatters and falls, devices fly out; check DevTools Performance ≈ 60 fps.
 - Test (Android): `/` → hero visual below the copy shows the K (no shards), 4 devices with static screens; scroll → K shrinks/fades smoothly; no jank; Lighthouse mobile ≥ 85.
+
+### Phase 2.1–2.2 — Legal pages & articles ✅
+**2.1** `/privacy`, `/terms`, `/cookies` (`src/data/legal.ts`, `components/content/LegalPage.tsx`): last-updated date, on-page contents, links between the three. Written from how the site actually works: no cookies, no analytics, local storage only (theme + AI chat, cleared by the chat's reset), processors Vercel / Google (Workspace, Gemini, Fonts), GDPR legal bases, transfers, retention, rights, ICO complaint route. Footer items are now real links on every page; "Cookie preferences" → **"Cookie policy"** link, because there are no non-essential cookies to consent to (a consent panel with nothing to switch off would be theatre). Old `LegalModal` removed.
+**2.2** Three full articles (`src/data/articles.ts`, 926–1,100 words, no invented statistics), author Muhammad Rashid (Founder & CEO), original publish dates kept, reading time, breadcrumb, reading-progress bar (replaces the global bar on articles), related articles, CTA; `Article` + `BreadcrumbList` JSON-LD; in sitemap. Insights cards are real links (old modal removed).
+- verify-build now passes on 26 routes and is part of `npm run build`.
+- Files: `src/data/legal.ts`, `src/data/articles.ts`, `src/components/content/{Prose,LegalPage,ArticlePage}.tsx`, `InsightsSection.tsx`, `Footer.tsx`, `App.tsx`, `src/data/seo.ts`, `src/data/companyData.ts`, `src/types.ts`, `src/index.css`, `package.json`.
+- Bundle (gzip): main −1.1 KB (119.6; the old modal text left the main bundle). Article and legal pages are lazy chunks (9.2 KB / 4.5 KB) — prerender now uses React `prerenderToNodeStream`, which waits for lazy chunks, so their full text is still in the HTML.
+- Test: footer → Privacy/Terms/Cookie policy open real pages (also in a new tab); /insights → each card opens its article; on an article the thin bar at the top fills as you read; Android: same, text readable without zoom.
