@@ -45,7 +45,9 @@ Covered: initial load, direct URL, refresh (each a new document → one hit), in
 | `scroll` | GA4 Enhanced Measurement (90 % depth) | automatic |
 | `click` | GA4 Enhanced Measurement outbound clicks (`outbound: true`) — this *is* the outbound-click event; no second custom event is sent | automatic |
 
-All custom events also carry page_location and page_title. `link_location` = header / nav / footer / section id (e.g. `hero`) / dialog. Every parameter passes `clean()`: values that look like an email address or phone number are dropped; form contents are never read. Add `data-analytics-ignore` to an element to exclude it.
+All custom events also carry page_location and page_title. `link_location` = header / nav / footer / section id (e.g. `hero`) / dialog. Add `data-analytics-ignore` to an element to exclude it.
+
+**URL & parameter privacy.** Every URL sent to GA (`page_location`, `page_referrer`, `link_url`) is rebuilt by `sanitizeUrl()`: origin + normalised path + only `utm_*`, `gclid`, `gbraid`, `wbraid`, `ga_debug` (lower-cased); no `#hash`; allow-listed values that look like an email/phone (after up to 3× URL-decoding) are dropped; a path containing one becomes `/redacted`. The sanitized URL is passed in the `config` call by an inline copy of the same function in `index.html` (so it applies before the app loads) and pinned with `gtag('set', …)` on every page view — so GA's automatic scroll / outbound-click / engagement events use it too and the tag never falls back to the raw browser URL. Other values that look like an email or phone number are dropped by `clean()`; form contents are never read. The browser's address bar is not modified.
 
 **Enhanced Measurement toggles:** keep *Scrolls* and *Outbound clicks* ON; turn **Form interactions OFF** (its automatic form_start/form_submit would duplicate ours and fires on failed submissions); Site search, Video, File downloads: optional (the site has none of these today).
 
@@ -61,11 +63,13 @@ Not key events: page views, `cta_click`, `contact_click` (they are steps, not le
 
 ## Consent & privacy
 
-- Consent Mode v2: `ad_storage`, `ad_user_data`, `ad_personalization` always **denied** (no advertising).
-- `analytics_storage` **denied by default in the EEA, UK and Switzerland** (region list in `index.html`) until "Accept analytics"; **granted by default elsewhere**, with Decline available at any time (banner + footer "Cookie preferences").
-- With analytics denied, Google receives cookieless pings (Consent Mode "advanced"). Some EU regulators expect *no* request before consent; if you want that, switch to "basic" mode (load gtag.js only after Accept) — a small change in `index.html`.
-- Privacy policy and cookie policy were updated to describe GA4 (dated 30 Oct 2026). This is not a legal opinion — have them reviewed.
-- Recommended GA settings: Admin → Data collection → **Google signals OFF**; Data retention → **14 months** (the privacy policy says "up to 14 months"); Data settings → turn off "ads personalization" for all regions.
+- Consent Mode v2: `ad_storage`, `ad_user_data`, `ad_personalization` always **denied** by the site's tag.
+- `analytics_storage` **denied by default in the EEA, UK and Switzerland** (region list in `index.html`) until "Accept analytics"; **granted by default elsewhere**, with Decline available at any time (banner + footer "Cookie preferences"). The choice is stored as `kz-consent` and re-applied before `config` on every load.
+- **Withdrawal:** Decline sends `consent update analytics_storage: denied` and then deletes `_ga` and `_ga_<id>` (host-only and every parent-domain variant, path `/`); nothing else is touched. On each load with a stored Decline, any stray GA cookie is removed again.
+- **Before consent / after Decline:** no GA cookies, but the tag can still send **cookieless measurement requests** (Consent Mode "advanced"): no cookie identifier, but page, time, browser/device data and the visitor's IP address reach Google, which may use them for modelling. Some EU/UK regulators expect no request at all before consent; the alternative is "basic" mode (load gtag.js only after Accept), a small change in `index.html`. **Legal review needed:** this choice, the default-on behaviour outside the EEA/UK/CH, and the "our interest in understanding how the site is used" basis stated for those visitors.
+- **Form:** the project/contact brief is sent only by JavaScript (`fetch` → `/api/contact`). The form has `method="post"` and its submit button stays disabled until the page has hydrated, so no native submission (pre-hydration or JavaScript disabled) can put field values in a URL; without JavaScript a notice points to sales@korvenzatech.com.
+- The privacy and cookie policies describe this behaviour (dated 30 Oct 2026). They make **no claims** about Google signals, data sharing or the retention period — those are GA account settings; update the wording once you have configured and verified them. Not a legal opinion — have them reviewed.
+- GA account settings to decide and verify (Admin): Data collection → Google signals; Data retention (2 or 14 months); Data settings → ads personalization; Account settings → data sharing.
 
 ## Campaign links (UTM)
 

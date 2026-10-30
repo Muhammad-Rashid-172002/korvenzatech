@@ -1,5 +1,5 @@
 import { trackEvent } from '../lib/analytics';
-import React, { useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Sparkles, CheckCircle, Send, Bot, Shield, Clock, AlertCircle } from 'lucide-react';
 import { SectionHeader } from './ui';
 import { ProjectBriefData } from '../types';
@@ -46,6 +46,11 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   // GA4: form_start once per form instance (first focus), form_submit + generate_lead only after
   // the server confirms. Only the form type is sent — never field contents.
   const startedRef = useRef(false);
+  // The brief is sent by JavaScript (fetch → /api/contact). Until the page has hydrated the
+  // submit button stays disabled, so a native (pre-hydration or no-JS) submission can't happen;
+  // method="post" additionally keeps field values out of the URL if one ever did.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const formType = defaultInquiryType === 'Project / Sales' ? 'project_brief' : 'contact';
   const onFormFocus = () => { if (!startedRef.current) { startedRef.current = true; trackEvent('form_start', { form_type: formType, form_id: 'start_project' }); } };
 
@@ -167,7 +172,10 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
               </button>
             </div>
           ) : (
-            <form ref={formRef} onSubmit={handleSubmit} onFocus={onFormFocus} noValidate className="space-y-9 text-left">
+            <form ref={formRef} method="post" onSubmit={handleSubmit} onFocus={onFormFocus} noValidate className="space-y-9 text-left">
+              <noscript>
+                <p className="rounded-2xl border border-[var(--kz-border)] p-4 text-[14px] leading-6 text-[var(--kz-text)]">This form needs JavaScript. Please email <a href="mailto:sales@korvenzatech.com" className="font-semibold underline">sales@korvenzatech.com</a> instead.</p>
+              </noscript>
               {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
               <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
                 <label htmlFor={`${uid}-website`}>Website</label>
@@ -276,7 +284,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
               )}
 
               <div className="flex flex-col items-start justify-between gap-5 border-t border-[var(--kz-border)] pt-7 sm:flex-row sm:items-center">
-                <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className="kz-btn kz-btn-primary !min-h-[52px] !px-7 disabled:cursor-wait disabled:opacity-60">
+                <button type="submit" disabled={isSubmitting || !ready} aria-busy={isSubmitting} className="kz-btn kz-btn-primary !min-h-[52px] !px-7 disabled:cursor-wait disabled:opacity-60">
                   <Send className="h-4 w-4" aria-hidden="true" />
                   {isSubmitting ? 'Sending brief…' : 'Discuss my project'}
                 </button>

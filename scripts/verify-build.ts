@@ -9,7 +9,7 @@
  *  - non-empty <main> (>= 120 words of server-rendered text)
  *  - no "Read full article" that is not a link with an href
  *  - no plain-text legal items (Privacy policy / Terms of service / Cookie preferences)
- *  - Google Analytics tag present exactly once, with send_page_view: false
+ *  - Google Analytics tag present exactly once, with send_page_view: false and a sanitized page_location
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -54,7 +54,7 @@ for (const file of files) {
 
   // Google Analytics: tag exactly once, page views sent by the app (no automatic page_view)
   if ((html.match(/googletagmanager\.com\/gtag\/js\?id=G-QB25ZM8KNL/g) ?? []).length !== 1) fail('GA4 tag missing or duplicated');
-  if (!/gtag\('config', 'G-QB25ZM8KNL', \{ send_page_view: false \}\)/.test(html)) fail('GA4 config must set send_page_view: false');
+  if (!/kzCfg = \{ send_page_view: false, page_location: kzSafeUrl\(location\.href\)/.test(html) || !/gtag\('config', 'G-QB25ZM8KNL', kzCfg\)/.test(html)) fail('GA4 config must set send_page_view: false and a sanitized page_location');
 
   // main content
   const main = html.match(/<main[\s\S]*?<\/main>/)?.[0] ?? '';

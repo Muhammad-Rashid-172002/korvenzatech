@@ -42,7 +42,23 @@
       gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
       try { var kzc = localStorage.getItem('kz-consent'); if (kzc === 'granted' || kzc === 'denied') gtag('consent', 'update', { analytics_storage: kzc }); } catch (_) {}
       gtag('js', new Date());
-      gtag('config', 'G-QB25ZM8KNL', { send_page_view: false });
+      // Sanitized URLs from the very first moment (before the app loads): only campaign / click-ID /
+      // debug parameters, no #hash, nothing that looks like an email or phone. Same rules as
+      // sanitizeUrl() in src/lib/analytics.ts (kept in sync by tests/analytics.test.ts).
+      function kzSafeUrl(h) {
+        try {
+          var u = new URL(h), d = function (v) { for (var i = 0; i < 3; i++) { try { var x = decodeURIComponent(v.replace(/\+/g, ' ')); if (x === v) break; v = x; } catch (_) { break; } } return v; },
+            bad = function (v) { v = d(v); return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(v) || /\+?\d[\d\s().-]{6,}\d/.test(v); };
+          if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+          var p = bad(u.pathname) ? '/redacted' : (u.pathname.length > 1 ? u.pathname.replace(/\/+$/, '') : u.pathname) || '/', q = new URLSearchParams();
+          u.searchParams.forEach(function (v, k) { k = k.toLowerCase(); if (/^(utm_[a-z0-9_]+|gclid|gbraid|wbraid|ga_debug)$/.test(k) && v.length <= 200 && !bad(v)) q.append(k, v); });
+          q = q.toString();
+          return u.origin + p + (q ? '?' + q : '');
+        } catch (_) { return ''; }
+      }
+      var kzCfg = { send_page_view: false, page_location: kzSafeUrl(location.href) || location.origin + '/' }, kzRef = document.referrer && kzSafeUrl(document.referrer);
+      if (kzRef) kzCfg.page_referrer = kzRef;
+      gtag('config', 'G-QB25ZM8KNL', kzCfg);
     </script>
 
     <!-- Fonts -->

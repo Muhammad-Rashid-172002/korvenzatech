@@ -16,7 +16,7 @@ KorvenzaTech is a founder-led software and AI product studio based in Islamabad,
 - **Emails and calls:** what you send us when you contact us directly.
 - **Technical data:** our hosting provider processes standard request logs (IP address, browser type, requested page, time) to deliver and protect the website.
 
-- **Website analytics (Google Analytics 4):** which pages are viewed, how visitors arrive (for example a LinkedIn link or campaign tag), approximate location (country/city derived by Google from the IP address), device and browser type, and anonymous interaction events such as clicking a contact link or submitting the enquiry form. We never send your name, email, phone number or form contents to Google Analytics.
+- **Website analytics (Google Analytics 4):** which pages are viewed, how visitors arrive (for example a LinkedIn link or campaign tag), approximate location (country/city derived by Google from the IP address), device and browser type, and interaction events such as clicking a contact link or submitting the enquiry form. When analytics cookies are allowed, these are linked to a random identifier stored in your browser (pseudonymous, not anonymous). The site removes query parameters other than campaign tags from the addresses it reports, and never sends your name, email, phone number or form contents to Google Analytics.
 
 We do not use advertising trackers or advertising cookies, and we do not buy personal data.
 
@@ -25,7 +25,7 @@ We do not use advertising trackers or advertising cookies, and we do not buy per
 - **To reply to your enquiry and prepare a proposal** — steps taken at your request before a contract (GDPR Art. 6(1)(b)).
 - **To answer questions in the AI assistant** — our legitimate interest in helping visitors understand our services (Art. 6(1)(f)), and your request.
 - **To keep the website secure and working** — legitimate interest (Art. 6(1)(f)).
-- **To measure and improve the website (Google Analytics)** — your consent in the EEA, UK and Switzerland (Art. 6(1)(a)), which you can withdraw at any time through "Cookie preferences" in the footer; elsewhere our legitimate interest in understanding how the site is used, and you can opt out the same way.
+- **To measure and improve the website (Google Analytics)** — in the EEA, UK and Switzerland, analytics cookies are used only with your consent, which you can withdraw at any time through "Cookie preferences" in the footer. Elsewhere analytics runs by default on the basis of our interest in understanding how the site is used, and you can opt out the same way.
 - **To meet legal, tax and accounting obligations** once we work together (Art. 6(1)(c)).
 
 We only send marketing emails if you ask for them, and every such email lets you unsubscribe.
@@ -35,7 +35,7 @@ We only send marketing emails if you ask for them, and every such email lets you
 We use a small number of service providers ("processors") who handle data on our behalf under their own data protection terms:
 
 - **Vercel** — website hosting and serverless functions (request logs, form and chat requests in transit).
-- **Google Analytics 4** — website usage statistics, as described above (advertising features are switched off).
+- **Google Analytics 4** — website usage statistics, as described above. The site's Google tag tells Google not to use advertising storage or ad personalisation for any visitor.
 - **Google** — Google Workspace (email and storage of enquiries) and the Google Gemini API, which generates the AI assistant's replies from the messages you send.
 - **Google Fonts** — delivers the website's fonts; your browser requests them from Google's servers.
 
@@ -51,7 +51,7 @@ We are based in Pakistan and our providers operate globally, including in the Un
 - Client project correspondence and records: for the duration of the engagement and as long as required by law afterwards.
 - AI assistant: our server does not keep a transcript database. Your conversation is stored in your own browser (local storage) so it survives a page reload; you can clear it at any time with the assistant's reset option or by clearing site data. Requests pass through our hosting and AI providers, which keep limited logs under their own retention policies.
 - Hosting request logs: kept by Vercel for a short period under its retention policy.
-- Google Analytics event data: up to 14 months (our Google Analytics retention setting), then deleted automatically; reports only show aggregated statistics.
+- Google Analytics event data: kept for the retention period configured in our Google Analytics account (Google offers 2 or 14 months for this data), then deleted automatically by Google.
 
 ## Security
 
@@ -113,14 +113,20 @@ These terms are governed by the laws of Pakistan. If you are a consumer, you als
 ## Changes and contact
 
 We may update these terms; the date at the top shows the latest version. Questions: ${CONTACT}.`,
-  cookies: `Short version: korvenzatech.com uses Google Analytics cookies to understand how the site is used — and nothing for advertising. In the EEA, UK and Switzerland they are only set after you click "Accept analytics"; elsewhere analytics is on by default and you can decline at any time with "Cookie preferences" in the footer.
+  cookies: `Short version: korvenzatech.com uses Google Analytics cookies to understand how the site is used. The site's Google tag does not use advertising storage or ad personalisation. In the EEA, UK and Switzerland analytics cookies are only set after you click "Accept analytics"; elsewhere they are used by default and you can decline at any time with "Cookie preferences" in the footer.
 
 ## Analytics cookies (Google Analytics 4)
 
-- **_ga** — distinguishes visitors (a random ID, not your name or email). Set by Google Analytics, expires after 2 years.
+- **_ga** — distinguishes visitors with a random identifier (not your name or email). Set by Google Analytics, expires after 2 years.
 - **_ga_QB25ZM8KNL** — keeps the state of your visit (session). Set by Google Analytics, expires after 2 years.
 
-They tell us which pages are read, how people find us (for example a LinkedIn post or a campaign link) and which contact options are used. Google processes this data for us; advertising features, Google signals and ad personalisation are not used. If you decline, these cookies are not set and Google receives only cookieless, aggregate signals under Google's Consent Mode.
+They tell us which pages are read, how people find us (for example a LinkedIn post or a campaign link) and which contact options are used. Google processes this data for us. Other Google Analytics account settings (for example Google signals and data retention) are managed in our Google Analytics account.
+
+## Before you choose, and if you decline
+
+While analytics cookies are not allowed — if you decline, and in the EEA, UK and Switzerland until you accept — no analytics cookies are set. The Google tag may still send cookieless measurement requests to Google ("Consent Mode"). These do not include a cookie identifier, but they do include information such as the page visited, the time, and your browser and device type, and they reach Google from your IP address. Google may use them to estimate overall usage.
+
+If you accepted earlier and later decline, the site deletes its Google Analytics cookies (_ga and _ga_QB25ZM8KNL) from your browser and stops setting them.
 
 ## Your choice
 
