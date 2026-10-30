@@ -29,13 +29,30 @@
     <meta name="twitter:description" content="Software development company building custom software, SaaS platforms, AI solutions, Flutter mobile apps, websites, APIs and cloud systems for growing businesses." />
     <meta name="twitter:image" content="https://korvenzatech.com/og-cover.png" />
 
-    <!-- Fonts: preconnect + swap so text is never invisible while fonts load. -->
+    <!-- Google Analytics 4 (loaded once, async). Page views are sent by the app (src/lib/analytics.ts)
+         on every SPA navigation, so automatic page_view is off here; see ANALYTICS.md. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QB25ZM8KNL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      // Consent Mode v2: advertising storage is never used. Analytics storage waits for consent in
+      // the EEA, UK and Switzerland; elsewhere it is on by default and can be declined at any time.
+      gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied',
+        region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'], wait_for_update: 500 });
+      gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
+      try { var kzc = localStorage.getItem('kz-consent'); if (kzc === 'granted' || kzc === 'denied') gtag('consent', 'update', { analytics_storage: kzc }); } catch (_) {}
+      gtag('js', new Date());
+      gtag('config', 'G-QB25ZM8KNL', { send_page_view: false });
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" /></noscript>
 
+    <!-- Theme initialization -->
     <script>
       (function () {
         try {

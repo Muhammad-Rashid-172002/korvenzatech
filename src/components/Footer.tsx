@@ -61,8 +61,9 @@ export const Footer: React.FC<FooterProps> = () => {
                 <li><Link to="/about#faq" className={linkCls}>FAQs</Link></li>
                 <li><Link to="/privacy" className={linkCls}>Privacy policy</Link></li>
                 <li><Link to="/terms" className={linkCls}>Terms of service</Link></li>
-                {/* No non-essential cookies exist, so there is nothing to consent to: this links to the policy. */}
                 <li><Link to="/cookies" className={linkCls}>Cookie policy</Link></li>
+                {/* Real link (works without JS); with JS it reopens the analytics consent panel. */}
+                <li><a href="/cookies" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new Event('kz:consent-open')); }} className={linkCls}>Cookie preferences</a></li>
               </ul>
             </div>
           </div>

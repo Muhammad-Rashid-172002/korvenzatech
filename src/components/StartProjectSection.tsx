@@ -1,3 +1,4 @@
+import { trackEvent } from '../lib/analytics';
 import React, { useId, useRef, useState } from 'react';
 import { Sparkles, CheckCircle, Send, Bot, Shield, Clock, AlertCircle } from 'lucide-react';
 import { SectionHeader } from './ui';
@@ -42,6 +43,11 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   const [errors, setErrors] = useState<Partial<Record<'fullName' | 'email' | 'ideaDescription', string>>>({});
   const uid = useId();
   const formRef = useRef<HTMLFormElement>(null);
+  // GA4: form_start once per form instance (first focus), form_submit + generate_lead only after
+  // the server confirms. Only the form type is sent — never field contents.
+  const startedRef = useRef(false);
+  const formType = defaultInquiryType === 'Project / Sales' ? 'project_brief' : 'contact';
+  const onFormFocus = () => { if (!startedRef.current) { startedRef.current = true; trackEvent('form_start', { form_type: formType, form_id: 'start_project' }); } };
 
   const validate = () => {
     const next: typeof errors = {};
@@ -75,6 +81,10 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
         throw new Error(data.error || 'We could not submit your project brief right now.');
       }
       setIsSubmitted(true);
+      const inquiry = (formData.inquiryType ?? 'Project / Sales').toLowerCase().replace(/[^a-z]+/g, '_');
+      trackEvent('form_submit', { form_type: formType, form_id: 'start_project', inquiry_type: inquiry });
+      trackEvent('generate_lead', { form_type: formType, lead_source: 'website_form', inquiry_type: inquiry });
+      startedRef.current = false;
     } catch (err: any) {
       console.error(err);
       const friendly = err instanceof SyntaxError || !err?.message ? 'We could not submit your project brief right now. Please try again, or email sales@korvenzatech.com.' : err.message;
@@ -157,7 +167,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
               </button>
             </div>
           ) : (
-            <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-9 text-left">
+            <form ref={formRef} onSubmit={handleSubmit} onFocus={onFormFocus} noValidate className="space-y-9 text-left">
               {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
               <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
                 <label htmlFor={`${uid}-website`}>Website</label>

@@ -8,6 +8,7 @@
     "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/generate-seo-pages.mjs && tsx scripts/verify-build.ts",
     "start": "tsx server.ts",
     "verify": "tsx scripts/verify-build.ts",
+    "test": "tsx --test tests/*.test.ts",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "check": "npm run lint && npm run build",
