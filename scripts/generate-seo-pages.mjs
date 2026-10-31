@@ -62,8 +62,8 @@ async function buildPage(route) {
   html = setTag(html, /<meta name="twitter:description" content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${esc(meta.description)}" />`);
   html = setTag(html, /<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${meta.image}" />`);
   const extraHead = [
-    // Desktop only: there the hero poster is above the fold; on phones it sits below the headline.
-    route === '/' ? '<link rel="preload" as="image" href="/media/hero/sculpture-640.webp" imagesrcset="/media/hero/sculpture-640.webp 640w, /media/hero/sculpture-1100.webp 1100w, /media/hero/sculpture-1600.webp 1600w" imagesizes="990px" media="(min-width: 1024px)" fetchpriority="high" />' : '',
+    // The hero's original K logo (components/hero/HeroLogo.tsx) is above the fold at every width.
+    route === '/' ? '<link rel="preload" as="image" href="/media/brand/k-original-640.webp" imagesrcset="/media/brand/k-original-480.webp 480w, /media/brand/k-original-640.webp 640w, /media/brand/k-original-800.webp 800w, /media/brand/k-original-1200.webp 1200w" imagesizes="(min-width: 1024px) 340px, (min-width: 640px) 300px, 280px" fetchpriority="high" />' : '',
     `<script type="application/ld+json" id="kz-schema">${jsonLd(buildStructuredData(route))}</script>`,
   ].join('');
   html = html.replace('</head>', `${extraHead}<meta name="kz-build" content="${STAMP}" /></head>`);
