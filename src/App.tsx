@@ -33,6 +33,8 @@ import { useRevealObserver } from './lib/motion';
 import { SectionHeader } from './components/ui';
 import { ExperienceGate } from './components/three/ExperienceGate';
 import { scrollToElement, scrollToTop } from './lib/scrollStore';
+import { installAnalytics, trackPageView } from './lib/analytics';
+import { ConsentBanner } from './components/ConsentBanner';
 
 // Long-form pages load as their own chunks (their text would otherwise weigh on every page).
 const ArticlePage = lazy(() => import('./components/content/ArticlePage'));
@@ -100,6 +102,11 @@ function App({ initialPath }: { initialPath?: string }) {
   }, []);
 
   useRevealObserver(path);
+
+  // GA4: one page_view per real navigation (initial load, pushState, back/forward). This effect
+  // runs after SeoManager's (a child) has set the new <title>; analytics.ts dedupes by path+query.
+  useEffect(() => { installAnalytics(); }, []);
+  useEffect(() => { trackPageView(); }, [path]);
 
   const scroll = (id: string) => { const el = document.getElementById(id); if (el) scrollToElement(el, true); };
   const startProject = () => navigate('/start-project');
@@ -218,6 +225,7 @@ function App({ initialPath }: { initialPath?: string }) {
         <main id="main" tabIndex={-1} className="outline-none">{content}</main>
         <Footer onNavigateSection={() => {}} onOpenCareers={() => navigate('/careers')} onOpenContact={() => navigate('/contact')} onSelectService={navigateService} />
         <KorvenzaAIChat />
+        <ConsentBanner />
         <ExperienceGate path={path} />
       </div>
     </RouterProvider>

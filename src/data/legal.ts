@@ -1,13 +1,13 @@
 /**
  * Legal pages (same block format as articles: "## " heading, "- " bullets, paragraphs).
  * Written for a Pakistan-based studio serving EU/UK/US clients, GDPR/UK-GDPR aware.
- * Facts reflect how the site works today (no cookies, no analytics, Vercel hosting,
+ * Facts reflect how the site works today (Google Analytics 4 with Consent Mode, Vercel hosting,
  * Google Gemini for the AI assistant, Google Workspace for enquiries).
  * TODO(Rashid): have a lawyer review before relying on these documents.
  */
 export type LegalDoc = { slug: 'privacy' | 'terms' | 'cookies'; title: string; description: string; updated: string };
 
-export const LEGAL_UPDATED = '2026-10-10';
+export const LEGAL_UPDATED = '2026-10-30';
 
 export const LEGAL: LegalDoc[] = [
   {
@@ -25,7 +25,7 @@ export const LEGAL: LegalDoc[] = [
   {
     slug: 'cookies',
     title: 'Cookie Policy',
-    description: 'KorvenzaTech does not use cookies or tracking. This page explains the small amount of browser storage the website uses and how to clear it.',
+    description: 'The Google Analytics cookies and browser storage korvenzatech.com uses, why, and how to accept, decline or change your choice.',
     updated: LEGAL_UPDATED,
   },
 ];
