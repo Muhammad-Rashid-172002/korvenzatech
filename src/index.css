@@ -742,3 +742,14 @@ body:has(.kz-read-progress) .kz-progress { display: none; }
 .kz-consent-btn--accept:hover { background: #0B9165; }
 @media (max-width: 640px) { .kz-consent { bottom: 88px; } } /* clear of the AI launcher */
 @media (prefers-reduced-motion: reduce) { .kz-consent { animation: none; } }
+
+/* ---------- Case study pages (CaseStudyLandingPage.tsx) ----------------- */
+.kz-cs-glow { background: radial-gradient(45% 60% at 78% 45%, color-mix(in srgb, var(--cs-brand, #19C784) 26%, transparent), transparent 70%); }
+.kz-cs-screens { display: grid; grid-auto-flow: column; grid-auto-columns: min(62vw, 240px); gap: 20px; overflow-x: auto; padding: 6px 2px 18px; scroll-snap-type: x mandatory; }
+@media (min-width: 1024px) { .kz-cs-screens { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); overflow: visible; } }
+.kz-cs-screens li { scroll-snap-align: start; }
+.kz-cs-phone { padding: 7px; border-radius: 34px; background: linear-gradient(150deg, #3B4048, #111317 40%, #0A0B0D 70%, #2A2E34); box-shadow: 0 30px 60px -28px rgba(0,0,0,.65), inset 0 1px 1px rgba(255,255,255,.2); transition: transform var(--kz-dur-slow) var(--kz-ease-out); }
+.kz-cs-phone img { display: block; width: 100%; height: auto; border-radius: 28px; }
+.kz-cs-screens li:hover .kz-cs-phone { transform: translateY(-6px); }
+.kz-cs-screens figcaption, .kz-cs-dash figcaption { margin-top: 14px; font-size: 13px; line-height: 1.5; color: var(--kz-muted); text-align: center; }
+.kz-cs-dash img { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--kz-border); box-shadow: var(--kz-shadow-md); }

@@ -38,21 +38,20 @@ export const Hero: React.FC<HeroProps> = () => {
       <div className="kz-container kzh-inner relative z-10">
         <div className="kzh-copy kzh-layer" style={layer(0.2, -0.35, 0)}>
           <div className="kz-hero-enter" style={{ '--i': 0 } as React.CSSProperties}>
-            <span className="kzh-badge"><i aria-hidden="true" />Design <b aria-hidden="true">•</b> Build <b aria-hidden="true">•</b> Scale</span>
+            <span className="kzh-badge"><i aria-hidden="true" />Mobile apps <b aria-hidden="true">•</b> AI <b aria-hidden="true">•</b> Software</span>
           </div>
           <h1 id="hero-title" className="kzh-title text-white">
-            Building intelligent <span className="kz-gradient-word">digital</span> experiences.
+            Build. <span className="kz-gradient-word">Automate.</span> Scale.
           </h1>
+          <p className="kzh-tagline kz-hero-enter" style={{ '--i': 1 } as React.CSSProperties}>Your Technology Partner for Intelligent Digital Products.</p>
           <p className="kzh-sub kz-hero-enter" style={{ '--i': 2 } as React.CSSProperties}>
-            {['AI-Powered Solutions', 'Mobile Apps', 'Web Platforms', 'Business Automation'].map((item, i) => (
-              <React.Fragment key={item}><span>{item}{i < 3 && <i aria-hidden="true">·</i>}</span> </React.Fragment>
-            ))}
+            KorvenzaTech helps startups and businesses build powerful mobile applications, intelligent AI solutions, and scalable digital systems that turn ideas into meaningful products.
           </p>
           <div className="kzh-ctas kz-hero-enter" style={{ '--i': 3 } as React.CSSProperties}>
             <Link to="/start-project" data-kz-magnetic="" data-kz-ripple="" className="kz-btn kz-btn-primary">
-              Start a project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" />
+              Start a Project <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to="/work" className="kz-btn kz-btn-secondary">View our work</Link>
+            <Link to="/work" className="kz-btn kz-btn-secondary">Explore Our Work</Link>
             <Link to="/services" className="kz-text-link inline-flex items-center sm:ml-1">Not sure yet? Explore services →</Link>
           </div>
         </div>

@@ -3,11 +3,8 @@ import { ArrowRight, Mail, MapPin, MessageCircle, MessageSquare, Video } from 'l
 import { SiteNavbar } from './components/SiteNavbar';
 import { PageHero } from './components/PageHero';
 import { Hero } from './components/Hero';
-import { ServicesOverview } from './components/ServicesOverview';
 import { HowWeHelp } from './components/HowWeHelp';
 import { FeaturedWork } from './components/FeaturedWork';
-import { AIFeatureSection } from './components/AIFeatureSection';
-import { APIFeatureSection } from './components/APIFeatureSection';
 import { InteractiveSolutionBuilder } from './components/InteractiveSolutionBuilder';
 import { ProcessTimeline } from './components/ProcessTimeline';
 import { WhyKorvenzaTech } from './components/WhyKorvenzaTech';
@@ -26,8 +23,8 @@ import { SolutionBlueprints } from './components/SolutionBlueprints';
 import { SeoManager } from './components/SeoManager';
 import { ARTICLES } from './data/articles';
 import { LEGAL } from './data/legal';
-import { ClosingCTA, HomeProjects, HomeServices, NotFound } from './components/home/HomeSections';
-import { SERVICES_DATA, CASE_STUDIES } from './data/companyData';
+import { ClosingCTA, HomeIndustries, HomeProjects, NotFound, PrimaryServices, ProjectCard, SupportingServices } from './components/home/HomeSections';
+import { SERVICES_DATA, CASE_STUDIES, WORK_REDIRECTS } from './data/companyData';
 import { RouterProvider } from './lib/router';
 import { useRevealObserver } from './lib/motion';
 import { SectionHeader } from './components/ui';
@@ -49,7 +46,9 @@ const CAREER_TRACKS = [
 
 const STATIC_ROUTES = ['/', '/services', '/work', '/industries', '/about', '/insights', '/careers', '/contact', '/start-project', ...LEGAL.map((d) => `/${d.slug}`)];
 
-export const normalizePath = (p: string) => (p.length > 1 ? p.replace(/\/+$/, '') : p) || '/';
+const trimPath = (p: string) => (p.length > 1 ? p.replace(/\/+$/, '') : p) || '/';
+/** Normalises trailing slashes and resolves permanent redirects (e.g. /work/skilllink → /work/skillnova). */
+export const normalizePath = (p: string) => { const n = trimPath(p); return WORK_REDIRECTS[n] ?? n; };
 
 export function isKnownRoute(path: string) {
   return STATIC_ROUTES.includes(path)
@@ -80,19 +79,27 @@ function App({ initialPath }: { initialPath?: string }) {
   const scrollTop = () => scrollToTop(true);
 
   const navigate = useCallback((to: string) => {
-    const [rawPath, hashPart] = to.split('#');
+    const [pathAndQuery, hashPart] = to.split('#');
+    const [rawPath, query] = pathAndQuery.split('?');
     const nextPath = normalizePath(rawPath || path);
     const hash = hashPart ? `#${hashPart}` : '';
+    const search = query ? `?${query}` : '';
     if (nextPath === path) {
       if (hash) { window.history.pushState({}, '', nextPath + hash); scrollToHash(hash); }
       else scrollToTop(false);
       return;
     }
-    window.history.pushState({}, '', nextPath + hash);
+    window.history.pushState({}, '', nextPath + search + hash);
     setPath(nextPath);
     scrollTop();
     if (hash) requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash(hash)));
   }, [path]);
+
+  // A redirected URL (old case-study slug) is replaced in the address bar before the first page view.
+  useEffect(() => {
+    if (trimPath(window.location.pathname) !== path) window.history.replaceState(window.history.state, '', path + window.location.search + window.location.hash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const pop = () => { setPath(normalizePath(window.location.pathname)); if (!scrollToHash(window.location.hash, false)) scrollTop(); };
@@ -124,12 +131,22 @@ function App({ initialPath }: { initialPath?: string }) {
   else if (articleRoute) content = <Suspense fallback={<PageFallback />}><ArticlePage article={articleRoute} /></Suspense>;
   else if (legalRoute) content = <Suspense fallback={<PageFallback />}><LegalPage doc={legalRoute} /></Suspense>;
   else if (path === '/services') content = <>
-    <PageHero eyebrow="Capabilities" title={<>Technology services built to <span className="gradient-text-cyan">solve real business problems.</span></>} description="From AI systems and APIs to mobile apps, websites, custom software and cloud delivery — choose one service or let us design the complete solution." primary="Discuss your project" onPrimary={startProject} secondary="See our work" onSecondary={openWork} />
-    <ServicesOverview onNavigateService={(id) => navigate(`/services/${id}`)} onStartProject={startProject} />
-    <AIFeatureSection /><APIFeatureSection /><InteractiveSolutionBuilder onStartProject={startProject} />
+    <PageHero eyebrow="Services" title={<>Technology That Moves <span className="gradient-text-cyan">Your Business Forward.</span></>} description="From powerful mobile applications to intelligent AI solutions, we help businesses transform ideas into scalable digital products." primary="Start a Project" onPrimary={startProject} secondary="Explore Our Work" onSecondary={openWork} />
+    <PrimaryServices headingId="svc-primary-title" eyebrow="Primary services" title="Our two core services." lead="Custom mobile apps and practical AI — the work we are best known for, backed by our own published products." />
+    <SupportingServices />
+    <HomeIndustries />
+    <section className="kz-section kz-section-alt" aria-labelledby="svc-projects-title">
+      <div className="kz-container">
+        <SectionHeader eyebrow="Selected projects" title={<span id="svc-projects-title">Real projects behind these services.</span>} />
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">{CASE_STUDIES.map((c, i) => <ProjectCard key={c.id} c={c} i={i} />)}</div>
+      </div>
+    </section>
+    <ProcessTimeline onStartProject={startProject} />
+    <InteractiveSolutionBuilder onStartProject={startProject} />
+    <ClosingCTA title="Have a Project in Mind?" lead="Let’s turn your idea into a working digital product." />
   </>;
   else if (path === '/work') content = <>
-    <PageHero eyebrow="Selected Work" title={<>Real products, clear architecture, <span className="gradient-text-cyan">credible outcomes.</span></>} description="Explore selected products across education technology and on-demand marketplaces, then review solution blueprints for AI, SaaS, APIs, cloud, design and growth." primary="Start a similar project" onPrimary={startProject} secondary="Explore services" onSecondary={() => navigate('/services')} />
+    <PageHero eyebrow="Portfolio" title={<>Digital Products Built to <span className="gradient-text-cyan">Solve Real Problems.</span></>} description="Explore how we transform ideas into practical digital solutions across mobile applications, AI-powered products, and business systems." primary="Start a similar project" onPrimary={startProject} secondary="Explore services" onSecondary={() => navigate('/services')} />
     <FeaturedWork onNavigateCaseStudy={(id) => navigate(`/work/${id}`)} onStartProject={startProject} />
     <SolutionBlueprints onStartProject={startProject} />
   </>;
@@ -139,7 +156,7 @@ function App({ initialPath }: { initialPath?: string }) {
   </>;
   else if (path === '/about') content = <>
     <PageHero eyebrow="About KorvenzaTech" title={<>Complex technology. <span className="gradient-text-cyan">Clear business value.</span></>} description="KorvenzaTech is built around a simple idea: clients should not need to understand technical complexity to benefit from excellent software engineering." primary="Work with us" onPrimary={startProject} secondary="Explore our process" onSecondary={() => scroll('process')} />
-    <AboutSection /><LeadershipTestimonialsSection /><WhyKorvenzaTech /><ProcessTimeline onStartProject={startProject} /><FAQSection />
+    <AboutSection /><LeadershipTestimonialsSection /><WhyKorvenzaTech /><HowWeHelp onStartProject={startProject} /><ProcessTimeline onStartProject={startProject} /><FAQSection />
   </>;
   else if (path === '/insights') content = <>
     <PageHero eyebrow="Knowledge Hub" title={<>Practical thinking for <span className="gradient-text-cyan">modern digital products.</span></>} description="Clear, useful articles on AI, app development, software architecture, APIs, cloud systems and digital product strategy." />
@@ -205,12 +222,13 @@ function App({ initialPath }: { initialPath?: string }) {
   </>;
   else if (path === '/') content = <>
     <Hero onStartProject={startProject} onExploreWork={openWork} onOpenSolutionWizard={() => navigate('/services')} />
-    <HomeServices />
+    <PrimaryServices />
+    <SupportingServices />
     <HomeProjects />
-    <HowWeHelp onStartProject={startProject} />
-    <TechStackSection />
+    <HomeIndustries />
+    <WhyKorvenzaTech />
     <ProcessTimeline onStartProject={startProject} />
-    <LeadershipTestimonialsSection />
+    <TechStackSection />
     <FAQSection teaser />
     <ClosingCTA />
   </>;

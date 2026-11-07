@@ -30,6 +30,7 @@ function doPost(e) {
       'Inquiry: ' + inquiry,
       'Service: ' + clean(data.serviceNeeded || 'Not specified'),
       'Budget: ' + clean(data.budgetRange || 'Not specified'),
+      'Timeline: ' + clean(data.projectTimeline || 'Not specified'),
       'Preferred contact: ' + clean(data.preferredContact || 'Email'),
       '',
       'Message / project brief:',

@@ -85,12 +85,12 @@ test('UTM parameters stay in page_location on the landing page view', () => {
 
 test('service and portfolio detail pages add service_view / portfolio_view (known ids only)', () => {
   go('/services/ai-solutions'); A.trackPageView();
-  go('/work/skilllink'); A.trackPageView();
+  go('/work/skillnova'); A.trackPageView();
   go('/services/not-a-service'); A.trackPageView(); // 404 → page_view only
   assert.equal(events('service_view').length, 1);
-  assert.equal(events('service_view')[0][2].service_name, 'AI Solutions');
+  assert.equal(events('service_view')[0][2].service_name, 'AI Solutions & Automation');
   assert.equal(events('service_view')[0][2].service_id, 'ai-solutions');
-  assert.equal(events('portfolio_view')[0][2].project_id, 'skilllink');
+  assert.equal(events('portfolio_view')[0][2].project_id, 'skillnova');
   assert.equal(events('page_view').length, 3);
 });
 

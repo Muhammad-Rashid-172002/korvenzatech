@@ -107,12 +107,18 @@ export const SiteNavbar: React.FC<Props> = ({ path, onToggleTheme }) => {
                   {servicesOpen && (
                     <div id="services-menu" className="kz-mega absolute left-1/2 top-full w-[640px] pt-3" style={{ transform: 'translateX(-50%)' }}>
                       <div className="grid grid-cols-2 gap-1.5 rounded-2xl border border-[var(--kz-border)] bg-[var(--kz-surface)] p-3 shadow-[var(--kz-shadow-lg)]">
-                        {SERVICES_DATA.slice(0, 8).map((s) => (
-                          <Link key={s.id} to={`/services/${s.id}`} className="group/item rounded-xl p-3 transition-colors hover:bg-[var(--kz-surface-2)]">
-                            <span className="block text-sm font-semibold text-[var(--kz-text)] group-hover/item:text-[var(--kz-accent-text)]">{s.title}</span>
-                            <span className="mt-1 block text-[12px] leading-5 text-[var(--kz-muted)] line-clamp-1">{s.shortDesc}</span>
+                        {SERVICES_DATA.filter((s) => s.tier === 'primary').map((s) => (
+                          <Link key={s.id} to={`/services/${s.id}`} className="group/item rounded-xl border border-emerald-500/20 bg-emerald-500/[.06] p-3.5 transition-colors hover:bg-emerald-500/[.11]">
+                            <span className="block text-[10px] font-bold uppercase tracking-[.14em] text-[var(--kz-accent-text)]">Primary service</span>
+                            <span className="mt-1 block text-[14.5px] font-bold text-[var(--kz-text)]">{s.title}</span>
+                            <span className="mt-1 block text-[12px] leading-5 text-[var(--kz-muted)] line-clamp-2">{s.shortDesc}</span>
                           </Link>
                         ))}
+                        <div className="col-span-2 mt-1 grid grid-cols-2 gap-x-1.5">
+                          {SERVICES_DATA.filter((s) => s.tier === 'supporting').map((s) => (
+                            <Link key={s.id} to={`/services/${s.id}`} className="rounded-lg px-3 py-2 text-[13px] font-semibold text-[var(--kz-text-2)] transition-colors hover:bg-[var(--kz-surface-2)] hover:text-[var(--kz-accent-text)]">{s.title}</Link>
+                          ))}
+                        </div>
                         <Link to="/services" className="col-span-2 mt-1 flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/[.07] px-4 py-3 text-[13px] font-semibold text-[var(--kz-accent-text)]">
                           View all services <ArrowRight className="h-4 w-4" aria-hidden="true" />
                         </Link>

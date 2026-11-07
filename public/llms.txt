@@ -2,7 +2,13 @@
 
 Official website: https://korvenzatech.com/
 
-KorvenzaTech is a technology company offering AI solutions, SaaS development, mobile app development, website and web application development, custom API development, custom business software, cloud/backend solutions, UI/UX design, and digital growth services.
+KorvenzaTech is a software development company. Primary services: Custom Mobile App Development (Android and iOS with Flutter) and AI Solutions & Automation. Supporting services: custom software, SaaS development, website development, custom API development, cloud solutions, UI/UX design and digital growth strategy (technical SEO, performance, analytics, conversion).
+
+Portfolio (case studies at https://korvenzatech.com/work):
+- FitMind AI — AI health & nutrition app (food, skin and medicine scanning, calorie tracking, workouts); live on Google Play.
+- IELTS AI Master — AI IELTS preparation app with Gemini-based coaching; live on Google Play.
+- SkillNova (formerly SkillLink) — on-demand service marketplace with customer and worker apps.
+- CareDesk — hospital complaint management system: Flutter employee app and web admin dashboard.
 
 Founder & CEO: Muhammad Rashid. Co-Founder: Muhammad Taha Amir. COO (Chief Operating Officer) and Software Engineer: Suliman. Public company profile does not publish education or private personal details.
 

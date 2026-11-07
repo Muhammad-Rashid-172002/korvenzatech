@@ -2,7 +2,7 @@
  * PRODUCT — two floating phones per case-study card, showing real-layout
  * screen recreations of the product. Hover: the front phone turns toward the
  * pointer and the screens slide through the app; touch devices auto-cycle.
- * A brand-coloured light sits behind the phones (purple for SkillLink).
+ * A brand-coloured light sits behind the phones (e.g. purple for SkillNova).
  * The server-rendered project image stays as the poster until the first frame.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';

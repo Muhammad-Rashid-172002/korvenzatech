@@ -1,391 +1,7 @@
-import { ServiceItem, CaseStudy, IndustryItem, TechStackCategory, ProcessStep, FAQItem, OpenRole } from '../types';
+import { IndustryItem, TechStackCategory, ProcessStep, FAQItem, OpenRole } from '../types';
 
-export const SERVICES_DATA: ServiceItem[] = [
-  {
-    id: 'ai-solutions',
-    title: 'AI Solutions',
-    category: 'AI & Automation',
-    iconName: 'Bot',
-    shortDesc: 'Intelligent systems that automate work, analyze data, and power smart digital experiences.',
-    businessValue: 'Eliminate repetitive manual tasks, provide 24/7 intelligent customer responses, and make data-driven decisions faster.',
-    technicalDescription: 'Intelligent assistant architectures, retrieval-based knowledge systems, natural language workflows, automation layers, and multimodal integrations selected to fit the project.',
-    whoNeedsIt: 'Businesses looking to automate client inquiries, streamline document processing, or build smart AI features directly into their products.',
-    features: [
-      'AI Assistants & Intelligent Chatbot Systems',
-      'Business Workflow & Task Automation',
-      'Document Analysis & Extraction Engines',
-      'Personalized Recommendation Systems',
-      'Custom language-model integrations',
-      'Image understanding with multimodal AI',
-      'Natural Language Analytics & Summarization'
-    ],
-    deliverables: [
-      'Production-ready intelligent workflow or model integration',
-      'Secure Middleware & API Layer',
-      'Admin Dashboard for Performance Monitoring',
-      'Security and privacy implementation aligned with project requirements'
-    ],
-    useCases: [
-      'Customer support triage and assisted response workflows',
-      'Automated invoice & document reading',
-      'Personalized learning/fitness feedback engines'
-    ],
-    faqs: [
-      {
-        q: 'Do I need my own training data to build an AI solution?',
-        a: 'Not necessarily. We can leverage modern pretrained language models, augmenting them with your business documents or knowledge base using Retrieval-Augmented Generation (RAG).'
-      },
-      {
-        q: 'How do you ensure user privacy with AI models?',
-        a: 'We design privacy and data-handling controls around the selected infrastructure, project requirements and available platform capabilities.'
-      }
-    ]
-  },
-  {
-    id: 'api-development',
-    title: 'Custom API Development',
-    category: 'Software',
-    iconName: 'Network',
-    shortDesc: 'Secure connections that allow your apps, websites, payment systems, and business tools to talk to each other.',
-    businessValue: 'Unify separate software tools into one seamless workflow so data updates everywhere instantly without manual copy-pasting.',
-    technicalDescription: 'High-throughput RESTful APIs, webhooks, rate-limited gateway architectures, and OAuth2 authentication handlers.',
-    whoNeedsIt: 'Companies connecting legacy systems to new mobile apps, integrating third-party payment gateways, or sharing data with partner platforms.',
-    features: [
-      'High-Performance REST & Backend APIs',
-      'Third-Party Service & SaaS Integrations',
-      'Payment Gateway Integration (Stripe, PayPal, Local Gateways)',
-      'Secure OAuth2 & JWT Authentication Systems',
-      'Real-Time Webhooks & Streaming Data APIs',
-      'AI Endpoint Proxying & Caching Layers'
-    ],
-    deliverables: [
-      'Production-Ready API Codebase',
-      'Interactive OpenAPI / Swagger Documentation',
-      'Automated Rate-Limiting & Security Shield',
-      'CI/CD Deployment Pipelines'
-    ],
-    useCases: [
-      'Syncing inventory between physical ERPs and web stores',
-      'Processing real-time payment notifications across mobile apps',
-      'Connecting custom mobile apps to central business databases'
-    ],
-    faqs: [
-      {
-        q: 'What is an API in simple terms?',
-        a: 'An API (Application Programming Interface) acts as a secure digital messenger that transfers information between different apps or websites so they can work together automatically.'
-      }
-    ]
-  },
-  {
-    id: 'mobile-app-development',
-    title: 'Mobile App Development',
-    category: 'Applications',
-    iconName: 'Smartphone',
-    shortDesc: 'Fast, beautiful, and scalable mobile applications for Android and iOS.',
-    businessValue: 'Engage your customers directly on their smartphones with push notifications, offline capability, and smooth user experiences.',
-    technicalDescription: 'Cross-platform Flutter & native iOS/Android development with state-managed architectures, background sync, and biometrics.',
-    whoNeedsIt: 'Entrepreneurs launching app ideas or established businesses providing dedicated mobile access to their services.',
-    features: [
-      'iOS & Android Cross-Platform Development (Flutter)',
-      'Native Android & iOS Engineering',
-      'Firebase & Custom Cloud Backends',
-      'Real-Time Push Notifications & Messaging',
-      'In-App Payments & Subscription Engines',
-      'Geolocation, Maps & Camera Integrations'
-    ],
-    deliverables: [
-      'Published App Store & Google Play Store Builds',
-      'Source Code & Architecture Documentation',
-      'Admin Panel for Content & User Management',
-      'Post-Launch Performance Monitoring'
-    ],
-    useCases: [
-      'On-demand service booking apps',
-      'Health, nutrition & fitness tracking mobile tools',
-      'E-commerce & marketplace native shopping apps'
-    ],
-    faqs: [
-      {
-        q: 'Do you publish the app to Google Play and Apple App Store for us?',
-        a: 'Yes! We manage the entire store submission, compliance, screenshot preparation, and approval process.'
-      }
-    ]
-  },
-  {
-    id: 'web-development',
-    title: 'Website Development',
-    category: 'Growth',
-    iconName: 'Globe',
-    shortDesc: 'Modern corporate websites and web apps that build trust, explain your business clearly, and convert visitors.',
-    businessValue: 'Turn casual web traffic into qualified leads with ultra-fast page speed, striking modern design, and clear messaging.',
-    technicalDescription: 'Next.js & React single-page / server-rendered applications, structured metadata, schema markup, and responsive layouts.',
-    whoNeedsIt: 'Businesses upgrading an outdated website, launching a new corporate brand, or needing high-converting product landing pages.',
-    features: [
-      'Corporate & Modern Brand Websites',
-      'High-Conversion Landing Pages',
-      'SaaS & Web Product Interfaces',
-      'Responsive Mobile-First Engineering',
-      'Technical SEO & Core Web Vitals Optimization',
-      'Dynamic CMS & Content Management'
-    ],
-    deliverables: [
-      'Blazing-Fast Web Application',
-      'Integrated Contact & Lead Generation Forms',
-      'Full SEO Optimization Package',
-      'Content Management Training'
-    ],
-    useCases: [
-      'Corporate positioning for tech and service firms',
-      'High-converting product launch pages',
-      'Interactive customer portals and quote calculators'
-    ],
-    faqs: [
-      {
-        q: 'Will my website load quickly on mobile devices?',
-        a: 'Yes. We build mobile-first and optimize assets, loading behavior and page structure with Core Web Vitals and real-device performance in mind.'
-      }
-    ]
-  },
-  {
-    id: 'custom-software',
-    title: 'Custom Software Development',
-    category: 'Software',
-    iconName: 'Code',
-    shortDesc: 'Tailor-made software solutions built specifically around your company’s unique operations.',
-    businessValue: 'Stop forcing your business into rigid off-the-shelf software. Build tools that match your exact business processes.',
-    technicalDescription: 'Modular multi-tier enterprise software architectures, microservices, secure database schemas, and role-based control.',
-    whoNeedsIt: 'Growing organizations needing internal management portals, custom ERP/CRM tools, or specialized operational platforms.',
-    features: [
-      'Business Management Systems & Portals',
-      'Custom ERP & CRM Platforms',
-      'Internal Operations & Workflow Automation',
-      'Role-Based Access Control & Security Audit Logs',
-      'Multi-Vendor Marketplace Platforms',
-      'Real-Time Reporting & Executive Dashboards'
-    ],
-    deliverables: [
-      'Tailored Enterprise Application',
-      'Role-Based Permission Matrix',
-      'Data Migration Scripts & Tooling',
-      'User Onboarding & System Admin Manuals'
-    ],
-    useCases: [
-      'Custom inventory & warehouse dispatch tracking',
-      'Multi-department employee task and approval portals',
-      'Specialized client booking and billing hubs'
-    ],
-    faqs: [
-      {
-        q: 'How long does custom software development take?',
-        a: 'Timeline depends on scope, integrations, design depth and testing requirements. After discovery, we provide a project-specific delivery plan rather than a generic promise.'
-      }
-    ]
-  },
-  {
-    id: 'saas-development',
-    title: 'SaaS Development',
-    category: 'Software',
-    iconName: 'Layers',
-    shortDesc: 'End-to-end subscription-based web and mobile products from MVP to enterprise scale.',
-    businessValue: 'Launch recurring revenue products with automated billing, multi-tenant security, and user analytics built in from day one.',
-    technicalDescription: 'Multi-tenant database architectures, Stripe billing webhooks, user lifecycle hooks, and high-concurrency cloud scaling.',
-    whoNeedsIt: 'Founders and companies building software products to sell to thousands of subscribers or business clients.',
-    features: [
-      'Subscription & Metered Billing Integration',
-      'Multi-Tenant Data Architecture',
-      'User Authentication & Team Workspaces',
-      'Super-Admin Management Consoles',
-      'Usage Analytics & Telemetry Systems',
-      'Automated Email & Notification Triggers'
-    ],
-    deliverables: [
-      'Complete Multi-Tenant SaaS Platform',
-      'Stripe / Payment Billing Gateway Setup',
-      'Admin Monitoring Dashboard',
-      'Scalable Cloud Infrastructure Blueprint'
-    ],
-    useCases: [
-      'B2B productivity software tools',
-      'Subscription-based analytics platforms',
-      'Niche vertical business management tools'
-    ],
-    faqs: [
-      {
-        q: 'Can KorvenzaTech help us build an MVP to present to investors?',
-        a: 'Yes! We specialize in rapidly shipping clean, functional MVPs that prove market value while keeping codebase quality investment-ready.'
-      }
-    ]
-  },
-  {
-    id: 'cloud-solutions',
-    title: 'Cloud Solutions',
-    category: 'Infrastructure',
-    iconName: 'Cloud',
-    shortDesc: 'Reliable cloud environments hosted on Google Cloud, AWS, or Firebase that scale seamlessly as you grow.',
-    businessValue: 'Improve reliability, protect customer data with encrypted backups, and design infrastructure that can scale with changing traffic demand.',
-    technicalDescription: 'Infrastructure-as-Code, Serverless Cloud Run/Lambda, auto-scaling clusters, Firestore/PostgreSQL managed DBs, and Docker.',
-    whoNeedsIt: 'Businesses experiencing server slowdowns, high hosting costs, or needing secure cloud architecture for global users.',
-    features: [
-      'Google Cloud & AWS Cloud Architecture',
-      'Serverless & Containerized Deployments (Docker)',
-      'Automated Database Backups & Encryption',
-      'Load Balancing & High Availability Clusters',
-      'Cloud Storage & CDN Acceleration',
-      'Cost Optimization & Resource Audits'
-    ],
-    deliverables: [
-      'Configured Cloud Infrastructure',
-      'Automated CI/CD Deployment Scripts',
-      'Security & Access Rules Matrix',
-      'Disaster Recovery Blueprint'
-    ],
-    useCases: [
-      'Migrating local servers to secure managed cloud',
-      'Designing scalable platforms for high-traffic growth',
-      'Setting up automated geo-redundant database backups'
-    ],
-    faqs: [
-      {
-        q: 'How do you keep cloud server costs from exploding?',
-        a: 'We design serverless and auto-scaling architectures so you only pay for the exact compute power your traffic uses.'
-      }
-    ]
-  },
-  {
-    id: 'ui-ux-design',
-    title: 'UI/UX Design',
-    category: 'Applications',
-    iconName: 'Layout',
-    shortDesc: 'Intuitive visual interfaces designed for maximum clarity, ease of use, and visual sophistication.',
-    businessValue: 'Reduce customer drop-off and eliminate user frustration with clean, accessible design that makes complex features feel effortless.',
-    technicalDescription: 'Figma design systems, interactive high-fidelity prototypes, user journey mapping, and WCAG accessibility compliance.',
-    whoNeedsIt: 'Products with cluttered interfaces, low conversion rates, or new applications requiring polished wireframes and visual identity.',
-    features: [
-      'Mobile & Web Application UI Design',
-      'User Flow & Information Architecture',
-      'Interactive High-Fidelity Prototypes',
-      'Scalable Design Systems & Component Libraries',
-      'Usability Audits & User Experience Refinement',
-      'Micro-Interactions & Motion Design Specifications'
-    ],
-    deliverables: [
-      'Interactive Figma Prototypes',
-      'Design System Token Library',
-      'Developer-Ready Handout Specs',
-      'Asset Packages (SVG, WebP, Icons)'
-    ],
-    useCases: [
-      'Redesigning legacy software for modern usability',
-      'Crafting new mobile app user journeys from scratch',
-      'Designing complex analytical data dashboards'
-    ],
-    faqs: [
-      {
-        q: 'Will we be able to test and preview the design before coding starts?',
-        a: 'Yes, you will receive interactive clickable prototypes so you can experience the product flow before a single line of code is written.'
-      }
-    ]
-  },
-  {
-    id: 'digital-marketing',
-    title: 'Digital Growth Strategy',
-    category: 'Growth',
-    iconName: 'TrendingUp',
-    shortDesc: 'Data-driven growth strategies to help your software or business reach the right audience and scale.',
-    businessValue: 'Attract qualified visitors, improve organic search engine rankings, and convert traffic into long-term customers.',
-    technicalDescription: 'Technical SEO audits, schema markup implementation, conversion rate optimization (CRO), and growth analytics setup.',
-    whoNeedsIt: 'Companies with newly launched apps or websites looking to acquire users and build a steady pipeline of digital leads.',
-    features: [
-      'Technical SEO & Search Engine Optimization',
-      'Conversion Rate Optimization (CRO)',
-      'Content Strategy & Product Messaging',
-      'User Acquisition Analytics & Funnel Tracking',
-      'Digital Campaign Architecture',
-      'Brand & Position Positioning Strategy'
-    ],
-    deliverables: [
-      'Technical SEO Audit & Strategy Map',
-      'Analytics & Event Conversion Dashboard',
-      'Target Keyword & Audience Strategy Plan'
-    ],
-    useCases: [
-      'Boosting organic Google search visibility',
-      'Improving landing-page conversion through measurement and iterative testing',
-      'Setting up multi-channel conversion analytics'
-    ],
-    faqs: [
-      {
-        q: 'Is KorvenzaTech a marketing agency?',
-        a: 'No. We are a technology company that provides technical growth and SEO strategies as part of building digital products.'
-      }
-    ]
-  }
-];
-
-export const CASE_STUDIES: CaseStudy[] = [
-  {
-    id: 'ielts-ai-master',
-    name: 'IELTS AI Master',
-    category: 'Education Technology',
-    industry: 'Education & Testing',
-    tagline: 'AI-Powered Language Assessment & Exam Practice Ecosystem',
-    summary: 'An AI-assisted preparation platform covering speaking, writing, reading and listening practice with automated feedback and progress tracking.',
-    problem: 'Students preparing for language proficiency exams often lack immediate, detailed feedback on speaking pronunciation and essay writing, requiring expensive human tutors and waiting days for score reports.',
-    solution: 'KorvenzaTech architected a multi-modal AI platform integrating custom speech and language processing and natural language evaluation engines to provide instant band scores, detailed grammatical feedback, and personalized improvement plans.',
-    coreTech: ['Flutter', 'Firebase Auth', 'Cloud Firestore', 'Multimodal AI', 'Text-to-Speech', 'Speech-to-Text'],
-    features: [
-      'Real-Time AI Speaking Test Simulator with Speech Audio Analysis',
-      'AI Essay & Task Writing Evaluation with Instant Band Scores & Corrections',
-      'Interactive Listening & Reading Mock Exams with Automated Marking',
-      'Personalized Grammar & Vocabulary Diagnostic Analytics Dashboard',
-      'Progress Tracking Across Listening, Reading, Writing & Speaking'
-    ],
-    platform: 'Android App • Google Play',
-    outcome: [
-      'Published on Google Play as a live Android product',
-      'Combines all four IELTS practice modules in one application',
-      'Uses AI-assisted feedback for writing and speaking practice',
-      'Stores learner progress securely with Firebase'
-    ],
-    metrics: [
-      { label: 'Status', value: 'Live' },
-      { label: 'Modules', value: '4 IELTS' },
-      { label: 'Platform', value: 'Android' }
-    ],
-    imageSrc: '/IELTS-AI-Study-Assistant .png'
-  },
-  {
-    id: 'skilllink',
-    name: 'SkillLink',
-    category: 'Digital Marketplace',
-    industry: 'On-Demand Services & Gig Economy',
-    tagline: 'End-to-End Service Marketplace Connecting Customers with Skilled Providers',
-    summary: 'A multi-sided service marketplace designed around the full job journey — from customer requests and worker acceptance to location-aware progress, communication, completion and ratings.',
-    problem: 'Connecting home and business owners with reliable service providers was hindered by fragmented communication, unverified ratings, payment disputes, and lack of real-time job tracking.',
-    solution: 'KorvenzaTech designed a role-based marketplace architecture for customers and workers with real-time requests, job status progression, location-aware workflows, communication, ratings and cloud-backed operational data.',
-    coreTech: ['Flutter', 'Firebase Auth', 'Cloud Firestore', 'Firebase Storage', 'Google Maps', 'FCM'],
-    features: [
-      'Real-Time Provider Geolocation & Smart Dispatch Matching',
-      'Job request, acceptance and milestone-based workflow',
-      'Real-time customer and worker communication flows',
-      'Worker/customer role-based dashboards and job history',
-      'Provider Profiles, Ratings & Job History'
-    ],
-    platform: 'Cross-Platform Marketplace Product',
-    outcome: [
-      'Separate customer and worker product experiences',
-      'Request-to-completion job lifecycle with clear status progression',
-      'Firebase-backed real-time marketplace workflows',
-      'Google Maps integration for location-aware service flows'
-    ],
-    metrics: [
-      { label: 'Type', value: 'Marketplace' },
-      { label: 'Roles', value: '2-sided' },
-      { label: 'Stack', value: 'Flutter' }
-    ],
-    imageSrc: '/SkillLink.png'
-  }
-];
+export { SERVICES_DATA, PRIMARY_SERVICES, SUPPORTING_SERVICES, SERVICE_OPTIONS } from './services';
+export { CASE_STUDIES, WORK_REDIRECTS } from './caseStudies';
 
 export const INDUSTRIES_DATA: IndustryItem[] = [
   {
@@ -457,43 +73,43 @@ export const INDUSTRIES_DATA: IndustryItem[] = [
 export const PROCESS_STEPS: ProcessStep[] = [
   {
     number: '01',
-    title: 'Discovery & Consultation',
+    title: 'Discovery',
     description: 'We listen to your goals, analyze your operational challenges, and understand your target audience without confusing technical jargon.',
     deliverable: 'Clear Product Roadmap & Scope Document'
   },
   {
     number: '02',
-    title: 'Architecture & Strategy',
+    title: 'Planning',
     description: 'We select the optimal technology stack, define secure system flows, and structure a budget-conscious development timeline.',
     deliverable: 'Technical System Blueprint & Wireframe Flow'
   },
   {
     number: '03',
-    title: 'UX/UI Design',
+    title: 'Design',
     description: 'Our design team crafts intuitive, highly interactive screen prototypes so you can preview and refine the user experience before code is written.',
     deliverable: 'Interactive Clickable Figma Prototype'
   },
   {
     number: '04',
-    title: 'Agile Engineering',
+    title: 'Development',
     description: 'Our senior engineers build your product in transparent 2-week sprints with clean code, modular architecture, and bi-weekly live demos.',
     deliverable: 'Working Application Builds (Staging Link)'
   },
   {
     number: '05',
-    title: 'Quality Testing & Security',
+    title: 'Testing',
     description: 'We rigorously test load performance, mobile responsiveness, edge case handling, and cybersecurity protection before launch.',
     deliverable: 'QA & Security Test Report'
   },
   {
     number: '06',
-    title: 'Deployment & Launch',
+    title: 'Launch',
     description: 'We handle app store submissions, cloud server provisioning, domain SSL setup, and seamless database migrations.',
     deliverable: 'Live Production Platform & App Store Links'
   },
   {
     number: '07',
-    title: 'Growth & Support',
+    title: 'Support',
     description: 'We monitor uptime, patch software, update third-party APIs, and continuously help you scale features as your business grows.',
     deliverable: 'Maintenance Plan & Ongoing Optimization'
   }

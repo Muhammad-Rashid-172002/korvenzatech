@@ -11,3 +11,12 @@ HTML recreations of IELTS AI Master and SkillLink screens used as textures for t
   `screen-N-540.webp` (WebGL texture size) and `contact-sheet.png`.
 
 **NEEDS RASHID REVIEW** — check that each screen matches the real apps closely enough before publishing.
+
+## Concept designs (FitMind AI, CareDesk) + AI showcase panels + portfolio covers
+
+`gen2.py` → `render2.mjs` → `sheet2.py` (same Playwright setup). These are **illustrative concept designs**
+based on each product's documented features — not screenshots of the shipped apps — and the website labels
+them that way. Outputs: `public/media/work/{fitmind,caredesk}/screen-N(.webp|-540.webp)`,
+`public/media/work/caredesk/dashboard-N(.webp|-960.webp)`, `public/media/ai/panel-{chat,flow,doc}.webp`
+(WebGL textures for the AI showcase) and the four portfolio covers `public/media/work/<name>-{800,1536}.webp`.
+Replace them with real screenshots when available (same file names and sizes).

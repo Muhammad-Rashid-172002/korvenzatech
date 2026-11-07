@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:1440px; height:900px; overflow:hidden; }
+body { font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; background:#F2F6F8; color:#0F2430; display:flex; }
+.ico { stroke:currentColor; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.side { width:248px; background:#0B2E33; color:#C7DADC; padding:26px 18px; display:flex; flex-direction:column; gap:4px; }
+.logo { display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; font-size:19px; margin:0 8px 26px; }
+.logo i { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#14B8A6,#0E8C86); display:grid; place-items:center; }
+.nav { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:11px; font-size:14px; font-weight:600; }
+.nav.on { background:rgba(20,184,166,.16); color:#fff; }
+.main { flex:1; padding:26px 32px; display:flex; flex-direction:column; gap:20px; }
+.top { display:flex; align-items:center; justify-content:space-between; }
+.h { font-size:26px; font-weight:800; letter-spacing:-.02em; }
+.muted { color:#647887; } .sm { font-size:13px; }
+.card { background:#fff; border-radius:18px; border:1px solid #E2EAEE; padding:20px; }
+.kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.kpi b { display:block; font-size:30px; font-weight:800; letter-spacing:-.02em; margin-top:8px; }
+.seg { display:inline-flex; background:#fff; border:1px solid #E2EAEE; border-radius:12px; padding:4px; }
+.seg span { padding:8px 14px; border-radius:9px; font-size:13px; font-weight:700; color:#647887; }
+.seg span.on { background:#0E8C86; color:#fff; }
+.st { display:inline-flex; padding:4px 10px; border-radius:99px; font-size:12px; font-weight:700; }
+.open { background:#FEF3C7; color:#92400E; } .prog { background:#DBEAFE; color:#1E40AF; } .done { background:#D1FAE5; color:#065F46; } .urg { background:#FEE2E2; color:#991B1B; }
+table { width:100%; border-collapse:collapse; font-size:13.5px; }
+th { text-align:left; color:#647887; font-weight:600; font-size:12px; padding:0 10px 10px; border-bottom:1px solid #E2EAEE; }
+td { padding:12px 10px; border-bottom:1px solid #EEF3F5; }
+.tag { position:absolute; right:32px; bottom:18px; font-size:11px; color:#8AA0AC; }
+</style></head><body>
+<aside class="side"><div class="logo"><i><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></i>CareDesk</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</div><div class="nav on"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Complaints</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>Departments</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0 1 14 0M16 4a3.5 3.5 0 0 1 0 7M22 21a7 7 0 0 0-4-6.3"/></svg>Employees</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg>Technicians</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</div><div class="nav"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</div>
+<div style="margin-top:auto;padding:14px;border-radius:14px;background:rgba(255,255,255,.06);font-size:12px;line-height:1.5">Admin console<br><span style="opacity:.7">Concept design · demo data</span></div></aside>
+<main class="main" style="position:relative">
+<div class="top"><div><div class="muted sm">Complaints / #CD-1042</div><div class="h" style="margin-top:4px">AC not cooling</div></div>
+<div style="display:flex;gap:10px"><span class="st prog" style="font-size:13px;padding:8px 14px">In progress</span><span class="st open" style="font-size:13px;padding:8px 14px">Medium priority</span></div></div>
+<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;flex:1">
+ <div style="display:flex;flex-direction:column;gap:16px">
+  <div class="card"><b>Details</b><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;font-size:13.5px">
+   <div><div class="muted sm">Category</div><b>AC / HVAC</b></div><div><div class="muted sm">Location</div><b>Ward 3B · Room 12</b></div><div><div class="muted sm">Reported by</div><b>Nursing staff</b></div>
+   <div><div class="muted sm">Submitted</div><b>Today 08:12</b></div><div><div class="muted sm">Department</div><b>Facilities</b></div><div><div class="muted sm">Channel</div><b>Employee app</b></div></div>
+   <p style="margin-top:16px;font-size:14px;line-height:1.6;color:#33505E">The AC unit is running but the room is not cooling. Started this morning.</p></div>
+  <div class="card" style="flex:1"><b>Activity</b>
+   <div style="display:flex;gap:14px;margin-top:16px"><div style="width:34px;height:34px;border-radius:10px;background:#E0F2F1;display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#0E8C86;stroke-width:2"><path d="M12 5v14M5 12h14"/></svg></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Complaint submitted</b><span class="muted sm">08:12</span></div><div class="muted sm" style="margin-top:2px">From the employee app</div></div></div><div style="display:flex;gap:14px;margin-top:16px"><div style="width:34px;height:34px;border-radius:10px;background:#DBEAFE;display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#1E40AF;stroke-width:2"><circle cx="9" cy="8" r="3.5"/><path d="M2 21a7 7 0 0 1 14 0M16 4a3.5 3.5 0 0 1 0 7M22 21a7 7 0 0 0-4-6.3"/></svg></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Assigned to HVAC team</b><span class="muted sm">08:20</span></div><div class="muted sm" style="margin-top:2px">By facilities admin</div></div></div><div style="display:flex;gap:14px;margin-top:16px"><div style="width:34px;height:34px;border-radius:10px;background:#FEF3C7;display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#B45309;stroke-width:2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Technician on site</b><span class="muted sm">09:05</span></div><div class="muted sm" style="margin-top:2px">Filter cleaned, checking refrigerant level</div></div></div><div style="display:flex;gap:14px;margin-top:16px"><div style="width:34px;height:34px;border-radius:10px;background:#F1F5F9;display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#475569;stroke-width:2"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Staff notified</b><span class="muted sm">09:06</span></div><div class="muted sm" style="margin-top:2px">Push notification sent</div></div></div>
+  </div>
+ </div>
+ <div style="display:flex;flex-direction:column;gap:16px">
+  <div class="card"><b>Assignment</b><div style="margin-top:14px;padding:14px;border-radius:14px;border:1px solid #E2EAEE;display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:50%;background:#0E8C86;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px">HT</div><div><b style="font-size:14px">HVAC team</b><div class="muted sm">Facilities · on duty</div></div></div>
+  <div style="margin-top:12px;display:flex;gap:10px"><div style="flex:1;text-align:center;padding:11px;border-radius:12px;background:#0E8C86;color:#fff;font-weight:700;font-size:13px">Reassign</div><div style="flex:1;text-align:center;padding:11px;border-radius:12px;border:1px solid #E2EAEE;font-weight:700;font-size:13px">Escalate</div></div></div>
+  <div class="card"><b>Resolution timeline</b><div style="margin-top:14px;display:grid;gap:12px;font-size:13.5px">
+   <div style="display:flex;justify-content:space-between"><span class="muted">Time to assign</span><b>8 min</b></div>
+   <div style="display:flex;justify-content:space-between"><span class="muted">Time on site</span><b>53 min</b></div>
+   <div style="display:flex;justify-content:space-between"><span class="muted">Target resolution</span><b>Same day</b></div></div></div>
+  <div class="card" style="flex:1"><b>Internal note</b><p class="muted" style="margin-top:10px;font-size:13.5px;line-height:1.6">Check the other units on Ward 3B during the next preventive maintenance round.</p></div>
+ </div>
+</div><div class="tag">Illustrative concept · sample data · no patient information</div></main></body></html>

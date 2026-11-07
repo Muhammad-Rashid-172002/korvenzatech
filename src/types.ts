@@ -1,23 +1,61 @@
+export interface ServiceCapability {
+  name: string;
+  /** Case-study ids where this capability is used in a product we built. */
+  proof?: string[];
+}
+
 export interface ServiceItem {
   id: string;
+  /** Primary services get visual priority everywhere; supporting ones sit in the grid. */
+  tier: 'primary' | 'supporting';
   title: string;
+  /** Shorter label for menus and the project form. */
+  shortTitle?: string;
+  headline: string;
   shortDesc: string;
+  description: string;
   businessValue: string;
   technicalDescription: string;
   iconName: string;
   category: 'AI & Automation' | 'Software' | 'Applications' | 'Infrastructure' | 'Growth';
   features: string[];
+  capabilities?: ServiceCapability[];
+  problems?: { problem: string; solution: string }[];
   deliverables: string[];
   useCases: string[];
+  industries?: { name: string; text: string }[];
+  process?: { title: string; text: string }[];
+  timeline?: { phase: string; duration: string; text: string }[];
+  tech: string[];
+  relatedWork: string[];
   whoNeedsIt: string;
+  cta: { primary: string; secondary: string; secondaryTo: string };
   faqs: { q: string; a: string }[];
+  seo: { title: string; description: string };
+}
+
+export interface CaseStudyVisuals {
+  /** `recreation` = redrawn from the real app layouts; `concept` = illustrative concept design. */
+  kind: 'recreation' | 'concept';
+  /** Folder under /media/work with screen-N.webp (+ -540) phone screens. */
+  screens: string;
+  count: number;
+  /** Base name of /media/work/<cover>-{800,1536}.webp. */
+  cover: string;
+  brand: string;
+  accent: string;
+  /** Web dashboard images in the screens folder (dashboard-N.webp + -960). */
+  dashboards?: string[];
+  captions: string[];
 }
 
 export interface CaseStudy {
   id: string;
   name: string;
+  formerName?: string;
   category: string;
   industry: string;
+  headline: string;
   tagline: string;
   summary: string;
   problem: string;
@@ -25,8 +63,14 @@ export interface CaseStudy {
   coreTech: string[];
   features: string[];
   platform: string;
+  status: string;
+  packageId?: string;
   outcome: string[];
   metrics: { label: string; value: string }[];
+  links: { label: string; href: string }[];
+  disclaimer?: string;
+  visuals: CaseStudyVisuals;
+  relatedServices: string[];
   imageSrc: string;
 }
 
@@ -66,6 +110,7 @@ export interface ProjectBriefData {
   country: string;
   serviceNeeded: string;
   budgetRange: string;
+  projectTimeline: string;
   ideaDescription: string;
   preferredContact: 'Email' | 'WhatsApp' | 'Video Call';
 }

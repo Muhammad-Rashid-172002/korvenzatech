@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>FitMind AI — Food scan</title>
+<link rel="stylesheet" href="../base.css"><style>
+:root { --bg:#0B0F14; --card:#151B22; --card2:#1C242D; --ink:#F2F6F4; --muted:#8B98A3; --line:#26303A; --brand:#A3E635; --orange:#FB923C; --blue:#38BDF8; --pink:#F472B6; }
+body { background: radial-gradient(120% 60% at 50% -10%, #17241A 0%, var(--bg) 55%); }
+.card { background: var(--card); box-shadow: none; border: 1px solid var(--line); }
+.tabbar { background: #10151B; border-top-color: var(--line); }
+.macro { flex:1; } .macro .bar { height:6px; background:#26303A; margin-top:7px; }
+.lbl { font-size:11px; color:var(--muted); font-weight:600; letter-spacing:.02em; }
+.disc { font-size:10.5px; color:#6F7C87; line-height:1.4; }
+.pill { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:99px; font-size:11.5px; font-weight:700; }
+body{background:#05080A} .status{color:#fff}</style></head>
+<body><div class="status"><span>9:41</span><i>
+<span style="display:inline-flex;gap:2px;align-items:flex-end;height:12px"><b style="height:4px"></b><b style="height:6px"></b><b style="height:9px"></b><b style="height:12px"></b></span>
+<svg viewBox="0 0 24 24" style="width:17px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.3a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r=".6"/></svg>
+<span class="batt"></span></i></div>
+<div style="position:absolute;inset:0;background:radial-gradient(70% 50% at 50% 42%,#3A3226,#0A0C0E 80%)"></div>
+<div style="position:absolute;left:0;right:0;top:56px;padding:0 20px;display:flex;justify-content:space-between;align-items:center;z-index:2">
+ <div style="width:40px;height:40px;border-radius:13px;background:rgba(0,0,0,.45);display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2"><path d="M15 18 9 12l6-6"/></svg></div>
+ <span class="pill" style="background:rgba(0,0,0,.5);color:#fff"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--brand);fill:none;stroke-width:2"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg> AI food scan</span>
+ <div style="width:40px;height:40px;border-radius:13px;background:rgba(0,0,0,.45);display:grid;place-items:center"><svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div></div>
+<div style="position:absolute;left:0;right:0;top:110px;height:400px"><div style="position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle,#F4F1EA 0 58%,#E3DDD0 59% 62%,#F7F4EE 63%);box-shadow:0 30px 60px rgba(0,0,0,.55)">
+ <div style="position:absolute;left:46px;top:58px;width:92px;height:70px;border-radius:44% 56% 52% 48%;background:linear-gradient(135deg,#C9822F,#9A5A1E);box-shadow:inset 0 -6px 0 rgba(0,0,0,.15)"></div>
+ <div style="position:absolute;left:50px;top:66px;width:84px;height:6px;border-radius:3px;background:rgba(60,30,8,.45);transform:rotate(-12deg)"></div>
+ <div style="position:absolute;left:58px;top:88px;width:76px;height:6px;border-radius:3px;background:rgba(60,30,8,.45);transform:rotate(-12deg)"></div>
+ <div style="position:absolute;right:40px;top:62px;width:78px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#FFFFFF,#EDE6D8);box-shadow:inset 0 -5px 0 rgba(0,0,0,.06)"></div>
+ <div style="position:absolute;left:62px;bottom:44px;width:120px;height:66px;border-radius:50% 50% 46% 54%;background:radial-gradient(circle at 25% 40%,#7BC043 0 18%,transparent 19%),radial-gradient(circle at 60% 30%,#4E9A2E 0 20%,transparent 21%),radial-gradient(circle at 75% 65%,#E2483B 0 13%,transparent 14%),radial-gradient(circle at 40% 70%,#F2C14E 0 12%,transparent 13%),radial-gradient(circle at 50% 50%,#5DAA35 0 60%,#3E7D24 61%)"></div>
+</div>
+ <div style="position:absolute;left:84px;top:150px;width:108px;height:84px;border:2px solid #A3E635;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.2)">
+<span style="position:absolute;left:-2px;top:-30px;white-space:nowrap;background:#A3E635;color:#0B0F14;font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:9px">Chicken · 280</span></div><div style="position:absolute;left:196px;top:152px;width:96px;height:98px;border:2px solid #FBBF24;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.2)">
+<span style="position:absolute;right:-2px;top:-30px;white-space:nowrap;background:#FBBF24;color:#0B0F14;font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:9px">Rice · 210</span></div><div style="position:absolute;left:96px;top:262px;width:142px;height:82px;border:2px solid #38BDF8;border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.2)">
+<span style="position:absolute;left:-2px;top:-30px;white-space:nowrap;background:#38BDF8;color:#0B0F14;font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:9px">Salad · 90</span></div>
+ <div style="position:absolute;left:30px;top:30px;width:34px;height:34px;border-left:3px solid #fff;border-top:3px solid #fff;border-radius:10px 0 0 0;opacity:.8"></div>
+ <div style="position:absolute;right:30px;top:30px;width:34px;height:34px;border-right:3px solid #fff;border-top:3px solid #fff;border-radius:0 10px 0 0;opacity:.8"></div>
+ <div style="position:absolute;left:30px;bottom:6px;width:34px;height:34px;border-left:3px solid #fff;border-bottom:3px solid #fff;border-radius:0 0 0 10px;opacity:.8"></div>
+ <div style="position:absolute;right:30px;bottom:6px;width:34px;height:34px;border-right:3px solid #fff;border-bottom:3px solid #fff;border-radius:0 0 10px 0;opacity:.8"></div>
+</div>
+<div style="position:absolute;left:10px;right:10px;bottom:10px;padding:20px 18px 26px;border-radius:28px;background:#151B22;border:1px solid #26303A;z-index:2">
+ <div style="width:40px;height:5px;border-radius:3px;background:#323C47;margin:-8px auto 14px"></div>
+ <div class="row between"><div><div class="lbl">Detected · 3 items</div><div style="font-size:24px;font-weight:800;margin-top:4px">≈ 580 kcal</div></div><span class="pill" style="background:#1B2A12;color:var(--brand)">Estimate</span></div>
+ <div class="row" style="gap:8px;margin-top:14px">
+  <div class="card" style="flex:1;padding:10px;background:#1C242D"><div class="lbl">Protein</div><b style="font-size:16px">42 g</b></div>
+  <div class="card" style="flex:1;padding:10px;background:#1C242D"><div class="lbl">Carbs</div><b style="font-size:16px">64 g</b></div>
+  <div class="card" style="flex:1;padding:10px;background:#1C242D"><div class="lbl">Fat</div><b style="font-size:16px">14 g</b></div></div>
+ <div class="btn" style="margin-top:14px;background:var(--brand);color:#0B0F14">Add to lunch</div>
+ <div class="disc" style="margin-top:10px;text-align:center">AI estimates are informational and may differ from actual values.</div>
+</div><div class="home-ind"></div></body></html>

@@ -2,6 +2,18 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/work/skilllink",
+      "destination": "/work/skillnova",
+      "permanent": true
+    },
+    {
+      "source": "/work/skilllink/",
+      "destination": "/work/skillnova",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

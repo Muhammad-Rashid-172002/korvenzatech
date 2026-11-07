@@ -296,7 +296,8 @@ sl['screen-4'] = page(SL_CSS, f'''
  <div class="card row between" style="margin-top:12px;padding:14px 16px"><div><div class="small muted">Estimated total</div><div style="font-weight:800;font-size:17px;margin-top:2px">Rs 1,800</div></div><span class="chip" style="background:#EEEDFD;color:var(--brand)">Pay after job</span></div>
 </div>{sl_tabbar(1)}''', 'SkillLink — Job status')
 
-for app, screens in (('ielts', ielts), ('skilllink', sl)):
-    for name, html in screens.items():
-        (ROOT / app / f'{name}.html').write_text(html, encoding='utf-8')
-print('ok', len(ielts) + len(sl))
+if __name__ == '__main__':
+    for app, screens in (('ielts', ielts), ('skilllink', sl)):
+        for name, html in screens.items():
+            (ROOT / app / f'{name}.html').write_text(html, encoding='utf-8')
+    print('ok', len(ielts) + len(sl))

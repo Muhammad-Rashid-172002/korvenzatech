@@ -94,8 +94,10 @@ export const PROCESS = {
 export const PRODUCT = {
   /** Per case study (id from companyData): screen folder in /media/work, brand light, accent glow. */
   apps: {
+    'fitmind-ai': { dir: 'fitmind', brand: '#84CC16', accent: '#FB923C' },
     'ielts-ai-master': { dir: 'ielts', brand: '#2F5BEA', accent: '#E2384D' },
-    skilllink: { dir: 'skilllink', brand: '#6D5CF0', accent: '#A99BFF' },
+    skillnova: { dir: 'skilllink', brand: '#6D5CF0', accent: '#A99BFF' },
+    caredesk: { dir: 'caredesk', brand: '#14B8A6', accent: '#5EEAD4' },
   } as Record<string, { dir: string; brand: string; accent: string }>,
   /** Number of screens per app (screen-1..N-540.webp). */
   screens: 4,
@@ -162,4 +164,53 @@ export const SCROLL = {
   lerp: 0.1,
   /** Mouse-wheel multiplier. */
   wheelMultiplier: 1,
+} as const;
+
+/* ------------------------------------------------------- service showcases */
+/**
+ * The two primary-service showcases (components/showcase/ServiceShowcase.tsx):
+ * MOBILE = floating phones with real-layout / concept app screens; AI = glass
+ * panels over a live neural network. Both render only while on screen.
+ */
+export const SHOWCASE = {
+  /** Start loading textures when the showcase is this close to the viewport. */
+  preloadMargin: '500px',
+  /** Entrance duration (s) once the showcase first becomes visible. */
+  enterDuration: 1.6,
+  /** Restrained camera parallax toward the pointer (world units). */
+  parallax: { x: 0.32, y: 0.18 },
+  mobile: {
+    fov: 30,
+    cameraZ: 6.0,
+    /** Seconds between screen swaps on each phone (staggered per phone). */
+    swapEvery: 4.2,
+    swapDuration: 0.7,
+    /** One phone per product: app screen folder in /media/work + layout. */
+    phones: [
+      { dir: 'caredesk', pos: [-1.95, -0.12, -1.1], rotY: 0.55, scale: 0.84 },
+      { dir: 'ielts', pos: [-0.68, 0.06, -0.35], rotY: 0.24, scale: 0.94 },
+      { dir: 'fitmind', pos: [0.68, -0.02, 0], rotY: -0.2, scale: 1 },
+      { dir: 'skilllink', pos: [1.95, 0.1, -1.1], rotY: -0.55, scale: 0.84 },
+    ] as { dir: string; pos: [number, number, number]; rotY: number; scale: number }[],
+    /** Screens per phone loaded as textures (screen-1..N-540.webp). */
+    screens: 2,
+    brand: '#19C784',
+    accent: '#3B82F6',
+  },
+  ai: {
+    fov: 32,
+    cameraZ: 5.5,
+    /** Network nodes / travelling data particles (tier 2; tier 1 uses ~60 %). */
+    nodes: 42,
+    particles: 56,
+    /** Panel textures (/media/ai/panel-<name>.webp), world size and layout. */
+    panelSize: [2.15, 1.373] as [number, number],
+    panels: [
+      { name: 'chat', pos: [-1.45, 0.42, -0.7], rot: [0.02, 0.32, 0.02] },
+      { name: 'flow', pos: [0.12, -0.32, 0.25], rot: [-0.03, -0.04, 0] },
+      { name: 'doc', pos: [1.62, 0.5, -1.05], rot: [0.02, -0.34, -0.02] },
+    ] as { name: string; pos: [number, number, number]; rot: [number, number, number] }[],
+    brand: '#22D3EE',
+    accent: '#19C784',
+  },
 } as const;

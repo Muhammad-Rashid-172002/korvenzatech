@@ -33,7 +33,8 @@
   text-shadow: 0 2px 30px rgba(0,0,0,.45);
 }
 .kzh-title .kz-gradient-word { filter: drop-shadow(0 0 22px rgba(25,199,132,.35)); }
-.kzh-sub { margin-top: 18px; max-width: 46rem; color: #A9BAB2; font-size: clamp(14px, 1.25vw, 17px); font-weight: 500; letter-spacing: .01em; }
+.kzh-tagline { margin-top: 16px; color: #E8F3EE; font-size: clamp(17px, 1.7vw, 23px); font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.kzh-sub { margin-top: 12px; max-width: 44rem; color: #A9BAB2; font-size: clamp(14.5px, 1.15vw, 16.5px); font-weight: 500; line-height: 1.65; }
 .kzh-sub i { margin: 0 .45em; color: var(--kzh-em); font-style: normal; }
 .kzh-sub span { white-space: nowrap; }
 .kzh-ctas { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }

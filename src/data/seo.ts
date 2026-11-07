@@ -27,37 +27,17 @@ export type RouteMeta = {
   priority: number;
 };
 
-const SERVICE_META: Record<string, [string, string]> = {
-  'ai-solutions': ['AI Development & Business Automation Services | KorvenzaTech', 'AI assistants, private knowledge systems, workflow automation, document intelligence and multimodal product features designed around real business operations.'],
-  'api-development': ['Custom API Development & Integration Services | KorvenzaTech', 'Secure custom APIs, backend integrations, webhooks and connected software systems for mobile apps, websites, SaaS products and business platforms.'],
-  'mobile-app-development': ['Mobile App Development | Flutter, iOS & Android | KorvenzaTech', 'Professional mobile app development for Android and iOS, including Flutter apps, cloud backends, notifications, maps, payments and scalable product engineering.'],
-  'web-development': ['Website & Web App Development Services | KorvenzaTech', 'Modern corporate websites, SaaS websites, web applications and conversion-focused digital experiences with responsive engineering and technical SEO.'],
-  'custom-software': ['Custom Software Development Services | KorvenzaTech', 'Custom business software, internal platforms, dashboards, workflow systems, CRM/ERP solutions and operational tools built around your process.'],
-  'saas-development': ['SaaS Development & Product Engineering | KorvenzaTech', 'End-to-end SaaS development for MVPs and scalable products, including subscriptions, user workspaces, dashboards, APIs, cloud backends and admin systems.'],
-  'cloud-solutions': ['Cloud & Backend Development Services | KorvenzaTech', 'Cloud-ready backends, databases, authentication, storage, serverless systems, deployment and scalable infrastructure for modern digital products.'],
-  'ui-ux-design': ['UI/UX Design for Apps, SaaS & Websites | KorvenzaTech', 'Product-focused UI/UX design for mobile apps, SaaS platforms, websites and dashboards with clear user flows and maintainable design systems.'],
-  'digital-marketing': ['Technical SEO & Digital Growth Strategy | KorvenzaTech', 'Technical SEO, analytics, conversion optimization and digital growth strategy aligned with modern websites, software products and technology businesses.'],
-};
-
-const STUDY_META: Record<string, [string, string]> = {
-  'ielts-ai-master': ['IELTS AI Master Case Study | KorvenzaTech', 'AI-powered education product case study covering speaking, writing, reading and listening workflows, Firebase architecture and mobile product delivery.'],
-  skilllink: ['SkillLink Marketplace Case Study | KorvenzaTech', 'On-demand services marketplace case study covering customer and worker flows, real-time job lifecycle, Firebase architecture and Google Maps integration.'],
-};
-
-const STUDY_IMAGES: Record<string, string> = {
-  'ielts-ai-master': '/media/work/ielts-ai-master-1536.webp',
-  skilllink: '/media/work/skilllink-1536.webp',
-};
+const STUDY_APP_CATEGORY: Record<string, string> = { 'fitmind-ai': 'HealthApplication', 'ielts-ai-master': 'EducationalApplication' };
 
 const STATIC: Record<string, { title: string; description: string; name: string; keywords?: string; changefreq: 'weekly' | 'monthly'; priority: number }> = {
   '/': {
-    title: 'KorvenzaTech | Software Development, AI, SaaS, Mobile & Web',
-    description: 'Software development company building custom software, SaaS platforms, AI solutions, Flutter mobile apps, websites, APIs and cloud systems for growing businesses.',
+    title: 'Software Development Company | Mobile Apps & AI Solutions — KorvenzaTech',
+    description: 'KorvenzaTech builds custom Android and iOS apps, practical AI solutions and automation, and scalable software for startups and businesses worldwide.',
     name: 'Home',
     changefreq: 'weekly', priority: 1.0,
   },
-  '/services': { title: 'Software Development Services: AI, SaaS, Apps & APIs | KorvenzaTech', description: 'Explore KorvenzaTech services across AI solutions, SaaS, custom software, mobile apps, websites, APIs, cloud infrastructure, UI/UX and digital growth.', name: 'Services', changefreq: 'weekly', priority: 0.9 },
-  '/work': { title: 'Software Case Studies & Solution Blueprints | KorvenzaTech', description: 'Explore selected KorvenzaTech products and solution blueprints across education technology, marketplaces, AI, SaaS, APIs, cloud and product design.', name: 'Work', changefreq: 'weekly', priority: 0.8 },
+  '/services': { title: 'Mobile App, AI & Software Development Services | KorvenzaTech', description: 'Custom mobile app development and AI solutions & automation, plus custom software, SaaS, websites, APIs, cloud, UI/UX design and technical growth.', name: 'Services', changefreq: 'weekly', priority: 0.9 },
+  '/work': { title: 'Software Development Portfolio | KorvenzaTech', description: 'Case studies of FitMind AI, IELTS AI Master, SkillNova and CareDesk — AI mobile apps, a service marketplace and a hospital complaint management system.', name: 'Work', changefreq: 'weekly', priority: 0.8 },
   '/industries': { title: 'Industry Software Solutions | KorvenzaTech', description: 'Software and digital product solutions for healthcare, education, finance, e-commerce, logistics, real estate, marketplaces and professional services.', name: 'Industries', changefreq: 'monthly', priority: 0.7 },
   '/about': { title: 'About KorvenzaTech | Software Engineering & Product Company', description: 'Learn about KorvenzaTech, our leadership, engineering philosophy, client-focused delivery model and approach to building modern digital products.', name: 'About', changefreq: 'monthly', priority: 0.7 },
   '/insights': { title: 'Software, AI, SaaS & App Development Insights | KorvenzaTech', description: 'Practical guidance on AI, SaaS products, mobile apps, APIs, cloud systems, product architecture and digital growth.', name: 'Insights', changefreq: 'weekly', priority: 0.7 },
@@ -84,7 +64,7 @@ export function getRouteMeta(path: string): RouteMeta {
 
   const service = path.startsWith('/services/') ? SERVICES_DATA.find((x) => `/services/${x.id}` === path) : undefined;
   if (service) {
-    const [title, description] = SERVICE_META[service.id] ?? [`${service.title} Services | KorvenzaTech`, service.shortDesc];
+    const { title, description } = service.seo;
     return { ...base, path, title, description, name: service.title, changefreq: 'monthly', priority: 0.9 };
   }
 
@@ -93,12 +73,10 @@ export function getRouteMeta(path: string): RouteMeta {
 
   const study = path.startsWith('/work/') ? CASE_STUDIES.find((x) => `/work/${x.id}` === path) : undefined;
   if (study) {
-    const [title, description] = STUDY_META[study.id] ?? [`${study.name} Case Study | KorvenzaTech`, study.summary];
-    const img = STUDY_IMAGES[study.id];
-    return {
-      ...base, path, title, description, name: study.name, ogType: 'article', changefreq: 'monthly', priority: 0.8,
-      ...(img ? { image: `${SITE}${img}`, imageWidth: 1536, imageHeight: 1024 } : {}),
-    };
+    const title = `${study.name}: ${study.category} | KorvenzaTech`;
+    const description = `${study.summary} ${study.coreTech.slice(0, 3).join(', ')}.`.slice(0, 300);
+    const img = study.imageSrc.startsWith('/media/') ? study.imageSrc : '/media/work/ielts-ai-master-1536.webp';
+    return { ...base, path, title, description, name: study.name, ogType: 'article', changefreq: 'monthly', priority: 0.8, image: `${SITE}${img}`, imageWidth: 1536, imageHeight: 1024 };
   }
 
   return { ...base, path, title: 'Page not found | KorvenzaTech', description: 'The page you are looking for does not exist. Explore KorvenzaTech services, work and contact options.', name: 'Not found', noindex: true, changefreq: 'monthly', priority: 0 };
@@ -116,7 +94,7 @@ const organization = {
   url: `${SITE}/`,
   logo: `${SITE}/media/brand/logo-512.png`,
   image: OG_IMAGE,
-  description: 'Software development company building custom software, SaaS platforms, mobile apps, AI solutions, websites, APIs and cloud-ready systems.',
+  description: 'Software development company building custom mobile apps, AI solutions and automation, and scalable digital products.',
   email: 'info@korvenzatech.com',
   founder: [
     { '@type': 'Person', name: 'Muhammad Rashid', jobTitle: 'Founder & CEO' },
@@ -129,7 +107,7 @@ const organization = {
     { '@type': 'ContactPoint', contactType: 'customer service', email: 'info@korvenzatech.com', telephone: '+92-370-1691701', availableLanguage: ['English', 'Urdu', 'Pashto'] },
     { '@type': 'ContactPoint', contactType: 'sales', email: 'sales@korvenzatech.com', telephone: '+92-370-1691701', availableLanguage: ['English', 'Urdu', 'Pashto'] },
   ],
-  knowsAbout: ['Custom Software Development', 'SaaS Development', 'Mobile App Development', 'Flutter', 'AI Solutions', 'Website Development', 'API Development', 'Cloud Solutions', 'UI/UX Design', 'Technical SEO'],
+  knowsAbout: ['Mobile App Development', 'Flutter', 'AI Solutions', 'Business Process Automation', 'Custom Software Development', 'SaaS Development', 'Website Development', 'API Development', 'Cloud Solutions', 'UI/UX Design', 'Technical SEO'],
   areaServed: 'Worldwide',
 };
 
@@ -172,7 +150,8 @@ export function buildStructuredData(path: string) {
 
   const service = SERVICES_DATA.find((s) => `/services/${s.id}` === path);
   if (service) {
-    graph.push({ '@type': 'Service', '@id': `${url}#service`, name: service.title, serviceType: service.title, description: service.shortDesc, url, provider: { '@id': ORG_ID }, areaServed: 'Worldwide' });
+    graph.push({ '@type': 'Service', '@id': `${url}#service`, name: service.title, serviceType: service.title, description: service.description, url, provider: { '@id': ORG_ID }, areaServed: 'Worldwide',
+      hasOfferCatalog: { '@type': 'OfferCatalog', name: `${service.title} capabilities`, itemListElement: (service.capabilities?.map((c) => c.name) ?? service.features).map((n) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: n } })) } });
     if (service.faqs.length) {
       graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: service.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
     }
@@ -195,7 +174,10 @@ export function buildStructuredData(path: string) {
 
   const study = CASE_STUDIES.find((s) => `/work/${s.id}` === path);
   if (study) {
-    graph.push({ '@type': 'CreativeWork', '@id': `${url}#work`, name: study.name, headline: study.tagline, description: study.summary, url, creator: { '@id': ORG_ID }, about: study.industry, image: meta.image, keywords: study.coreTech.join(', ') });
+    graph.push({ '@type': 'CreativeWork', '@id': `${url}#work`, name: `${study.name} case study`, headline: study.headline, description: study.summary, url, creator: { '@id': ORG_ID }, about: study.industry, image: meta.image, keywords: study.coreTech.join(', ') });
+    // Live store apps only: SoftwareApplication without ratings, prices or download counts.
+    const store = study.links.find((l) => l.href.startsWith('https://play.google.com/'));
+    if (store) graph.push({ '@type': 'SoftwareApplication', '@id': `${url}#app`, name: study.name, description: study.summary, operatingSystem: 'Android', applicationCategory: STUDY_APP_CATEGORY[study.id] ?? 'MobileApplication', url: store.href, installUrl: store.href, author: { '@id': ORG_ID }, publisher: { '@id': ORG_ID } });
   }
 
   return { '@context': 'https://schema.org', '@graph': graph };

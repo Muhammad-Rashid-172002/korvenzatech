@@ -21,6 +21,8 @@ import { ProcessScene } from './scenes/Process';
 import { ProductScene } from './scenes/Product';
 import { OrbitScene } from './scenes/Orbit';
 import { CtaScene } from './scenes/Cta';
+import { MobileShowcaseScene } from './scenes/MobileShowcase';
+import { AiShowcaseScene } from './scenes/AiShowcase';
 
 export type Quality = { tier: 1 | 2; lite: boolean };
 
@@ -73,7 +75,7 @@ function VisibilityLoop({ targets }: { targets: (HTMLElement | null)[] }) {
 const PRODUCT_SLOTS = Object.keys(PRODUCT.apps).map((id) => `product-${id}`);
 // The homepage hero is a DOM/CSS composition around the original raster K logo (components/hero/),
 // so it has no WebGL slot.
-const SLOTS = ['process', 'orbit', 'cta', ...PRODUCT_SLOTS];
+const SLOTS = ['process', 'orbit', 'cta', 'showcase-mobile', 'showcase-ai', ...PRODUCT_SLOTS];
 
 /**
  * Finds every slot's DOM track for the current route. Views stay mounted for the
@@ -149,6 +151,12 @@ export default function Experience({ path, tier }: { path: string; tier: 1 | 2 }
       </View>
       <View track={refs.cta as React.MutableRefObject<HTMLElement>} index={4}>
         <Suspense fallback={null}>{cta && <CtaScene key={elKey(cta)} track={cta} quality={quality} />}</Suspense>
+      </View>
+      <View track={refs['showcase-mobile'] as React.MutableRefObject<HTMLElement>} index={5}>
+        <Suspense fallback={null}>{els['showcase-mobile'] && <MobileShowcaseScene key={elKey(els['showcase-mobile'])} track={els['showcase-mobile']} quality={quality} />}</Suspense>
+      </View>
+      <View track={refs['showcase-ai'] as React.MutableRefObject<HTMLElement>} index={6}>
+        <Suspense fallback={null}>{els['showcase-ai'] && <AiShowcaseScene key={elKey(els['showcase-ai'])} track={els['showcase-ai']} quality={quality} />}</Suspense>
       </View>
       {PRODUCT_SLOTS.map((k, i) => {
         const el = els[k];

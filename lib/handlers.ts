@@ -334,7 +334,7 @@ export async function handleContact(
 
   const referenceId = `KZ-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   const normalized = inquiryType.toLowerCase();
-  const isSales = /sales|project|software|saas|mobile|website|api|cloud|ui\/ux|digital|ai solution|not sure|budget/.test(normalized);
+  const isSales = /sales|project|software|saas|mobile|website|api|cloud|ui\/ux|digital|ai solution|automation|not sure|budget/.test(normalized);
   const destinationEmail = isSales ? 'sales@korvenzatech.com' : 'info@korvenzatech.com';
 
   const payload = {
@@ -348,6 +348,7 @@ export async function handleContact(
     country: String(body?.country || '').slice(0, 120),
     serviceNeeded: String(body?.serviceNeeded || 'General Inquiry').slice(0, 160),
     budgetRange: String(body?.budgetRange || 'Not specified').slice(0, 100),
+    projectTimeline: String(body?.projectTimeline || 'Not specified').slice(0, 100),
     ideaDescription: String(body?.ideaDescription || body?.message || '').slice(0, 8000),
     preferredContact: String(body?.preferredContact || 'Email').slice(0, 80),
     whatsapp: '+923701691701',

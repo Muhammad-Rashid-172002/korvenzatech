@@ -68,7 +68,7 @@ export const AIFeatureSection: React.FC = () => {
           {/* Left: AI Use Case Badges */}
           <div className="lg:col-span-5 space-y-6 text-left">
             <h3 className="text-2xl font-bold text-white">
-              Proven AI Capabilities We Engineer:
+              AI capabilities we can engineer:
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
@@ -84,7 +84,7 @@ export const AIFeatureSection: React.FC = () => {
 
             <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs text-slate-300 flex items-center gap-3">
               <ShieldAlert className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span><strong>Privacy First:</strong> All AI models process data securely without exposing proprietary company files to public model training.</span>
+              <span><strong>Privacy first:</strong> AI features are designed so your files are not used for public model training, using provider settings that support this.</span>
             </div>
           </div>
 

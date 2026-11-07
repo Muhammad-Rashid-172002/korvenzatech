@@ -24,14 +24,16 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onStartPro
         
         {/* Where we've delivered: only industries backed by shipped work, each linked to its case study. */}
         <div className="kz-reveal mx-auto mb-14 max-w-3xl space-y-5 text-center">
-          <div className="kz-eyebrow mx-auto"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /><span>Where we've delivered</span></div>
-          <h2 className="kz-h2">Shipped products, not slideware</h2>
-          <p className="kz-lead">Two industries where we have designed, built and shipped our own products. Open each case study for the architecture and the decisions behind it.</p>
+          <div className="kz-eyebrow mx-auto"><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /><span>Where we've built</span></div>
+          <h2 className="kz-h2">Real products, not slideware</h2>
+          <p className="kz-lead">Industries where we have designed and built real products. Open each case study for the architecture and the decisions behind it.</p>
         </div>
         <div className="mb-20 grid gap-5 md:grid-cols-2">
           {[
+            { id: 'caredesk', industry: 'Healthcare', Icon: Activity },
             { id: 'ielts-ai-master', industry: 'Education & EdTech', Icon: GraduationCap },
-            { id: 'skilllink', industry: 'Marketplaces & On-demand services', Icon: Briefcase },
+            { id: 'fitmind-ai', industry: 'Health & Wellness', Icon: Dumbbell },
+            { id: 'skillnova', industry: 'Marketplaces & On-demand services', Icon: Briefcase },
           ].map(({ id, industry, Icon }, i) => {
             const study = CASE_STUDIES.find((c) => c.id === id);
             if (!study) return null;

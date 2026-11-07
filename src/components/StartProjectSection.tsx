@@ -3,6 +3,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { Sparkles, CheckCircle, Send, Bot, Shield, Clock, AlertCircle } from 'lucide-react';
 import { SectionHeader } from './ui';
 import { ProjectBriefData } from '../types';
+import { SERVICES_DATA, SERVICE_OPTIONS } from '../data/companyData';
 
 interface StartProjectSectionProps {
   onOpenConsultation?: () => void;
@@ -16,11 +17,19 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     email: '',
     companyName: '',
     country: '',
-    serviceNeeded: 'Not Sure Yet',
-    budgetRange: '$5,000–$15,000',
+    serviceNeeded: '',
+    budgetRange: '',
+    projectTimeline: '',
     ideaDescription: '',
     preferredContact: 'Email'
   });
+
+  // /start-project?service=<service id> (from the service cards) preselects that service.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('service');
+    const svc = id ? SERVICES_DATA.find((s) => s.id === id) : undefined;
+    if (svc) setFormData((prev) => (prev.serviceNeeded ? prev : { ...prev, serviceNeeded: svc.shortTitle ?? svc.title }));
+  }, []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -29,18 +38,12 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
 
-  const servicesList = [
-    'AI Solution', 'Mobile App', 'Website', 'Custom Software', 
-    'SaaS Platform', 'API Development', 'Cloud Solution', 
-    'UI/UX Design', 'Digital Marketing', 'Not Sure Yet'
-  ];
+  const servicesList = SERVICE_OPTIONS;
+  const budgetList = ['Under $1,000', '$1,000–$5,000', '$5,000–$15,000', '$15,000–$50,000', '$50,000+', 'Not sure yet'];
+  const timelineList = ['As soon as possible', 'Within 1 month', '1–3 months', '3–6 months', 'Flexible'];
 
-  const budgetList = [
-    'Under $1,000', '$1,000–$5,000', '$5,000–$15,000', 
-    '$15,000–$50,000', '$50,000+', 'Not Sure Yet'
-  ];
-
-  const [errors, setErrors] = useState<Partial<Record<'fullName' | 'email' | 'ideaDescription', string>>>({});
+  type FieldKey = 'fullName' | 'email' | 'serviceNeeded' | 'ideaDescription';
+  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
   const uid = useId();
   const formRef = useRef<HTMLFormElement>(null);
   // GA4: form_start once per form instance (first focus), form_submit + generate_lead only after
@@ -59,11 +62,12 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     if (!formData.fullName.trim()) next.fullName = 'Please enter your name.';
     if (!formData.email.trim()) next.email = 'Please enter your email address.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) next.email = 'Please enter a valid email address, e.g. name@company.com.';
-    if (formData.ideaDescription.trim().length < 3) next.ideaDescription = 'Please describe your idea or question in a sentence or two.';
+    if (formData.inquiryType === 'Project / Sales' && !formData.serviceNeeded) next.serviceNeeded = 'Please choose the service you need (or “Other”).';
+    if (formData.ideaDescription.trim().length < 20) next.ideaDescription = 'Please describe your project in a sentence or two (at least 20 characters).';
     setErrors(next);
     if (Object.keys(next).length) {
       const firstKey = Object.keys(next)[0];
-      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(`[name="${firstKey}"]`)?.focus());
+      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>(`[name="${firstKey}"], [data-field="${firstKey}"] button`)?.focus());
       return false;
     }
     return true;
@@ -79,7 +83,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, website: websiteTrap })
+        body: JSON.stringify({ ...formData, serviceNeeded: formData.serviceNeeded || 'Not specified', budgetRange: formData.budgetRange || 'Not specified', projectTimeline: formData.projectTimeline || 'Not specified', website: websiteTrap })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -112,7 +116,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
       const data = await res.json();
       if (!res.ok || data?.error) throw new Error(data?.error || 'Scope analysis unavailable');
       setAiAnalysis(data);
-      if (data.recommendedService) {
+      if (data.recommendedService && SERVICE_OPTIONS.includes(data.recommendedService)) {
         setFormData(prev => ({ ...prev, serviceNeeded: data.recommendedService }));
       }
     } catch (err) {
@@ -122,13 +126,13 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     }
   };
 
-  const field = (key: 'fullName' | 'email' | 'ideaDescription') => ({
+  const field = (key: FieldKey) => ({
     id: `${uid}-${key}`,
     name: key,
     'aria-invalid': errors[key] ? true : undefined,
     'aria-describedby': errors[key] ? `${uid}-${key}-error` : undefined,
   });
-  const ErrorText = ({ k }: { k: 'fullName' | 'email' | 'ideaDescription' }) => errors[k] ? (
+  const ErrorText = ({ k }: { k: FieldKey }) => errors[k] ? (
     <p id={`${uid}-${k}-error`} className="kz-error flex items-center gap-1.5"><AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />{errors[k]}</p>
   ) : null;
   const chip = (active: boolean) => `min-h-[40px] rounded-full border px-4 text-[13px] font-semibold transition-all duration-300 ${active ? 'border-emerald-600 bg-emerald-700 text-white kz-on-accent shadow-[0_8px_20px_-10px_rgba(25,199,132,.8)]' : 'border-[var(--kz-border-strong)] bg-[var(--kz-surface-2)] text-[var(--kz-text-2)] hover:border-emerald-500/40'}`;
@@ -160,7 +164,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
                 type="button"
                 onClick={() => {
                   setIsSubmitted(false);
-                  setFormData({ inquiryType: defaultInquiryType, fullName: '', email: '', companyName: '', country: '', serviceNeeded: 'Not Sure Yet', budgetRange: '$5,000–$15,000', ideaDescription: '', preferredContact: 'Email' });
+                  setFormData({ inquiryType: defaultInquiryType, fullName: '', email: '', companyName: '', country: '', serviceNeeded: '', budgetRange: '', projectTimeline: '', ideaDescription: '', preferredContact: 'Email' });
                   setAiAnalysis(null);
                   setSubmitError('');
                   setWebsiteTrap('');
@@ -199,7 +203,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
                   <ErrorText k="fullName" />
                 </div>
                 <div>
-                  <label htmlFor={`${uid}-email`} className="kz-label">Work email <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
+                  <label htmlFor={`${uid}-email`} className="kz-label">Business email <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
                   <input {...field('email')} type="email" autoComplete="email" inputMode="email" required placeholder="e.g. sarah@company.com" value={formData.email} onChange={(e) => update({ email: e.target.value })} className="kz-field" />
                   <ErrorText k="email" />
                 </div>
@@ -213,27 +217,36 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
                 </div>
               </div>
 
-              <fieldset>
-                <legend className="kz-label">What do you need help with?</legend>
+              <fieldset data-field="serviceNeeded" aria-describedby={errors.serviceNeeded ? `${uid}-serviceNeeded-error` : undefined}>
+                <legend className="kz-label">Service required {formData.inquiryType === 'Project / Sales' && <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span>}</legend>
                 <div className="flex flex-wrap gap-2">
                   {servicesList.map((srv) => (
                     <button key={srv} type="button" aria-pressed={formData.serviceNeeded === srv} onClick={() => update({ serviceNeeded: srv })} className={chip(formData.serviceNeeded === srv)}>{srv}</button>
                   ))}
                 </div>
+                <ErrorText k="serviceNeeded" />
               </fieldset>
 
-              <fieldset>
-                <legend className="kz-label">Estimated project budget</legend>
-                <div className="flex flex-wrap gap-2">
-                  {budgetList.map((bgt) => (
-                    <button key={bgt} type="button" aria-pressed={formData.budgetRange === bgt} onClick={() => update({ budgetRange: bgt })} className={chip(formData.budgetRange === bgt)}>{bgt}</button>
-                  ))}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor={`${uid}-budget`} className="kz-label">Project budget <span className="font-normal text-[var(--kz-muted)]">(optional)</span></label>
+                  <select id={`${uid}-budget`} name="budgetRange" value={formData.budgetRange} onChange={(e) => update({ budgetRange: e.target.value })} className="kz-field">
+                    <option value="">Select a range</option>
+                    {budgetList.map((b) => <option key={b} value={b}>{b}</option>)}
+                  </select>
                 </div>
-              </fieldset>
+                <div>
+                  <label htmlFor={`${uid}-timeline`} className="kz-label">Project timeline <span className="font-normal text-[var(--kz-muted)]">(optional)</span></label>
+                  <select id={`${uid}-timeline`} name="projectTimeline" value={formData.projectTimeline} onChange={(e) => update({ projectTimeline: e.target.value })} className="kz-field">
+                    <option value="">Select a timeline</option>
+                    {timelineList.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
 
               <div>
                 <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                  <label htmlFor={`${uid}-ideaDescription`} className="kz-label !mb-0">Tell us about your idea or business challenge <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
+                  <label htmlFor={`${uid}-ideaDescription`} className="kz-label !mb-0">Project description <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span></label>
                   <button type="button" onClick={handleRunAiAnalysis} disabled={isAiAnalyzing || !formData.ideaDescription} className="inline-flex items-center gap-1.5 self-start font-mono text-[11.5px] text-[var(--kz-accent-text)] hover:underline disabled:opacity-40">
                     <Bot className="h-3.5 w-3.5" aria-hidden="true" />
                     {isAiAnalyzing ? 'Analyzing scope…' : 'Analyze idea with AI scope engine'}

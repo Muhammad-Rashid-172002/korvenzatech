@@ -1,0 +1,105 @@
+import type { CaseStudy } from '../types';
+
+/**
+ * The four portfolio projects (URL: /work/<id>).
+ *
+ * Visual honesty: none of the phone/dashboard images are screenshots of the shipped apps.
+ *  - `recreation`: interface recreations drawn from the real app layouts (IELTS AI Master, SkillNova).
+ *  - `concept`: illustrative concept designs based on the documented features (FitMind AI, CareDesk).
+ * The UI labels every gallery accordingly. No user counts, downloads, revenue or accuracy claims.
+ * Store links are included only where the listing was checked (Nov 2026).
+ */
+export const CASE_STUDIES: CaseStudy[] = [
+  {
+    id: 'fitmind-ai',
+    name: 'FitMind AI',
+    category: 'AI-Powered Health & Fitness Application',
+    industry: 'Health & Wellness',
+    headline: 'Making Health and Nutrition Tracking Smarter with AI.',
+    tagline: 'AI food, skin and medicine scanning with calorie tracking and workouts',
+    summary: 'FitMind AI is an AI-powered mobile application designed to help users better understand food, nutrition, and personal wellness through intelligent scanning and tracking features.',
+    problem: 'Logging meals by hand is slow, so most people stop tracking within days. Understanding what is on a plate, on a medicine label or on your skin usually means searching several apps and websites.',
+    solution: 'One Flutter app that uses multimodal AI to turn a photo into useful information: an estimated calorie and macro breakdown for a meal, a general skin check and a readable summary of a medicine label — alongside daily calorie tracking, an AI coach and workouts.',
+    features: ['AI food scanning from a photo', 'Calorie tracking with daily goals', 'Nutrition and macro analysis', 'Fitness and workout features', 'AI skin scan', 'AI medicine scanner', 'AI coach guidance'],
+    coreTech: ['Flutter', 'Dart', 'Firebase', 'Multimodal AI integration'],
+    platform: 'Android · Google Play',
+    status: 'Live on Google Play',
+    packageId: 'com.rashidapps.fitmindai',
+    outcome: ['Published on Google Play as a live Android app', 'Food, skin and medicine scanning in one product', 'AI features combined with everyday calorie and workout tracking'],
+    metrics: [{ label: 'Status', value: 'Live' }, { label: 'Platform', value: 'Android' }, { label: 'AI scanners', value: '3' }],
+    links: [{ label: 'View on Google Play', href: 'https://play.google.com/store/apps/details?id=com.rashidapps.fitmindai' }],
+    disclaimer: 'AI-generated insights in FitMind AI are informational and are not a substitute for professional medical advice, diagnosis or treatment.',
+    visuals: { kind: 'concept', screens: 'fitmind', count: 4, cover: 'fitmind', brand: '#A3E635', accent: '#FB923C', captions: ['Daily calorie and macro dashboard', 'AI food scan with nutrition estimate', 'Meal nutrition analysis and AI insight', 'Skin scan, medicine scanner and workouts'] },
+    relatedServices: ['mobile-app-development', 'ai-solutions', 'ui-ux-design'],
+    imageSrc: '/media/work/fitmind-1536.webp',
+  },
+  {
+    id: 'ielts-ai-master',
+    name: 'IELTS AI Master',
+    category: 'AI-Powered Education Application',
+    industry: 'Education & EdTech',
+    headline: 'Making IELTS Preparation More Intelligent with AI.',
+    tagline: 'AI IELTS coaching for Speaking, Writing, Reading and Listening practice',
+    summary: 'IELTS AI Master is an AI-powered educational application designed to support IELTS learners with intelligent coaching and personalized study assistance.',
+    problem: 'IELTS learners practise alone and wait a long time — or pay a tutor — for feedback on writing and speaking. Generic study material does not adapt to what each learner is weak at.',
+    solution: 'A Flutter app with Gemini-powered coaching across all four IELTS modules: practice tasks, AI feedback on writing and speaking practice, and study assistance that adapts to the learner — with progress stored in Firebase.',
+    features: ['AI IELTS coach', 'Practice for Speaking, Writing, Reading and Listening', 'AI feedback on writing and speaking practice', 'Personalized learning assistance', 'Study support and progress tracking'],
+    coreTech: ['Flutter', 'Dart', 'Firebase', 'Gemini AI'],
+    platform: 'Android · Google Play',
+    status: 'Live on Google Play',
+    packageId: 'com.rashidapps.ieltsaimaster',
+    outcome: ['Published on Google Play as a live Android app', 'All four IELTS practice modules in one application', 'Gemini-based coaching and feedback built into the study flow'],
+    metrics: [{ label: 'Status', value: 'Live' }, { label: 'Modules', value: '4 IELTS' }, { label: 'Platform', value: 'Android' }],
+    links: [{ label: 'View on Google Play', href: 'https://play.google.com/store/apps/details?id=com.rashidapps.ieltsaimaster' }],
+    visuals: { kind: 'recreation', screens: 'ielts', count: 4, cover: 'ielts', brand: '#2F5BEA', accent: '#E2384D', captions: ['Practice dashboard with the four modules', 'AI writing feedback', 'Speaking practice', 'Progress and personal study plan'] },
+    relatedServices: ['ai-solutions', 'mobile-app-development', 'cloud-solutions'],
+    imageSrc: '/media/work/ielts-1536.webp',
+  },
+  {
+    id: 'skillnova',
+    name: 'SkillNova',
+    formerName: 'SkillLink',
+    category: 'On-Demand Service Marketplace Application',
+    industry: 'On-Demand Services',
+    headline: 'Connecting Customers and Service Providers Through a Digital Marketplace.',
+    tagline: 'Customer and worker apps for booking local services',
+    summary: 'SkillNova is an on-demand service marketplace designed to connect customers with service providers through a structured digital experience.',
+    problem: 'Finding a reliable electrician, plumber or technician still depends on phone calls and word of mouth. Customers cannot see who is nearby or where a job stands; providers juggle requests by phone.',
+    solution: 'A two-sided Flutter marketplace: a customer app to discover services and request a worker, a worker app to receive and manage jobs, location features with Google Maps, and admin management — on a real-time Firebase backend.',
+    features: ['Customer application', 'Worker application', 'Service discovery by category', 'Location-based features with Google Maps', 'Customer and worker job workflows', 'Real-time service updates', 'Admin management'],
+    coreTech: ['Flutter', 'Dart', 'Firebase', 'Cloud Firestore', 'Google Maps'],
+    platform: 'Flutter · customer + worker apps',
+    status: 'Marketplace product',
+    outcome: ['Separate customer and worker experiences in one product', 'Request-to-completion job flow with clear status', 'Location-aware matching built on Google Maps'],
+    metrics: [{ label: 'Type', value: 'Marketplace' }, { label: 'Apps', value: '2 roles' }, { label: 'Stack', value: 'Flutter' }],
+    links: [],
+    visuals: { kind: 'recreation', screens: 'skilllink', count: 4, cover: 'skillnova', brand: '#6D5CF0', accent: '#A99BFF', captions: ['Customer home with service categories', 'Nearby workers on the map', 'Worker profile', 'Live job status'] },
+    relatedServices: ['mobile-app-development', 'api-development', 'cloud-solutions'],
+    imageSrc: '/media/work/skillnova-1536.webp',
+  },
+  {
+    id: 'caredesk',
+    name: 'CareDesk',
+    category: 'Healthcare Complaint & Management System',
+    industry: 'Healthcare',
+    headline: 'Improving Hospital Complaint Management Through Digital Workflows.',
+    tagline: 'Employee complaint app with a separate web admin dashboard',
+    summary: 'CareDesk is a healthcare-focused complaint management solution designed to help hospital staff record, manage, and track complaints while giving administrators a dedicated dashboard for oversight and management.',
+    problem: 'In many hospitals, complaints about facilities and services are raised verbally or on paper. They get lost between departments, staff cannot see progress, and management has no reliable view of what is happening.',
+    solution: 'A Flutter employee app to submit and track complaints, connected through Firebase to a separate web admin dashboard where administrators assign, monitor and review complaints across departments over monthly, quarterly and yearly periods.',
+    features: ['Employee mobile application', 'Separate web admin dashboard', 'Complaint submission and tracking', 'Complaint management workflows', 'Employee management', 'Administrative monitoring and reporting', 'Firebase integration'],
+    coreTech: ['Flutter', 'Dart', 'Firebase', 'Web admin dashboard'],
+    platform: 'Flutter app + web dashboard',
+    status: 'Client project',
+    outcome: ['Complaints recorded digitally with a clear status trail', 'Administrators see every complaint in one dashboard', 'A complaint management system — not a full hospital management system'],
+    metrics: [{ label: 'Apps', value: 'Mobile + web' }, { label: 'Users', value: 'Staff & admin' }, { label: 'Backend', value: 'Firebase' }],
+    links: [],
+    disclaimer: 'Visuals use invented sample data. No patient information or hospital records are shown.',
+    visuals: { kind: 'concept', screens: 'caredesk', count: 4, cover: 'caredesk', brand: '#14B8A6', accent: '#5EEAD4', dashboards: ['dashboard-1', 'dashboard-2'], captions: ['Employee home with complaint status', 'Submitting a complaint', 'Tracking a complaint', 'My complaints'] },
+    relatedServices: ['custom-software', 'mobile-app-development', 'ui-ux-design'],
+    imageSrc: '/media/work/caredesk-1536.webp',
+  },
+];
+
+/** Old case-study URLs that permanently redirect (also in vercel.json and server.ts). */
+export const WORK_REDIRECTS: Record<string, string> = { '/work/skilllink': '/work/skillnova' };

@@ -12,10 +12,10 @@ const pillars = [
 ];
 
 const strengths = [
-  { label: 'Live products delivered', detail: 'Mobile & web apps' },
-  { label: 'AI-powered solutions', detail: 'Private RAG & reasoning engines' },
-  { label: 'Cross-platform expertise', detail: 'Flutter & React / Next.js' },
-  { label: 'Global-ready engineering', detail: 'Secure cloud infrastructure' },
+  { label: '2 live apps on Google Play', detail: 'FitMind AI · IELTS AI Master' },
+  { label: 'AI built into real products', detail: 'Gemini & multimodal AI' },
+  { label: 'One Flutter codebase', detail: 'Android & iOS' },
+  { label: 'Apps + admin dashboards', detail: 'SkillNova · CareDesk' },
 ];
 
 export const WhyKorvenzaTech: React.FC = () => (
@@ -23,7 +23,7 @@ export const WhyKorvenzaTech: React.FC = () => (
     <div className="kz-container">
       <SectionHeader
         eyebrow="The KorvenzaTech advantage"
-        title={<span id="why-title">Built differently. Engineered for results.</span>}
+        title={<span id="why-title">Why KorvenzaTech</span>}
         lead="We bridge business strategy and software engineering to create products that perform reliably from launch day forward."
       />
       <div className="mt-14 grid overflow-hidden rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-border)] gap-px md:grid-cols-2 lg:grid-cols-3">

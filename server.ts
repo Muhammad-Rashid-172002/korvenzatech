@@ -100,6 +100,14 @@ app.post('/api/contact', rateLimit, async (req, res) => {
   }
 });
 
+// Permanent redirects for renamed pages (mirrors vercel.json "redirects").
+const REDIRECTS: Record<string, string> = { '/work/skilllink': '/work/skillnova' };
+app.use((req, res, next) => {
+  const to = REDIRECTS[req.path.replace(/\/+$/, '')];
+  if (to) return res.redirect(301, to);
+  next();
+});
+
 async function start() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
