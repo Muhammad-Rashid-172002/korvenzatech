@@ -753,3 +753,16 @@ body:has(.kz-read-progress) .kz-progress { display: none; }
 .kz-cs-screens li:hover .kz-cs-phone { transform: translateY(-6px); }
 .kz-cs-screens figcaption, .kz-cs-dash figcaption { margin-top: 14px; font-size: 13px; line-height: 1.5; color: var(--kz-muted); text-align: center; }
 .kz-cs-dash img { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--kz-border); box-shadow: var(--kz-shadow-md); }
+
+/* ---------- Project brief form: submit button + "email ready" panel (StartProjectSection) ---------- */
+.kz-submit-btn { position: relative; overflow: hidden; isolation: isolate; transition: transform var(--kz-dur) var(--kz-ease-out), box-shadow var(--kz-dur-slow) var(--kz-ease-out), background-color var(--kz-dur); }
+.kz-submit-btn::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); transform: translateX(-110%); transition: transform 700ms var(--kz-ease-out); }
+.kz-submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 30px -12px rgba(25,199,132,.65); }
+.kz-submit-btn:hover:not(:disabled)::after { transform: translateX(110%); }
+.kz-submit-btn:active:not(:disabled) { transform: translateY(0); }
+.kz-submit-btn:focus-visible { outline: 2px solid #19C784; outline-offset: 3px; }
+@media (max-width: 639px) { .kz-submit-btn { width: 100%; } }
+.kz-mail-ready { border-radius: 18px; border: 1px solid rgba(25,199,132,.35); background: linear-gradient(160deg, rgba(25,199,132,.10), rgba(8,127,91,.04)); padding: 18px; outline: none; }
+.kz-mail-ready:focus-visible { box-shadow: 0 0 0 2px #19C784; }
+.kz-mail-ready-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #087F5B; color: #fff; }
+@media (prefers-reduced-motion: reduce) { .kz-submit-btn::after { display: none; } }

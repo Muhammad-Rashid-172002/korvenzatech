@@ -108,7 +108,8 @@ export interface ProjectBriefData {
   email: string;
   companyName?: string;
   country: string;
-  serviceNeeded: string;
+  /** Selected services (multi-select). */
+  services: string[];
   budgetRange: string;
   projectTimeline: string;
   ideaDescription: string;

@@ -1,6 +1,7 @@
 import { trackEvent } from '../lib/analytics';
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { Sparkles, CheckCircle, Send, Bot, Shield, Clock, AlertCircle } from 'lucide-react';
+import { Sparkles, Bot, Shield, Clock, AlertCircle, ArrowRight, Copy, Mail, MailCheck, Check } from 'lucide-react';
+import { buildInquiryEmail, MAILTO_SAFE_LENGTH } from '../lib/inquiryEmail';
 import { SectionHeader } from './ui';
 import { ProjectBriefData } from '../types';
 import { SERVICES_DATA, SERVICE_OPTIONS } from '../data/companyData';
@@ -17,7 +18,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     email: '',
     companyName: '',
     country: '',
-    serviceNeeded: '',
+    services: [],
     budgetRange: '',
     projectTimeline: '',
     ideaDescription: '',
@@ -28,12 +29,14 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('service');
     const svc = id ? SERVICES_DATA.find((s) => s.id === id) : undefined;
-    if (svc) setFormData((prev) => (prev.serviceNeeded ? prev : { ...prev, serviceNeeded: svc.shortTitle ?? svc.title }));
+    if (svc) setFormData((prev) => (prev.services.length ? prev : { ...prev, services: [svc.shortTitle ?? svc.title] }));
   }, []);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  // The prepared email (after "Discuss my project"): shown in the confirmation panel so the
+  // visitor can reopen it or copy it. The form keeps every entered value.
+  const [prepared, setPrepared] = useState<ReturnType<typeof buildInquiryEmail> | null>(null);
+  const [copied, setCopied] = useState<'idle' | 'done' | 'failed'>('idle');
+  const statusRef = useRef<HTMLDivElement>(null);
   const [websiteTrap, setWebsiteTrap] = useState('');
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
@@ -42,14 +45,15 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   const budgetList = ['Under $1,000', '$1,000–$5,000', '$5,000–$15,000', '$15,000–$50,000', '$50,000+', 'Not sure yet'];
   const timelineList = ['As soon as possible', 'Within 1 month', '1–3 months', '3–6 months', 'Flexible'];
 
-  type FieldKey = 'fullName' | 'email' | 'serviceNeeded' | 'ideaDescription';
+  type FieldKey = 'fullName' | 'email' | 'services' | 'ideaDescription';
   const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
   const uid = useId();
   const formRef = useRef<HTMLFormElement>(null);
-  // GA4: form_start once per form instance (first focus), form_submit + generate_lead only after
-  // the server confirms. Only the form type is sent — never field contents.
+  // GA4: form_start once per form instance (first focus); form_submit (delivery: mailto) when the
+  // email is prepared. No generate_lead: the site cannot know whether the visitor sends the email.
+  // Only the form type is sent — never field contents.
   const startedRef = useRef(false);
-  // The brief is sent by JavaScript (fetch → /api/contact). Until the page has hydrated the
+  // The brief is turned into an email by JavaScript (mailto:). Until the page has hydrated the
   // submit button stays disabled, so a native (pre-hydration or no-JS) submission can't happen;
   // method="post" additionally keeps field values out of the URL if one ever did.
   const [ready, setReady] = useState(false);
@@ -61,8 +65,8 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     const next: typeof errors = {};
     if (!formData.fullName.trim()) next.fullName = 'Please enter your name.';
     if (!formData.email.trim()) next.email = 'Please enter your email address.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) next.email = 'Please enter a valid email address, e.g. name@company.com.';
-    if (formData.inquiryType === 'Project / Sales' && !formData.serviceNeeded) next.serviceNeeded = 'Please choose the service you need (or “Other”).';
+    else if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(formData.email.trim())) next.email = 'Please enter a valid email address, e.g. name@company.com.';
+    if (formData.inquiryType === 'Project / Sales' && !formData.services.length) next.services = 'Please choose at least one service (or “Other”).';
     if (formData.ideaDescription.trim().length < 20) next.ideaDescription = 'Please describe your project in a sentence or two (at least 20 characters).';
     setErrors(next);
     if (Object.keys(next).length) {
@@ -73,33 +77,32 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /** Opens the visitor's default email app with the prepared message (whatever app the OS uses for mailto:). */
+  const openComposer = (url: string) => { window.location.href = url; };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    if (websiteTrap) return; // honeypot filled: almost certainly a bot
 
-    setIsSubmitting(true);
-    setSubmitError('');
+    const email = buildInquiryEmail(formData);
+    setPrepared(email);
+    setCopied('idle');
+    openComposer(email.url);
+    const inquiry = (formData.inquiryType ?? 'Project / Sales').toLowerCase().replace(/[^a-z]+/g, '_');
+    trackEvent('form_submit', { form_type: formType, form_id: 'start_project', inquiry_type: inquiry, delivery: 'mailto' });
+    startedRef.current = false;
+    requestAnimationFrame(() => statusRef.current?.focus());
+  };
+
+  const copyEmail = async () => {
+    if (!prepared) return;
+    const text = `To: ${prepared.to}\nSubject: ${prepared.subject}\n\n${prepared.body}`;
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, serviceNeeded: formData.serviceNeeded || 'Not specified', budgetRange: formData.budgetRange || 'Not specified', projectTimeline: formData.projectTimeline || 'Not specified', website: websiteTrap })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'We could not submit your project brief right now.');
-      }
-      setIsSubmitted(true);
-      const inquiry = (formData.inquiryType ?? 'Project / Sales').toLowerCase().replace(/[^a-z]+/g, '_');
-      trackEvent('form_submit', { form_type: formType, form_id: 'start_project', inquiry_type: inquiry });
-      trackEvent('generate_lead', { form_type: formType, lead_source: 'website_form', inquiry_type: inquiry });
-      startedRef.current = false;
-    } catch (err: any) {
-      console.error(err);
-      const friendly = err instanceof SyntaxError || !err?.message ? 'We could not submit your project brief right now. Please try again, or email sales@korvenzatech.com.' : err.message;
-      setSubmitError(friendly);
-    } finally {
-      setIsSubmitting(false);
+      await navigator.clipboard.writeText(text);
+      setCopied('done');
+    } catch {
+      setCopied('failed');
     }
   };
 
@@ -117,7 +120,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
       if (!res.ok || data?.error) throw new Error(data?.error || 'Scope analysis unavailable');
       setAiAnalysis(data);
       if (data.recommendedService && SERVICE_OPTIONS.includes(data.recommendedService)) {
-        setFormData(prev => ({ ...prev, serviceNeeded: data.recommendedService }));
+        setFormData(prev => (prev.services.includes(data.recommendedService) ? prev : { ...prev, services: [...prev.services, data.recommendedService] }));
       }
     } catch (err) {
       console.error('AI Scope Analysis failed:', err);
@@ -125,6 +128,8 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
       setIsAiAnalyzing(false);
     }
   };
+
+  const toggleService = (srv: string) => update({ services: formData.services.includes(srv) ? formData.services.filter((x) => x !== srv) : [...formData.services, srv] });
 
   const field = (key: FieldKey) => ({
     id: `${uid}-${key}`,
@@ -138,6 +143,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
   const chip = (active: boolean) => `min-h-[40px] rounded-full border px-4 text-[13px] font-semibold transition-all duration-300 ${active ? 'border-emerald-600 bg-emerald-700 text-white kz-on-accent shadow-[0_8px_20px_-10px_rgba(25,199,132,.8)]' : 'border-[var(--kz-border-strong)] bg-[var(--kz-surface-2)] text-[var(--kz-text-2)] hover:border-emerald-500/40'}`;
   const update = (patch: Partial<ProjectBriefData>) => {
     setFormData((prev) => ({ ...prev, ...patch }));
+    if (prepared) setPrepared(null); // edits after preparing → the confirmation no longer matches
     const keys = Object.keys(patch) as (keyof typeof errors)[];
     if (keys.some((k) => errors[k])) setErrors((prev) => { const n = { ...prev }; keys.forEach((k) => delete n[k]); return n; });
   };
@@ -153,29 +159,7 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
         />
 
         <div className="kz-reveal relative mx-auto mt-14 max-w-4xl overflow-hidden rounded-[var(--kz-radius-xl)] border border-[var(--kz-border)] bg-[var(--kz-surface)] p-6 shadow-[var(--kz-shadow-md)] sm:p-12">
-          {isSubmitted ? (
-            <div className="animate-in py-12 text-center" role="status" aria-live="polite">
-              <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-emerald-500/30 bg-emerald-500/15 text-[var(--kz-accent-text)]">
-                <CheckCircle className="h-8 w-8" aria-hidden="true" />
-              </div>
-              <h3 className="mt-6 text-2xl font-bold text-[var(--kz-text)]">Brief received successfully</h3>
-              <p className="mx-auto mt-3 max-w-md text-[15px] leading-7 text-[var(--kz-text-2)]">Thank you. Our team will review your project details and respond with the most practical next step as soon as possible.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSubmitted(false);
-                  setFormData({ inquiryType: defaultInquiryType, fullName: '', email: '', companyName: '', country: '', serviceNeeded: '', budgetRange: '', projectTimeline: '', ideaDescription: '', preferredContact: 'Email' });
-                  setAiAnalysis(null);
-                  setSubmitError('');
-                  setWebsiteTrap('');
-                  setErrors({});
-                }}
-                className="kz-btn kz-btn-secondary mt-8"
-              >
-                Submit another brief
-              </button>
-            </div>
-          ) : (
+          {(
             <form ref={formRef} method="post" onSubmit={handleSubmit} onFocus={onFormFocus} noValidate className="space-y-9 text-left">
               <noscript>
                 <p className="rounded-2xl border border-[var(--kz-border)] p-4 text-[14px] leading-6 text-[var(--kz-text)]">This form needs JavaScript. Please email <a href="mailto:sales@korvenzatech.com" className="font-semibold underline">sales@korvenzatech.com</a> instead.</p>
@@ -217,14 +201,19 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
                 </div>
               </div>
 
-              <fieldset data-field="serviceNeeded" aria-describedby={errors.serviceNeeded ? `${uid}-serviceNeeded-error` : undefined}>
-                <legend className="kz-label">Service required {formData.inquiryType === 'Project / Sales' && <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span>}</legend>
+              <fieldset data-field="services" aria-describedby={errors.services ? `${uid}-services-error` : undefined}>
+                <legend className="kz-label">Required services {formData.inquiryType === 'Project / Sales' && <span className="text-[var(--kz-accent-text)]" aria-hidden="true">*</span>} <span className="font-normal text-[var(--kz-muted)]">— select all that apply</span></legend>
                 <div className="flex flex-wrap gap-2">
-                  {servicesList.map((srv) => (
-                    <button key={srv} type="button" aria-pressed={formData.serviceNeeded === srv} onClick={() => update({ serviceNeeded: srv })} className={chip(formData.serviceNeeded === srv)}>{srv}</button>
-                  ))}
+                  {servicesList.map((srv) => {
+                    const on = formData.services.includes(srv);
+                    return (
+                      <button key={srv} type="button" aria-pressed={on} onClick={() => toggleService(srv)} className={`${chip(on)} inline-flex items-center gap-1.5`}>
+                        {on && <Check className="h-3.5 w-3.5" aria-hidden="true" />}{srv}
+                      </button>
+                    );
+                  })}
                 </div>
-                <ErrorText k="serviceNeeded" />
+                <ErrorText k="services" />
               </fieldset>
 
               <div className="grid gap-6 sm:grid-cols-2">
@@ -289,17 +278,32 @@ export const StartProjectSection: React.FC<StartProjectSectionProps> = ({ onOpen
                 </div>
               </fieldset>
 
-              {submitError && (
-                <div role="alert" className="flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/[.07] p-4 text-[14px] leading-6 text-[var(--kz-text)]">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" aria-hidden="true" />
-                  <span>{submitError}</span>
+              {prepared && (
+                <div ref={statusRef} tabIndex={-1} role="status" aria-live="polite" className="kz-mail-ready animate-in">
+                  <div className="flex items-start gap-3">
+                    <span className="kz-mail-ready-icon"><MailCheck className="h-5 w-5" aria-hidden="true" /></span>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-bold text-[var(--kz-text)]">Your email is ready. Please review and send it to our team.</p>
+                      <p className="mt-1 text-[13px] leading-6 text-[var(--kz-text-2)]">It is addressed to <b className="whitespace-nowrap text-[var(--kz-accent-text)]">{prepared.to}</b> with the subject “{prepared.subject}”. Nothing is sent until you press Send in your email app.</p>
+                      <p className="mt-1 text-[12.5px] leading-5 text-[var(--kz-muted)]">
+                        {prepared.url.length > MAILTO_SAFE_LENGTH
+                          ? 'Your message is long — if your email app shows it shortened, use “Copy email” and paste it instead.'
+                          : 'No email app opened? Copy the email and send it from any mail account.'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <a href={prepared.url} className="kz-btn kz-btn-secondary !min-h-[42px] !text-[13px]"><Mail className="h-4 w-4" aria-hidden="true" />Open email again</a>
+                    <button type="button" onClick={copyEmail} className="kz-btn kz-btn-secondary !min-h-[42px] !text-[13px]"><Copy className="h-4 w-4" aria-hidden="true" />{copied === 'done' ? 'Copied' : 'Copy email'}</button>
+                  </div>
+                  {copied === 'failed' && <p className="mt-2 text-[12.5px] text-[var(--kz-muted)]">Copying isn’t available in this browser. Please email <a className="font-semibold underline" href={`mailto:${prepared.to}`}>{prepared.to}</a> directly.</p>}
                 </div>
               )}
 
               <div className="flex flex-col items-start justify-between gap-5 border-t border-[var(--kz-border)] pt-7 sm:flex-row sm:items-center">
-                <button type="submit" disabled={isSubmitting || !ready} aria-busy={isSubmitting} className="kz-btn kz-btn-primary !min-h-[52px] !px-7 disabled:cursor-wait disabled:opacity-60">
-                  <Send className="h-4 w-4" aria-hidden="true" />
-                  {isSubmitting ? 'Sending brief…' : 'Discuss my project'}
+                <button type="submit" disabled={!ready} className="kz-btn kz-btn-primary kz-submit-btn !min-h-[52px] !px-7 disabled:cursor-wait disabled:opacity-60">
+                  Discuss my project
+                  <ArrowRight className="kz-btn-arrow h-4 w-4" aria-hidden="true" />
                 </button>
                 <div className="flex flex-wrap items-center gap-4 font-mono text-[12px] text-[var(--kz-muted)]">
                   <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />NDA available on request</span>

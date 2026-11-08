@@ -9,7 +9,7 @@ Property: Web data stream for `https://korvenzatech.com/` · Measurement ID **G-
 | Google tag | `index.html` `<head>` (async) | Loads gtag.js once, sets Consent Mode defaults, `gtag('config', 'G-QB25ZM8KNL', { send_page_view: false })`. Prerendered into every route's HTML. |
 | SPA tracking + events | `src/lib/analytics.ts` | `trackPageView()`, `trackEvent()`, one delegated click listener, consent helpers. Never loads or re-initialises the tag. |
 | Hook-up | `src/App.tsx` | `installAnalytics()` once; `trackPageView()` in an effect on every route change. |
-| Forms | `src/components/StartProjectSection.tsx` | `form_start`, `form_submit`, `generate_lead`. |
+| Forms | `src/components/StartProjectSection.tsx` | `form_start`, `form_submit` (delivery `mailto`). |
 | Consent | `src/components/ConsentBanner.tsx`, footer "Cookie preferences" | Accept / Decline analytics; choice stored as `kz-consent`. |
 | CSP | `vercel.json`, `server.ts` | Allows `www.googletagmanager.com` (script) and `*.google-analytics.com`, `*.analytics.google.com`, `*.googletagmanager.com` (connect/img). Without this the tag was blocked in production. |
 | Tests | `tests/analytics.test.ts` (`npm test`) | Page-view dedupe, back/forward, hash, trailing slash, UTM, content views, click classification, PII stripping, consent, debug. |
@@ -40,8 +40,8 @@ Covered: initial load, direct URL, refresh (each a new document → one hit), in
 | `whatsapp_click` | `wa.me` / WhatsApp links | contact_method, link_url `https://wa.me/`, link_location (**no number**) |
 | `phone_click` | `tel:` links — **none exist on the site today**, so this will not fire until one is added | contact_method, link_location |
 | `form_start` | first focus in the project/contact form (once per form) | form_type (`project_brief` / `contact`), form_id |
-| `form_submit` | server confirmed the submission | form_type, form_id, inquiry_type |
-| `generate_lead` | same moment as form_submit | form_type, lead_source, inquiry_type |
+| `form_submit` | the visitor clicked “Discuss my project” and the email was prepared in their mail app (`delivery: mailto`) | form_type, form_id, inquiry_type, delivery |
+| `generate_lead` | **not sent any more** — with mailto the site cannot know whether the email was actually sent | — |
 | `scroll` | GA4 Enhanced Measurement (90 % depth) | automatic |
 | `click` | GA4 Enhanced Measurement outbound clicks (`outbound: true`) — this *is* the outbound-click event; no second custom event is sent | automatic |
 
@@ -54,12 +54,12 @@ All custom events also carry page_location and page_title. `link_location` = hea
 ## Key events (conversions) — set in GA, not in code
 
 Admin → Data display → Events (after the events have arrived once, up to 24 h) → toggle **Mark as key event** for:
-- `generate_lead` (project brief / contact form submitted)
+- `form_submit` (visitor prepared an email from the form — the email itself is sent from their own mail app, so this is an intent signal, not a confirmed lead)
 - `whatsapp_click`
 - `email_click`
 - `phone_click` (once a phone link exists)
 
-Not key events: page views, `cta_click`, `contact_click` (they are steps, not leads). Optionally create an audience/exploration funnel `cta_click → form_start → generate_lead`.
+Not key events: page views, `cta_click`, `contact_click` (they are steps, not leads). Optionally create an audience/exploration funnel `cta_click → form_start → form_submit`.
 
 ## Consent & privacy
 
@@ -67,7 +67,7 @@ Not key events: page views, `cta_click`, `contact_click` (they are steps, not le
 - `analytics_storage` **denied by default in the EEA, UK and Switzerland** (region list in `index.html`) until "Accept analytics"; **granted by default elsewhere**, with Decline available at any time (banner + footer "Cookie preferences"). The choice is stored as `kz-consent` and re-applied before `config` on every load.
 - **Withdrawal:** Decline sends `consent update analytics_storage: denied` and then deletes `_ga` and `_ga_<id>` (host-only and every parent-domain variant, path `/`); nothing else is touched. On each load with a stored Decline, any stray GA cookie is removed again.
 - **Before consent / after Decline:** no GA cookies, but the tag can still send **cookieless measurement requests** (Consent Mode "advanced"): no cookie identifier, but page, time, browser/device data and the visitor's IP address reach Google, which may use them for modelling. Some EU/UK regulators expect no request at all before consent; the alternative is "basic" mode (load gtag.js only after Accept), a small change in `index.html`. **Legal review needed:** this choice, the default-on behaviour outside the EEA/UK/CH, and the "our interest in understanding how the site is used" basis stated for those visitors.
-- **Form:** the project/contact brief is sent only by JavaScript (`fetch` → `/api/contact`). The form has `method="post"` and its submit button stays disabled until the page has hydrated, so no native submission (pre-hydration or JavaScript disabled) can put field values in a URL; without JavaScript a notice points to sales@korvenzatech.com.
+- **Form:** the project/contact brief is turned into an email in the visitor's own mail app by JavaScript (`mailto:` link, see `src/lib/inquiryEmail.ts`); nothing is sent to KorvenzaTech's server or to GA. The form has `method="post"` and its submit button stays disabled until the page has hydrated, so no native submission (pre-hydration or JavaScript disabled) can put field values in a URL; without JavaScript a notice points to sales@korvenzatech.com.
 - The privacy and cookie policies describe this behaviour (dated 30 Oct 2026). They make **no claims** about Google signals, data sharing or the retention period — those are GA account settings; update the wording once you have configured and verified them. Not a legal opinion — have them reviewed.
 - GA account settings to decide and verify (Admin): Data collection → Google signals; Data retention (2 or 14 months); Data settings → ads personalization; Account settings → data sharing.
 
